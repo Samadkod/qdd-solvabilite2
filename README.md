@@ -16,6 +16,17 @@ Référentiels (répertoire de données, référentiel des contrôles, plan de c
   → analyse de variation N-1 → N → rapport Excel vivant + export JSON (tableau de bord)
 ```
 
+## Application en ligne (Streamlit)
+
+```bash
+pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+Elle a trois onglets : l'**Atelier** (fiches, QCM, vrai/faux, simulateur, avis critique, plan 90 jours), la **Campagne live** (le moteur tourne en direct, avec des paramètres modifiables et un rapport Excel téléchargeable) et le **Code SAS / SQL**.
+
+## Version production : SAS / PROC SQL
+Le dossier `sas/` est un portage complet : contrôles, campagne, variation et rapport ODS EXCEL. Voir `sas/README_SAS.md`.
+
 ## Démarrage
 
 ```bash

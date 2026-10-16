@@ -1,0 +1,7 @@
+point_id;date_realisation;resultat_brut;commentaire
+C07|TOUS;2025-12-31;0.9862;Résultat antérieur saisi (campagne déc. 2025)
+C08|ACTIONS;2026-03-31;0.989;Résultat antérieur saisi (campagne mars 2026)
+C08|OBLIGATIONS;2026-03-31;0.9935;Résultat antérieur saisi (campagne mars 2026)
+R05|RC_DECENNALE;2025-12-31;1.0;Campagne annuelle déc. 2025
+R05|DOMMAGES_OUVRAGE;2025-12-31;0.9615;Campagne annuelle déc. 2025
+R05|AUTO_FLOTTE;2025-12-31;1.0;Campagne annuelle déc. 2025

@@ -25,6 +25,7 @@ def main():
     html = html.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     out = R / "output" / "atelier_qdd_s2.html"
     out.write_text(html, encoding="utf-8")
+    (R / "app" / "atelier_qdd_s2.html").write_text(html, encoding="utf-8")  # version embarquée par Streamlit
     print(out, f"{len(html) // 1024} Ko")
 
 

@@ -2,3 +2,6 @@ __pycache__/
 .pytest_cache/
 data/*.duckdb
 output/
+sas/lib_si/
+sas/lib_qdd/
+sas/sorties/

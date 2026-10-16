@@ -1,0 +1,944 @@
+<title>Atelier QDD Solvabilité 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Mise en page : bandeau sobre façon « fiche de contrôle », onglets collants, colonne de 1120px, grilles qui passent en une colonne sur mobile */
+:root{
+  --bg:#EEF1F3; --surface:#FFFFFF; --sunk:#F6F8F9; --ink:#15202A; --muted:#566370; --line:#D3DAE0;
+  --accent:#0E5A69; --accent-ink:#FFFFFF; --accent-soft:#DDEDF0; --gold:#8E6210; --gold-soft:#F6ECD8;
+  --ok:#22744A; --ok-soft:#DCF1E4; --warn:#9C6400; --warn-soft:#FBEBCB; --bad:#AD3030; --bad-soft:#F8DEDE;
+  --grey-zone:#E3E7EB; --bad-zone:rgba(173,48,48,.10);
+  --display:"Spectral",Georgia,"Times New Roman",serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E151B; --surface:#151F27; --sunk:#111A21; --ink:#E4EAEF; --muted:#98A6B2; --line:#28343F;
+  --accent:#5EB4C4; --accent-ink:#0B1A1F; --accent-soft:#163238; --gold:#D8A445; --gold-soft:#2E2512;
+  --ok:#5DC08A; --ok-soft:#17301F; --warn:#E3A947; --warn-soft:#33270F; --bad:#E77272; --bad-soft:#3A1A1A;
+  --grey-zone:#1D2832; --bad-zone:rgba(231,114,114,.14); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E151B; --surface:#151F27; --sunk:#111A21; --ink:#E4EAEF; --muted:#98A6B2; --line:#28343F;
+  --accent:#5EB4C4; --accent-ink:#0B1A1F; --accent-soft:#163238; --gold:#D8A445; --gold-soft:#2E2512;
+  --ok:#5DC08A; --ok-soft:#17301F; --warn:#E3A947; --warn-soft:#33270F; --bad:#E77272; --bad-soft:#3A1A1A;
+  --grey-zone:#1D2832; --bad-zone:rgba(231,114,114,.14); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(28px,4.4vw,42px);letter-spacing:-.01em}
+h2{font-size:24px}
+h3{font-size:19px}
+p{margin:0}
+.mono,code{font-family:var(--mono);font-size:.92em}
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* En-tête */
+.masthead{background:var(--surface);border-bottom:1px solid var(--line)}
+.masthead .wrap{padding-block:28px 22px;display:grid;gap:14px}
+.lead{max-width:68ch;color:var(--muted)}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:500 12.5px var(--mono)}
+.chain span{padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--sunk)}
+.chain i{font-style:normal;color:var(--muted)}
+.chain span.k{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* Onglets */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs button{border:0;background:none;padding:12px 12px 10px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:500}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button:hover{color:var(--ink)}
+main .wrap{padding-block:26px 60px}
+section.panel{display:grid;gap:22px}
+section.panel>*{min-width:0}
+.intro{display:grid;gap:6px;max-width:72ch}
+
+/* Composants */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.pad{padding:18px}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:var(--r);cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{display:inline-block;padding:1px 9px;border-radius:999px;font:600 12px/1.6 var(--mono);text-transform:uppercase;letter-spacing:.04em}
+.pill.vert{background:var(--ok-soft);color:var(--ok)}
+.pill.orange{background:var(--warn-soft);color:var(--warn)}
+.pill.rouge{background:var(--bad-soft);color:var(--bad)}
+.pill.na{background:var(--sunk);color:var(--muted)}
+.field{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.field input,.field select{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:6px 8px;color:var(--ink);width:100%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--sunk);white-space:nowrap}
+td.r,th.r{text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{padding:12px 14px;display:grid;gap:2px}
+.kpi b{font:600 24px var(--display);font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted);font-size:12px}
+.kpi.alert{border-color:var(--bad)}
+.kpi.alert b{color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid2>*{min-width:0}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+
+/* Fiches */
+.fiches{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+.fiches>*{min-width:0}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);display:grid;gap:2px;font-size:13.5px}
+.toc a{color:var(--muted);text-decoration:none;padding:5px 8px;border-radius:4px;display:flex;justify-content:space-between;gap:6px}
+.toc a:hover{background:var(--surface);color:var(--ink)}
+.toc a.done::after{content:"✓";color:var(--ok);font-weight:600}
+.toc .prog{font:500 12px var(--mono);color:var(--muted);padding:6px 8px}
+@media (max-width:860px){.fiches{grid-template-columns:1fr}.toc{position:static;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}}
+.fiche{padding:20px 22px;display:grid;gap:12px;scroll-margin-top:70px}
+.fiche header{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}
+.fiche ul{margin:0;padding-left:18px;display:grid;gap:6px;max-width:78ch}
+.formula{font:13.5px/1.7 var(--mono);background:var(--sunk);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;white-space:pre-wrap;overflow-x:auto}
+.note{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px 12px;border-radius:var(--r);font-size:14px}
+.note b{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.note.ret{background:var(--accent-soft)} .note.ret b{color:var(--accent)}
+.note.pie{background:var(--gold-soft)} .note.pie b{color:var(--gold)}
+label.chk{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+
+/* Quiz */
+.quiz{max-width:760px;padding:22px;display:grid;gap:16px}
+.progress{height:4px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:11px 14px;cursor:pointer;display:flex;gap:10px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .l{font:600 13px var(--mono);color:var(--muted);min-width:18px}
+.opt.good{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.vfopts{grid-template-columns:1fr 1fr}
+.vfopts .opt{justify-content:center;font-weight:600;font-size:16px;padding:16px}
+.expl{padding:12px 14px;border-left:3px solid var(--accent);background:var(--sunk);font-size:14px}
+.score{font:600 44px var(--display)}
+
+/* Simulateur & graphiques */
+.sim{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+.sim>*{min-width:0}
+@media (max-width:900px){.sim{grid-template-columns:1fr}}
+.params{padding:16px;display:grid;gap:12px}
+.coh{font-size:13px;padding:8px 10px;border-radius:var(--r)}
+.coh.ok{background:var(--ok-soft);color:var(--ok)}
+.coh.ko{background:var(--bad-soft);color:var(--bad)}
+td input{width:84px;border:1px solid var(--line);border-radius:4px;padding:3px 6px;background:var(--surface);text-align:right;font-variant-numeric:tabular-nums}
+td input.txt{width:150px;text-align:left}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--muted);font:11px var(--mono)}
+svg .axis{stroke:var(--line)}
+svg .grid{stroke:var(--line);stroke-dasharray:2 3}
+svg .greyz{fill:var(--grey-zone)}
+svg .badz{fill:var(--bad-zone)}
+svg .curve{stroke:var(--bad);fill:none;stroke-width:1.6}
+svg .pt{stroke:var(--surface);stroke-width:1.5}
+svg .pt.vert{fill:var(--ok)} svg .pt.orange{fill:var(--warn)} svg .pt.rouge{fill:var(--bad)} svg .pt.na{fill:var(--muted)}
+svg .lbl{fill:var(--ink);font:11.5px var(--body)}
+svg .cross{stroke:var(--accent);stroke-width:2.4}
+svg .minline{stroke:var(--accent);stroke-dasharray:5 4;stroke-width:1.2}
+svg .bar-pos{fill:var(--ok)} svg .bar-neg{fill:var(--bad)} svg .bar-tot{fill:var(--accent)}
+svg .bar{fill:var(--accent)} svg .bar.vert{fill:var(--ok)} svg .bar.orange{fill:var(--warn)} svg .bar.rouge{fill:var(--bad)}
+svg .tick{stroke:var(--ink);stroke-width:2}
+svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold);fill:none;stroke-width:2;stroke-dasharray:5 3}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-2px}
+.calc{padding:16px;display:grid;gap:10px;align-content:start}
+.calc .row .field{flex:1;min-width:90px}
+.res{font:500 14px var(--mono)}
+.meter{position:relative;height:8px;background:var(--sunk);border-radius:4px;min-width:90px}
+.meter i{position:absolute;inset:0 auto 0 0;border-radius:4px}
+.meter i.vert{background:var(--ok)} .meter i.orange{background:var(--warn)} .meter i.rouge{background:var(--bad)} .meter i.na{background:var(--muted)}
+.meter b{position:absolute;top:-3px;width:2px;height:14px;background:var(--ink)}
+
+/* Avis & plan */
+.verdict{padding:20px 22px;display:grid;gap:8px;border-left:4px solid var(--gold)}
+.list{margin:0;padding-left:18px;display:grid;gap:8px}
+.sev{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:4px;margin-right:6px}
+.sev.h{background:var(--bad-soft);color:var(--bad)} .sev.m{background:var(--warn-soft);color:var(--warn)} .sev.b{background:var(--sunk);color:var(--muted)}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols3>*{min-width:0}
+@media (max-width:860px){.cols3{grid-template-columns:1fr}}
+.phase{padding:18px;display:grid;gap:10px;align-content:start}
+.phase h3{font-size:18px}
+.phase .eyebrow{color:var(--accent)}
+.script{font-size:14.5px;display:grid;gap:8px;max-width:76ch}
+.script p b{font-family:var(--mono);font-size:12px;color:var(--accent);margin-right:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <span class="eyebrow">Mémoire C. Motard · ISFA 2024 · notice QDD de l'ACPR</span>
+    <h1>Atelier QDD Solvabilité 2</h1>
+    <p class="lead">Réviser la méthode, s'entraîner, la faire tourner sur une campagne réelle de bout en bout. Les chiffres de la campagne viennent d'un assureur dommages BTP <strong>fictif</strong>, calculés par le moteur Python du projet.</p>
+    <div class="chain" aria-label="Chaîne de calcul">
+      <span>Contrôle C<sub>i</sub></span><i>→ dégradation →</i><span>Note donnée</span><i>→ × sensibilité s<sub>d</sub> →</i><span class="k">Note QDD agrégée</span><i>vs</i><span>Note min = 1 − ΔSCR/S̄</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap" role="tablist">
+    <button role="tab" data-tab="fiches">Fiches</button>
+    <button role="tab" data-tab="qcm">QCM</button>
+    <button role="tab" data-tab="vf">Vrai / Faux</button>
+    <button role="tab" data-tab="simulateur">Simulateur</button>
+    <button role="tab" data-tab="campagne">Campagne BTP</button>
+    <button role="tab" data-tab="avis">Avis critique</button>
+    <button role="tab" data-tab="plan">Plan 90 jours</button>
+  </div>
+</nav>
+
+<main><div class="wrap">
+
+<!-- FICHES -->
+<section class="panel" id="p-fiches" data-panel="fiches">
+  <div class="intro"><span class="eyebrow">14 fiches · 3 parties</span><h2>Fiches de révision</h2>
+  <p class="muted">Chaque fiche reprend une section du mémoire : l'essentiel, la formule, ce qu'il faut retenir et le piège à éviter. Coche « Révisée » pour suivre ta progression (enregistrée dans ce navigateur).</p></div>
+  <div class="fiches"><nav class="toc" id="toc"></nav><div id="fiches" style="display:grid;gap:14px"></div></div>
+</section>
+
+<!-- QCM -->
+<section class="panel" id="p-qcm" data-panel="qcm" hidden>
+  <div class="intro"><span class="eyebrow">27 questions</span><h2>QCM</h2><p class="muted">Une seule bonne réponse par question. L'explication s'affiche après chaque réponse.</p></div>
+  <div class="row" id="qcm-ctrl"></div>
+  <div class="card quiz" id="qcm-box"></div>
+</section>
+
+<!-- VRAI / FAUX -->
+<section class="panel" id="p-vf" data-panel="vf" hidden>
+  <div class="intro"><span class="eyebrow">QCB · 25 affirmations</span><h2>Vrai ou faux ?</h2><p class="muted">Questions à choix binaire, pour vérifier vite les réflexes réglementaires et les formules.</p></div>
+  <div class="row" id="vf-ctrl"></div>
+  <div class="card quiz" id="vf-box"></div>
+</section>
+
+<!-- SIMULATEUR -->
+<section class="panel" id="p-simulateur" data-panel="simulateur" hidden>
+  <div class="intro"><span class="eyebrow">Figure 11 du mémoire, en interactif</span><h2>Simulateur de tolérance</h2>
+  <p class="muted">Modifie les sensibilités, les notes et les paramètres : criticité, notes minimum et note agrégée se recalculent. Le graphique reprend la lecture du mémoire : zone grise = non critique, zone rouge = hors tolérance, croix = note agrégée.</p></div>
+  <div class="sim">
+    <div class="card params">
+      <div class="row"><button class="btn" id="preset-memoire">Exemple du mémoire</button><button class="btn" id="preset-btp">Cas BTP (N)</button></div>
+      <label class="field">Seuil de significativité (%)<input id="s-seuil" type="number" step="0.1" min="0.1"></label>
+      <div class="field">Approche de tolérance<div class="seg" id="s-mode"><button data-v="donnee">ΔSCR par donnée</button><button data-v="globale">Tolérance globale</button></div></div>
+      <label class="field" id="f-dscr">ΔSCR max par donnée (%)<input id="s-dscr" type="number" step="0.05" min="0"></label>
+      <label class="field" id="f-tol" hidden>Tolérance globale (%)<input id="s-tol" type="number" step="0.5" min="0"></label>
+      <div class="coh" id="s-coh"></div>
+      <div class="kpis" id="s-kpis" style="grid-template-columns:1fr 1fr"></div>
+    </div>
+    <div style="display:grid;gap:14px;min-width:0">
+      <div class="card pad"><svg id="s-chart" viewBox="0 0 680 380" role="img" aria-label="Notes QDD en fonction de la sensibilité"></svg>
+        <div class="legend"><span><i style="background:var(--grey-zone)"></i>Non critique</span><span><i style="background:var(--bad-zone);border:1px solid var(--bad)"></i>Hors tolérance</span><span><i style="background:var(--accent)"></i>Note agrégée (croix) et note min agrégée (tirets)</span></div></div>
+      <div class="tablebox"><table><thead><tr><th>Donnée</th><th class="r">Sensibilité %</th><th class="r">Note QDD %</th><th>Critique</th><th class="r">Note min</th><th class="r">Poids</th><th>Statut</th><th></th></tr></thead><tbody id="s-rows"></tbody></table></div>
+      <div><button class="btn" id="s-add">+ Ajouter une donnée</button></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card calc"><h3>Contrôle de rapprochement</h3><p class="muted" style="font-size:13.5px">Trois sources pour une même donnée. Méthode du mémoire (max/min − 1) comparée à l'écart symétrique borné.</p>
+      <div class="row"><label class="field">Source 1<input id="r1" type="number" value="196.33"></label><label class="field">Source 2<input id="r2" type="number" value="191.53"></label><label class="field">Source 3<input id="r3" type="number" value="193.07"></label></div>
+      <div class="res" id="r-out"></div></div>
+    <div class="card calc"><h3>Contrôle non réalisé</h3><p class="muted" style="font-size:13.5px">Dégradation du dernier résultat connu selon l'antériorité (éq. 36-37).</p>
+      <div class="row"><label class="field">Dernier résultat %<input id="d-res" type="number" value="100"></label><label class="field">Coefficient %<input id="d-coef" type="number" value="20"></label></div>
+      <svg id="d-chart" viewBox="0 0 480 170" role="img" aria-label="Dégradation simple et composée"></svg>
+      <div class="legend"><span><i style="background:var(--accent)"></i>Simple (retenue)</span><span><i style="background:var(--gold)"></i>Composée</span></div></div>
+  </div>
+</section>
+
+<!-- CAMPAGNE -->
+<section class="panel" id="p-campagne" data-panel="campagne" hidden>
+  <div class="intro"><span class="eyebrow">Assureur dommages BTP fictif · arrêtés 30/06 et 30/09/2026</span><h2>Campagne QDD</h2>
+  <p class="muted">16 contrôles SQL, 39 points de contrôle, 11 données au répertoire. En N, un incident de migration vers l'entrepôt altère les provisions dossier de la RC décennale. Les paramètres sont modifiables : tout se recalcule ici, avec les mêmes formules que le moteur Python.</p></div>
+  <div class="card pad row" style="gap:16px;align-items:end">
+    <div class="field">Campagne<div class="seg" id="c-camp"></div></div>
+    <label class="field" style="width:130px">Seuil signif. (%)<input id="c-seuil" type="number" step="0.1"></label>
+    <label class="field" style="width:130px">ΔSCR max (%)<input id="c-dscr" type="number" step="0.05"></label>
+    <label class="field" style="width:130px">Coef. dégradation (%)<input id="c-coef" type="number" step="1"></label>
+    <label class="field" style="width:150px">Dégradation<select id="c-deg"><option value="simple">Simple</option><option value="composee">Composée</option></select></label>
+    <button class="btn" id="c-reset">Paramètres par défaut</button>
+  </div>
+  <div class="kpis" id="c-kpis"></div>
+  <div class="card"><div class="pad" style="padding-bottom:8px"><h3>Données</h3><p class="muted" style="font-size:13.5px">Barre = note QDD, trait noir = note minimum. Une donnée orange ou rouge doit être traitée même si la note agrégée est verte.</p></div>
+    <div class="tablebox" style="border:0;border-top:1px solid var(--line);border-radius:0"><table><thead><tr><th>Donnée</th><th>Propriétaire</th><th class="r">Sensibilité</th><th class="r">Note</th><th class="r">Min</th><th style="min-width:120px"></th><th>Statut</th><th>E/X/P</th><th class="r">Ctrl</th></tr></thead><tbody id="c-don"></tbody></table></div></div>
+  <div class="grid2">
+    <div class="card pad" style="display:grid;gap:8px"><h3>Pourquoi la note a bougé (N-1 → N)</h3><p class="muted" style="font-size:13.5px">Analyse de variation par substitutions successives (tableau 20), aux paramètres par défaut.</p><svg id="c-wf" viewBox="0 0 520 300" role="img" aria-label="Cascade de variation"></svg></div>
+    <div class="card pad" style="display:grid;gap:8px"><div class="row" style="justify-content:space-between"><h3>Par axe d'analyse</h3><select id="c-axe" class="btn"><option value="maille">Segment / classe</option><option value="etape">Étape de la chaîne</option><option value="criteres">Critère S2</option><option value="responsable">Responsable</option></select></div><svg id="c-axes" viewBox="0 0 520 300" role="img" aria-label="Notes par modalité"></svg></div>
+  </div>
+  <div class="card"><div class="pad row" style="justify-content:space-between;padding-bottom:10px"><h3>Points de contrôle</h3>
+    <div class="row"><select id="c-fstat" class="btn"><option value="">Tous les statuts</option><option value="rouge">Rouge</option><option value="orange">Orange</option><option value="vert">Vert</option><option value="retard">En retard (antériorité > 0)</option></select></div></div>
+    <div class="tablebox" style="border:0;border-top:1px solid var(--line);border-radius:0"><table><thead><tr><th>Point</th><th>Libellé</th><th>Donnée</th><th>Étape</th><th class="r">Brut</th><th class="r">Ant.</th><th class="r">Retenu</th><th class="r">Seuil</th><th>Statut</th></tr></thead><tbody id="c-ctrl"></tbody></table></div></div>
+</section>
+
+<!-- AVIS -->
+<section class="panel" id="p-avis" data-panel="avis" hidden>
+  <div class="intro"><span class="eyebrow">Lecture critique</span><h2>Ce que vaut le mémoire</h2></div>
+  <div class="card verdict"><span class="eyebrow" style="color:var(--gold)">Verdict</span>
+    <p style="font-size:16.5px;max-width:74ch">Un très bon mémoire de cadrage. La synthèse réglementaire est solide et la méthode tient dans ses grandes lignes : criticité, agrégation, tolérance. En revanche il n'est pas prêt pour la production tel quel. Il fait un saut conceptuel sur la nature de la note, ses moyennes peuvent masquer une donnée en échec, plusieurs exemples chiffrés sont incohérents, et la partie « outil » est presque vide. Le prototype corrige ces points sans changer l'esprit de la méthode.</p></div>
+  <div class="grid2">
+    <div class="card pad" style="display:grid;gap:10px"><h3>Points forts</h3><ul class="list">
+      <li>Lecture croisée directive, règlement délégué, orientations EIOPA et notice ACPR, point par point. C'est la meilleure fiche de révision du sujet.</li>
+      <li>Méthode simple à expliquer : contrôle, puis donnée, puis note globale pondérée par la sensibilité du SCR.</li>
+      <li>Deux approches de tolérance (par donnée ou globale) dérivées proprement, avec leur condition de cohérence.</li>
+      <li>Traitement des contrôles non réalisés (antériorité, dégradation) : rare dans la littérature, très opérationnel.</li>
+      <li>Analyse de variation en cascade : c'est l'outil qui fait vivre la note en comité.</li></ul></div>
+    <div class="card pad" style="display:grid;gap:10px"><h3>Faiblesses</h3><ul class="list">
+      <li><span class="sev h">Majeur</span>« 1 − note » est traité comme une incertitude relative sur la valeur de la donnée. C'est vrai pour un rapprochement, faux pour un ratio d'anomalies compté en lignes. Toute la tolérance ΔSCR repose sur cette assimilation.</li>
+      <li><span class="sev h">Majeur</span>Moyennes compensatoires : une donnée critique en échec peut se cacher derrière une bonne note agrégée.</li>
+      <li><span class="sev m">Moyen</span>Formule d'écart max/min − 1 : non bornée, fausse avec des montants négatifs, et l'éq. 27 peut alors produire une note négative.</li>
+      <li><span class="sev m">Moyen</span>Linéarité du SCR supposée, testée sur les primes uniquement.</li>
+      <li><span class="sev m">Moyen</span>Partie « outil » (§3.2) sans architecture, sans modèle de données, sans SQL.</li>
+      <li><span class="sev b">Mineur</span>Cas d'étude en modèle interne partiel : il faut transposer pour une formule standard.</li></ul></div>
+  </div>
+  <div class="card"><div class="pad" style="padding-bottom:8px"><h3>Erreurs relevées dans le texte</h3></div>
+    <div class="tablebox" style="border:0;border-top:1px solid var(--line);border-radius:0"><table><thead><tr><th>Page</th><th>Dans le mémoire</th><th>Correction</th></tr></thead><tbody>
+      <tr><td class="mono">21</td><td>« ratio du SCR sur le fonds propre »</td><td>Ratio de solvabilité = fonds propres éligibles / SCR</td></tr>
+      <tr><td class="mono">54</td><td>Sensibilité 10 % : +1 % de donnée ⇒ +10 % de SCR</td><td>+0,1 % de SCR. Les formules du mémoire utilisent d'ailleurs bien 0,1 %.</td></tr>
+      <tr><td class="mono">50-57</td><td>Provisions math. : 4,57 % (tab. 3 et 14), puis 5,74 % (tab. 5 à 9)</td><td>Incohérence entre exemples ; le tableau 4 réutilise en outre les pondérations du tableau 2 comme sensibilités.</td></tr>
+      <tr><td class="mono">82</td><td>Tableau 19 : colonne « Note QDD » décalée (91,33 % affiché 99,50 %)</td><td>Recalculée, la note N-1 vaut 94,07 %, ce qui est cohérent avec le tableau 22 (94,08 %).</td></tr>
+      <tr><td class="mono">84</td><td>Variation proratisée : Note_N = Note_N-1 × Note_N^(N-1) / Note_N^N</td><td>Si la qualité ne bouge pas, cette formule ne rend pas Note_N-1. Le chaînage cohérent est Note_N-1 × Note_N^N / Note_N-1^N.</td></tr>
+    </tbody></table></div></div>
+  <div class="card"><div class="pad" style="padding-bottom:8px"><h3>Améliorations intégrées au prototype</h3></div>
+    <div class="tablebox" style="border:0;border-top:1px solid var(--line);border-radius:0"><table><thead><tr><th>Sujet</th><th>Ce que fait le prototype</th></tr></thead><tbody>
+      <tr><td>Homogénéité de la note</td><td>Ratio d'anomalies pondéré en montant par défaut (montant en anomalie / montant total)</td></tr>
+      <tr><td>Bornes</td><td>Résultat de contrôle borné dans [0 ; 100 %] ; écart symétrique min(1, |a−b| / max(|a|,|b|)) en option</td></tr>
+      <tr><td>Maillon faible</td><td>Statut vert / orange / rouge par donnée et par contrôle ; nombre de données hors tolérance ; note plancher</td></tr>
+      <tr><td>Linéarité</td><td>Sensibilité calculée avec 4 chocs et indicateur de non-linéarité (alerte au-delà de 10 %)</td></tr>
+      <tr><td>Couverture</td><td>Couverture E/X/P par donnée ; données critiques sans contrôle signalées</td></tr>
+      <tr><td>Cohérence</td><td>Vérification bloquante ΔSCR < seuil (éq. 12) ou tolérance < seuil / S̄ (éq. 19)</td></tr>
+      <tr><td>Industrialisation</td><td>Contrôles SQL sans CTE (portables en PROC SQL), historique des résultats, rapport Excel vivant, tests de non-régression sur les tableaux du mémoire</td></tr>
+    </tbody></table></div></div>
+</section>
+
+<!-- PLAN -->
+<section class="panel" id="p-plan" data-panel="plan" hidden>
+  <div class="intro"><span class="eyebrow">À partir de la prise de poste</span><h2>Plan à 90 jours</h2>
+  <p class="muted">Une trajectoire réaliste pour un analyste qualité des données / Solvabilité 2 rattaché à l'actuariat. Les éléments propres à l'organisme sont à vérifier sur place : modèle de SCR, outils, comitologie.</p></div>
+  <div class="cols3">
+    <div class="card phase"><span class="eyebrow">Jours 1 à 30 · comprendre</span><h3>Cartographier l'existant</h3><ul class="list">
+      <li>Lire la politique QDD, le document cadre, le dernier rapport de la fonction actuarielle, le RSR et le SFCR.</li>
+      <li>Vérifier dans le SFCR : formule standard ou USP, segments S2 principaux, poids de la RC décennale dans le best estimate.</li>
+      <li>Inventorier les contrôles existants (programmes SAS, fiches Excel) avec, pour chacun, la donnée, les critères, la fréquence et le responsable.</li>
+      <li>Dessiner la chaîne de la donnée : gestion, entrepôt, comptabilité, outil de provisionnement, outil SCR, QRT.</li></ul>
+      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> référentiel des contrôles et répertoire des données, version 0.</p></div>
+    <div class="card phase"><span class="eyebrow">Jours 31 à 60 · prototyper</span><h3>Première note sur un arrêté pilote</h3><ul class="list">
+      <li>Criticité : sensibilités par relance du moteur SCR, ou à dire d'expert faute de mieux, validées avec le responsable actuariat.</li>
+      <li>Rendre chaque contrôle quantitatif : rapprochement en écart relatif, cohérence en ratio pondéré en montant.</li>
+      <li>Porter les SQL du prototype en PROC SQL sur les vraies tables et calculer la première note.</li>
+      <li>Proposer les paramètres (seuil, ΔSCR max, coefficient) en documentant chaque choix.</li></ul>
+      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> note méthodologique et rapport de campagne pilote.</p></div>
+    <div class="card phase"><span class="eyebrow">Jours 61 à 90 · industrialiser</span><h3>Campagnes trimestrielles</h3><ul class="list">
+      <li>Historiser les résultats dans une table ; planifier l'exécution après chaque arrêté.</li>
+      <li>Présenter la note et l'analyse de variation au comité, avec les données rouges et un plan d'action par propriétaire.</li>
+      <li>Formaliser les choix dans la politique QDD (notice ACPR, point 17).</li>
+      <li>Ouvrir les chantiers suivants : contrôles de niveau 2, lignage des données critiques, données externes.</li></ul>
+      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> rapport de campagne et mise à jour de la politique.</p></div>
+  </div>
+  <div class="card pad" style="display:grid;gap:12px"><span class="eyebrow">Présenter en comité, en trois minutes</span><h3>Le script</h3>
+    <div class="script">
+      <p><b>30 s</b>Le chiffre : « La note QDD agrégée est de 97,4 %, pour un objectif de 97,1 %. Elle respecte la tolérance mais a perdu 1,3 point en un trimestre. »</p>
+      <p><b>60 s</b>Pourquoi : on montre la cascade. « −0,7 point vient de la qualité mesurée, −0,6 point des contrôles non réalisés. »</p>
+      <p><b>60 s</b>Le maillon faible : « Les provisions RC décennale sont au rouge : 97,0 % pour un minimum de 99,3 %. C'est la donnée la plus sensible : +1 % sur ces provisions fait varier le SCR d'environ 0,73 %. La cause est un écart entre l'entrepôt et l'outil de gestion apparu après la migration. »</p>
+      <p><b>30 s</b>La décision attendue : « Je propose une correction par l'équipe données avant l'arrêté du 31/12, et la réalisation des trois contrôles en retard. »</p>
+    </div>
+    <p class="muted" style="font-size:13.5px">Une règle à garder : un chiffre, une cause, une décision. Les formules restent en annexe, et les questions de méthode trouvent leur réponse dans les fiches.</p></div>
+</section>
+
+</div></main>
+
+<script>/* Moteur QDD en JavaScript — miroir de qdd_s2/moteur.py (parité testée). */
+(function (root) {
+  const FREQ_MOIS = { M: 1, T: 3, S: 6, A: 12 };
+
+  function degrader(r, ant, coef, methode) {
+    return methode === "composee" ? r * Math.pow(1 - coef, ant) : r * Math.max(0, 1 - coef * ant);
+  }
+
+  function ecartMemoire(ref, comp) {
+    if (ref !== 0) return Math.abs(comp / ref - 1);
+    return comp === ref ? 0 : 1;
+  }
+  function ecartSymetrique(a, b) {
+    const m = Math.max(Math.abs(a), Math.abs(b));
+    return m === 0 ? 0 : Math.min(1, Math.abs(a - b) / m);
+  }
+  function mesureRapprochement(vals, methode) {
+    const f = methode === "symetrique" ? ecartSymetrique : ecartMemoire;
+    let m = 0;
+    for (let k = 0; k < vals.length; k++)
+      for (let j = 0; j < vals.length; j++) if (k !== j) m = Math.max(m, f(vals[k], vals[j]));
+    return m;
+  }
+
+  function moyPond(items, val, poids) {
+    let s = 0, w = 0;
+    for (const it of items) { s += val(it) * poids(it); w += poids(it); }
+    return w > 0 ? s / w : NaN;
+  }
+
+  /* donnees : [{donnee_id, sensibilite, critique_expert(true/false/null)}]
+     controles : [{controle_id, donnee_id, poids, resultat_brut, anteriorite, criteres, ...}]
+     p : {seuil, mode:"donnee"|"globale", dscr, tol, coef, degradation:"simple"|"composee", marge} */
+  function evaluer(donnees, controles, p) {
+    const D = donnees.map((d) => {
+      let crit = d.sensibilite >= p.seuil;
+      if (d.critique_expert === true || d.critique_expert === false) crit = d.critique_expert;
+      return Object.assign({}, d, { critique: crit });
+    });
+    const crit = D.filter((d) => d.critique);
+    const S = crit.length ? crit.reduce((a, d) => a + d.sensibilite, 0) / crit.length : 0;
+    const coherent = p.mode === "donnee" ? p.dscr < p.seuil : p.tol < p.seuil / S;
+    for (const d of D) {
+      d.tolerance = d.critique ? (p.mode === "donnee" ? p.dscr / d.sensibilite : (p.tol * S) / d.sensibilite) : NaN;
+      d.note_min = 1 - d.tolerance;
+    }
+    const byId = Object.fromEntries(D.map((d) => [d.donnee_id, d]));
+    const C = controles.map((c) => {
+      const r = degrader(c.resultat_brut, c.anteriorite, p.coef, p.degradation);
+      const d = byId[c.donnee_id];
+      const critique = !!(d && d.critique);
+      const seuil = critique ? d.note_min : NaN;
+      return Object.assign({}, c, { resultat: r, critique, seuil, conforme: critique ? r >= seuil : null,
+        statut: critique ? statut(r, seuil, p.marge) : null });
+    });
+    for (const d of D) {
+      const cs = C.filter((c) => c.donnee_id === d.donnee_id);
+      d.nb_controles = cs.length;
+      d.note = moyPond(cs, (c) => c.resultat, (c) => c.poids);
+      d.note_avant_degradation = moyPond(cs, (c) => c.resultat_brut, (c) => c.poids);
+      d.statut = d.critique ? statut(d.note, d.note_min, p.marge) : null;
+    }
+    const agg = agreger(D, C);
+    const cc = C.filter((c) => c.critique);
+    const critd = D.filter((d) => d.critique);
+    return {
+      donnees: D, controles: C, S, coherent,
+      indicateurs: {
+        note: agg.note, note_min: agg.note_min, ecart_objectif: agg.note - agg.note_min,
+        note_avant_degradation: agg.note_brute, degradation_moyenne: 1 - agg.note / agg.note_brute,
+        nb_donnees_critiques: critd.length, sensibilite_moyenne: S,
+        taux_validation: cc.filter((c) => c.anteriorite === 0).length / cc.length,
+        anteriorite_moyenne: cc.reduce((a, c) => a + c.anteriorite, 0) / cc.length,
+        taux_conformite_controles: cc.filter((c) => c.conforme).length / cc.length,
+        nb_donnees_hors_tolerance: critd.filter((d) => d.note < d.note_min).length,
+      },
+    };
+  }
+
+  function agreger(D, C) {
+    const crit = new Set(D.filter((d) => d.critique).map((d) => d.donnee_id));
+    const groupes = {};
+    for (const c of C) if (crit.has(c.donnee_id)) (groupes[c.donnee_id] = groupes[c.donnee_id] || []).push(c);
+    const ids = Object.keys(groupes);
+    const byId = Object.fromEntries(D.map((d) => [d.donnee_id, d]));
+    const notes = ids.map((id) => ({ d: byId[id],
+      n: moyPond(groupes[id], (c) => c.resultat, (c) => c.poids),
+      nb: moyPond(groupes[id], (c) => c.resultat_brut, (c) => c.poids) }));
+    return {
+      note: moyPond(notes, (x) => x.n, (x) => x.d.sensibilite),
+      note_brute: moyPond(notes, (x) => x.nb, (x) => x.d.sensibilite),
+      note_min: moyPond(notes, (x) => x.d.note_min, (x) => x.d.sensibilite),
+      nb: ids.length,
+    };
+  }
+
+  function parAxe(ev, axe) {
+    const mod = {};
+    for (const c of ev.controles) {
+      for (const m of String(c[axe]).split(",").map((s) => s.trim()))
+        (mod[m] = mod[m] || []).push(c);
+    }
+    return Object.entries(mod).map(([m, cs]) => {
+      const a = agreger(ev.donnees, cs);
+      const cc = cs.filter((c) => c.critique);
+      return { modalite: m, note: a.note, note_min: a.note_min, nb_donnees: a.nb, nb_controles: cc.length,
+        taux_conformite: cc.length ? cc.filter((c) => c.conforme).length / cc.length : NaN };
+    }).filter((r) => r.nb_donnees > 0);
+  }
+
+  function statut(note, mini, marge) {
+    if (!(isFinite(note) && isFinite(mini))) return null;
+    return note >= mini ? "vert" : note >= mini - marge ? "orange" : "rouge";
+  }
+
+  root.QDD = { evaluer, parAxe, degrader, mesureRapprochement, ecartMemoire, ecartSymetrique, statut, FREQ_MOIS };
+  if (typeof module !== "undefined") module.exports = root.QDD;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>/* Contenu pédagogique — synthèse du mémoire de C. Motard (ISFA / Grant Thornton, 2024) */
+window.CONTENU = {
+fiches: [
+{ id:"s2", partie:"Partie 1 · §1.2.1", titre:"Solvabilité 2 en une page",
+  points:[
+   "Textes : directive 2009/138/CE, règlement délégué (UE) 2015/35, orientations EIOPA ; en France, contrôle par l'ACPR. En vigueur depuis le 1er janvier 2016.",
+   "Pilier 1 (quantitatif) : bilan prudentiel en valeur de marché ; provisions techniques = best estimate (BE, espérance actualisée des flux futurs) + marge de risque ; SCR et MCR.",
+   "Pilier 2 (gouvernance) : au moins deux dirigeants effectifs (principe des quatre yeux), quatre fonctions clés (actuarielle, gestion des risques, conformité, audit interne), politiques écrites.",
+   "Pilier 3 (reporting) : QRT et états nationaux spécifiques (ENS) ; rapports narratifs RSR (au superviseur) et SFCR (public).",
+   "La revue de Solvabilité 2 (directive (UE) 2025/2) est à transposer au plus tard le 29 janvier 2027."],
+  formule:"SCR = VaR 99,5 % à 1 an des fonds propres\nRatio de solvabilité = fonds propres éligibles / SCR",
+  retenir:"Le ratio moyen du marché français cité par le mémoire est d'environ 250 %.",
+  piege:"Le mémoire écrit « ratio du SCR sur les fonds propres » : c'est l'inverse." },
+{ id:"scr", partie:"Partie 1 · §1.2.2", titre:"Calcul du SCR",
+  points:[
+   "Formule standard : modules (marché, contrepartie, vie, santé, non-vie, incorporels), chocs calibrés par l'EIOPA (ex. +15 % sur les taux de mortalité), agrégés par des matrices de corrélation.",
+   "Paramètres propres (USP) : seulement pour les sous-modules primes et réserves non-vie, révision vie et primes et réserves santé non-vie, avec accord de l'ACPR.",
+   "Modèle interne partiel ou intégral : il faut l'approbation de l'ACPR, qui vérifie notamment la qualité des données.",
+   "Avant d'entrer dans le calcul, les données traversent de nombreux systèmes et traitements (filtres, agrégations par survenance et développement…). D'où l'enjeu de leur qualité."],
+  formule:"BSCR = √( Σ Corr(i,j) · SCR_i · SCR_j ) + SCR_incorporels\nSCR = BSCR + SCR_opérationnel + Ajustement",
+  retenir:"Les données de qualité sont une condition d'accès aux USP et au modèle interne : une mauvaise QDD immobilise du capital.",
+  piege:"Le cas étudié par le mémoire est un modèle interne partiel ; un assureur régional sera plus souvent en formule standard." },
+{ id:"perimetre", partie:"Partie 1 · §1.2.3", titre:"Quelles données sont concernées ?",
+  points:[
+   "Directive : données des provisions techniques (art. 77 et 82), des paramètres internes (art. 104) et du modèle interne (art. 121 et 124).",
+   "Données externes incluses : recourir à un tiers n'exempte d'aucune exigence (art. 126), et l'entreprise reste responsable en cas de sous-traitance (art. 49).",
+   "La notice QDD de l'ACPR (fin 2023) étend le périmètre en bonne pratique à toutes les « données S2 » : SCR, MCR, bilan prudentiel, états prudentiels.",
+   "Le périmètre couvre toutes les lignes d'activité (point 12), tous les SI de la gestion jusqu'aux états (point 13) et les données externes (point 14)."],
+  retenir:"Minimum réglementaire : provisions techniques, paramètres internes, modèle interne. Bonne pratique : toutes les données S2.",
+  piege:"Une donnée externe n'est pas « moins exigeante » : ses critères sont même renforcés (traçabilité, compréhension fine)." },
+{ id:"criteres", partie:"Partie 1 · §1.2.3", titre:"Les critères de qualité",
+  points:[
+   "Exhaustivité : historique suffisant pour dégager des tendances, données disponibles pour chaque groupe de risques homogène, aucune exclusion sans justification. La profondeur d'historique se justifie par une étude de sensibilité (notice, point 34).",
+   "Exactitude : pas d'erreur importante, cohérence entre périodes, enregistrement en temps utile et cohérent dans la durée.",
+   "Caractère approprié (pertinence) : adapté à l'usage, volume suffisant, cohérent avec les hypothèses actuarielles, reflet des risques, procédure documentée.",
+   "Critères complémentaires : traçabilité des données externes ; données en défaut enregistrées avant tout ajustement (notice, point 37) ; crédibilité ; hypothèses réalistes ; techniques actuarielles adéquates."],
+  formule:"E = exhaustivité · X = exactitude · P = pertinence (caractère approprié)",
+  retenir:"Chaque contrôle doit déclarer quels critères il vérifie. C'est ce qui permet de mesurer la couverture E/X/P d'une donnée critique.",
+  piege:"Fiabilité, lisibilité, pérennité et contrôle sont les objectifs du dispositif (§1.1), pas les critères S2." },
+{ id:"outils", partie:"Partie 1 · §1.2.3", titre:"Les outils exigés par l'ACPR",
+  points:[
+   "Contrôle permanent : les contrôles de niveau 1 (opérationnels) sont recensés dans un référentiel qui indique risque, périodicité, critères, données, seuils, mode manuel ou automatique, mode opératoire et responsable. Les contrôles de niveau 2 vérifient l'adéquation et l'efficacité du niveau 1 (points 67 à 70).",
+   "Indicateurs : tolérance globale à la non-QDD (point 27), impact des données sur les calculs (points 50-51), synthèse des résultats des contrôles (point 28).",
+   "Répertoire des données (points 47-48) : description, localisation, source, usage, criticité, propriétaire, modalités, fréquence de mise à jour, pour toutes les données et pas seulement les critiques.",
+   "Cartographies (points 55-60) : SI et flux de données (traitements majeurs, références des contrôles). Lignage par donnée critique : bonne pratique.",
+   "Tableaux de bord synthétisant tous les résultats des contrôles, du niveau le plus fin au plus agrégé (point 26)."],
+  retenir:"Répertoire, cartographie et référentiel des contrôles doivent être reliés entre eux. Le prototype les relie par donnee_id et par étape.",
+  piege:"Le répertoire couvre toutes les données S2, pas seulement les données critiques." },
+{ id:"acteurs", partie:"Partie 1 · §1.2.3", titre:"Qui fait quoi ?",
+  points:[
+   "Gestion des risques : intègre la non-QDD dans la cartographie des risques.",
+   "Contrôle interne : conçoit, recense et réalise les contrôles de niveau 1 et de niveau 2.",
+   "Audit interne : intègre le risque de non-QDD dans son univers d'audit et dans son plan pluriannuel (point 72).",
+   "Fonction actuarielle : seul rôle explicite dans la directive (art. 48), elle apprécie la suffisance et la qualité des données des provisions techniques. Rapport écrit au moins annuel (art. 272 du règlement délégué).",
+   "Responsable ou équipe QDD : documentation, pilotage, consolidation des résultats (calcul de l'indicateur), amélioration continue, risque de non-QDD des projets, sous-traitance. Peut s'appuyer sur des relais et des propriétaires de données.",
+   "Comité de pilotage des données S2 (points 21-25) : direction générale, responsable QDD, représentants des fonctions opérationnelle, informatique, actuarielle et gestion des risques. Il peut être épaulé par un comité opérationnel."],
+  retenir:"C'est l'équipe QDD qui calcule la note agrégée et anime les comités. Ce sera ton rôle.",
+  piege:"Avoir un responsable QDD ne suffit pas : l'enquête ACPR 2022 note que moins de la moitié s'y consacrent exclusivement." },
+{ id:"forma", partie:"Partie 1 · §1.2.3", titre:"Documents à produire",
+  points:[
+   "Document cadre du dispositif (points 16-17), validé par la direction générale et revu au moins une fois par an : périmètre, rôles, comitologie, critères (S2, criticité, tolérance), instruments de suivi.",
+   "Si la criticité vient de tests de sensibilité, on documente la méthode et la justification du seuil. Si elle vient d'un dire d'expert, on formalise cet avis.",
+   "Fonction actuarielle : documenter les insuffisances (limites, remédiation ou contournement, responsables), point 36.",
+   "Comités : compte-rendu avec relevé de décisions pour les dirigeants effectifs, feuilles de route pour les opérationnels.",
+   "Sous-traitance : accord d'externalisation et annexe précisant les données attendues, les modalités d'envoi, les contrôles du fournisseur et la disponibilité (points 44-45)."],
+  retenir:"Chaque paramètre du prototype (seuil, ΔSCR, coefficient de dégradation) doit être justifié dans la politique QDD." },
+{ id:"etat", partie:"Partie 1 · §1.3", titre:"État des lieux : ACPR et EIOPA",
+  points:[
+   "ACPR 2016 : 90 % des organismes ont une politique QDD (38 % en 2015), mais l'évaluation est partielle, peu fréquente et rarement remontée aux dirigeants.",
+   "Enquête ACPR 2022 (publiée en février 2023, 239 organismes, 88 % du chiffre d'affaires) : plus de 96 % ont une politique formalisée, 40 % ont un lignage, plus de 80 % utilisent des données externes et 90 % en intègrent une partie à la main. Moins de 62 % pratiquent des contrôles de niveau 2, un tiers n'a jamais audité la QDD, et trois quarts formalisent les résultats pour la fonction actuarielle.",
+   "La criticité est rarement évaluée, et le plus souvent à dire d'expert.",
+   "Indicateur global EIOPA (actifs financiers) : moyenne pondérée à dire d'expert. Cibles 2023-2024 : exhaustivité 97 % par entité ou 99 % en parts de marché ; comparaison au CSDB 93,5 %."],
+  formule:"Indicateur EIOPA = 40 % exhaustivité + 25 % CSDB + 15 % LEI + 10 % ISIN + 5 % CIC + 5 % qualité de crédit",
+  retenir:"Le régulateur attend une synthèse chiffrée des contrôles, suivie dans le temps et remontée jusqu'au conseil d'administration." },
+{ id:"note", partie:"Partie 2 · §2.1-2.2", titre:"Note agrégée et criticité",
+  points:[
+   "On agrège d'abord les contrôles par donnée, puis les données entre elles. Sinon, une donnée visée par trois contrôles pèserait trois fois plus (exemple du mémoire : 96,92 % en agrégation directe contre 93,85 % en agrégeant par donnée).",
+   "Sensibilité d'une donnée : variation relative du SCR divisée par le choc appliqué à la donnée.",
+   "Une donnée est critique si sa sensibilité est au moins égale au seuil de significativité. Ce seuil est un choix arbitraire, à formaliser dans la politique QDD.",
+   "Les données critiques sont pondérées par leur sensibilité ; les données non critiques ont un poids nul.",
+   "Hypothèse forte : le SCR est linéaire par rapport à chaque donnée (vérifié seulement sur les primes en formule standard)."],
+  formule:"s_d = (|SCR_d − SCR_ref| / SCR_ref) / Δd\ncritique ⇔ s_d ≥ seuil\nNote = Σ s_d · Note_d / Σ s_d   (données critiques)",
+  retenir:"Avec des sensibilités de 14,23 %, 5,74 % et 2,67 % et des notes de 99,90 %, 74,71 % et 81,72 %, on obtient une note agrégée de 91,37 %.",
+  piege:"Une sensibilité de 10 % signifie que +1 % sur la donnée donne +0,1 % de SCR, pas +10 % comme l'écrit le mémoire p. 54." },
+{ id:"tolerance", partie:"Partie 2 · §2.2.4", titre:"Tolérance de non-QDD",
+  points:[
+   "Interprétation : 1 − Note_d est l'incertitude sur la donnée ; multipliée par s_d, elle donne l'incertitude induite sur le SCR.",
+   "Approche « donnée » : on fixe ΔSCR max, la variation acceptable du SCR due à une donnée. On en déduit la note minimum de chaque donnée, puis la note minimum agrégée.",
+   "Approche « globale » : on fixe la tolérance globale. La note minimum agrégée est fixe et chaque donnée reçoit une tolérance relative à sa sensibilité.",
+   "Plus une donnée est sensible, plus sa tolérance est faible.",
+   "Cohérence avec la criticité : il faut ΔSCR max < seuil, ou tolérance globale < seuil / S̄. Exemple : seuil de 1 % et S̄ de 5 % imposent une tolérance globale inférieure à 20 %."],
+  formule:"Approche donnée : Note_d^min = 1 − ΔSCRmax / s_d ;  Note^min = 1 − ΔSCRmax / S̄\nApproche globale : Note_d^min = 1 − Tol · S̄ / s_d ;  Note^min = 1 − Tol",
+  retenir:"Seuil d'acceptation d'un contrôle = note minimum de la donnée qu'il contrôle (répartition uniforme, retenue par le mémoire).",
+  piege:"Une donnée juste au-dessus du seuil reçoit une note minimum très basse (51 % dans le cas BTP fictif). C'est voulu, mais à expliquer en comité." },
+{ id:"controle", partie:"Partie 2 · §2.3-2.4.1", titre:"Note d'une donnée et résultat d'un contrôle",
+  points:[
+   "La note d'une donnée est la moyenne pondérée des résultats de ses contrôles. Pondérations possibles : uniforme, à dire d'expert, nombre de critères vérifiés (1 à 3) × volume contrôlé.",
+   "Unicité : un contrôle porte sur une seule donnée. Sinon on le scinde en points de contrôle, ce qui permet aussi de choisir la maille (par ligne d'activité, par exemple).",
+   "Résultat d'un contrôle = 100 % − mesure de non-QDD. La méthode de calcul ne doit pas changer dans le temps ; si elle change, on traite cela comme la suppression d'un contrôle et l'ajout d'un nouveau.",
+   "Rapprochement : écart relatif. Par prudence on retient le maximum des écarts injustifiés entre sources deux à deux. Pour un contrôle par maille, on fait une moyenne pondérée par le maximum des |valeurs| de chaque maille (option 3).",
+   "Cohérence : ratio d'anomalies = nombre d'éléments incohérents / nombre d'éléments contrôlés."],
+  formule:"Note_d = Σ p_i · C_i / Σ p_i\nC = 100 % − mesure de non-QDD\nE = max |b_k / b_j − 1| = max/min − 1 (si tous les écarts sont injustifiés)",
+  retenir:"Pour trois sources à 196,33, 191,53 et 193,07, la mesure vaut 2,51 % et le résultat 97,49 %.",
+  piege:"Avec un écart supérieur à 100 % ou des montants négatifs, la formule du mémoire donne une note négative : il faut borner le résultat." },
+{ id:"anteriorite", partie:"Partie 2 · §2.4.2", titre:"Contrôles non réalisés",
+  points:[
+   "Un contrôle non réalisé garde son dernier résultat connu, dégradé selon son antériorité.",
+   "Antériorité en base fréquence : nombre de réalisations attendues manquées. Les périodes où aucun résultat n'est attendu ne comptent pas.",
+   "Antériorité en base annuelle : la même chose exprimée en années, ce qui rend comparables des contrôles de fréquences différentes.",
+   "Dégradation simple : rapide et proportionnelle, elle atteint 0 %. C'est celle que retient le mémoire, parce que c'est la plus incitative.",
+   "Dégradation composée : continue, mais elle ralentit et n'atteint jamais 0 %."],
+  formule:"Simple : C_N = C̃ × max(0 ; 1 − coef × Ant)\nComposée : C_N = C̃ × (1 − coef)^Ant",
+  retenir:"Contrôle semestriel réalisé au 30/06/2022, campagne au 30/03/2023 : antériorité de 1 en base fréquence, 0,5 en base annuelle.",
+  piege:"Un contrôle jamais réalisé n'a pas de dernier résultat : le prototype lui donne 0 %." },
+{ id:"reporting", partie:"Partie 3 · §3.1", titre:"Reporting et suivi dans le temps",
+  points:[
+   "Indicateurs : sensibilité moyenne, note avant et après dégradation, taux de validation, antériorité moyenne, dégradation moyenne, note minimum, écart à l'objectif.",
+   "Les indicateurs sont propres à chaque organisme : on ne les compare pas d'un organisme à l'autre, seulement dans le temps au sein du même organisme.",
+   "Facteurs statiques (méthodes, seuils, périmètre des contrôles) et facteurs dynamiques (sensibilités, donc criticité, pondérations et tolérances).",
+   "Comparabilité dans le temps : accepter la variation, la proratiser ou l'annuler en recalculant le passé. Aucune option n'est pleinement satisfaisante.",
+   "Analyse de variation : on fait évoluer les facteurs un par un, dans un ordre fixé, et l'impact de chaque facteur est la différence de note avant et après. On présente le résultat en cascade.",
+   "Axes d'analyse (entité, risque) et filtres (critère, donnée, fréquence) : on applique la même formule à un sous-ensemble de contrôles."],
+  formule:"Note|F = Σ_{d|F} s_d · Note_d|F / Σ_{d|F} s_d",
+  retenir:"L'analyse de variation est l'outil le plus utile en comité : elle répond à la question « pourquoi la note a-t-elle bougé ? ».",
+  piege:"La proratisation ne gère pas la suppression d'un contrôle ; le recalcul du passé ne gère pas l'ajout d'un contrôle." },
+{ id:"mission", partie:"Partie 3 · §3.2 et §1.4", titre:"Mise en œuvre dans la mission",
+  points:[
+   "Le client est un groupe dont un modèle interne partiel est approuvé sur une seule branche. La mission a été lancée après des recommandations de l'ACPR.",
+   "Cinq chantiers : dispositif de maîtrise ; répertoire, référentiel des contrôles et lignage ; adaptation des outils de contrôle ; gouvernance et politique ; reporting groupe. Chacun comprend un volet formation.",
+   "Données hiérarchisées par niveau (une donnée de niveau 1 alimente directement le modèle). Une soixantaine de données critiques ont été identifiées.",
+   "Revue du dispositif : une donnée critique par contrôle, les critères E/X/P de chaque contrôle identifiés, un résultat quantitatif calculable en Excel ou en SQL, la couverture des zones de risque vérifiée grâce au lignage.",
+   "L'outil développé gère les habilitations, des référentiels reliés entre eux, les calculs et des visuels dynamiques."],
+  retenir:"Le mémoire conclut que c'est « complexe et coûteux ». Le prototype réduit ce coût en écrivant les contrôles en SQL et en automatisant l'agrégation." }
+],
+
+qcm: [
+{p:1,q:"Quels sont les trois critères principaux de qualité des données sous Solvabilité 2 ?",o:["Fiabilité, lisibilité, pérennité","Exhaustivité, exactitude, caractère approprié","Exactitude, traçabilité, disponibilité","Cohérence, crédibilité, actualité"],a:1,e:"Directive art. 82, 104, 121, définis aux art. 19, 219 et 231 du règlement délégué. Fiabilité, lisibilité et pérennité sont des objectifs du dispositif."},
+{p:1,q:"Qui a publié fin 2023 la notice « Exigences en matière de qualité des données pour les organismes et groupes d'assurance soumis à la directive Solvabilité 2 » ?",o:["L'EIOPA","La Commission européenne","L'ACPR","L'Institut des actuaires"],a:2,e:"Notice QDD de l'ACPR, datée de novembre 2023 et mise en ligne en décembre 2023."},
+{p:1,q:"Quelle fonction clé la directive charge-t-elle explicitement d'apprécier la qualité des données des provisions techniques ?",o:["Fonction conformité","Fonction audit interne","Fonction gestion des risques","Fonction actuarielle"],a:3,e:"Article 48 de la directive. Les autres fonctions ne sont impliquées qu'indirectement."},
+{p:1,q:"Le SCR correspond au niveau de fonds propres permettant de faire face à ses engagements…",o:["à 1 an avec un niveau de confiance de 99,5 %","à 1 an avec un niveau de confiance de 95 %","à 5 ans avec un niveau de confiance de 99,5 %","sur toute la durée des engagements"],a:0,e:"Définition du SCR (pilier 1)."},
+{p:1,q:"Comment se calcule le ratio de solvabilité ?",o:["SCR / fonds propres éligibles","Fonds propres éligibles / SCR","MCR / SCR","Best estimate / SCR"],a:1,e:"Fonds propres / SCR. Le mémoire écrit l'inverse p. 21, c'est une erreur."},
+{p:1,q:"Lequel de ces éléments n'est PAS exigé dans le répertoire des données par la notice ACPR ?",o:["Le propriétaire de la donnée","La criticité","La fréquence de mise à jour","Le coût de stockage de la donnée"],a:3,e:"Points 47-48 : description, localisation, source, usage, criticité, propriétaire, modalités, fréquence de mise à jour."},
+{p:1,q:"Que vérifient les contrôles de niveau 2 ?",o:["La qualité des données externes","L'adéquation et l'efficacité des contrôles de niveau 1","Le calcul du SCR","La conformité du SFCR"],a:1,e:"Notice, points 67 à 70."},
+{p:1,q:"Dans l'indicateur global de qualité de l'EIOPA, quel bloc a le poids le plus élevé ?",o:["Comparaison au CSDB","Score LEI","Exhaustivité","Couverture ISIN"],a:2,e:"40 % exhaustivité, 25 % CSDB, 15 % LEI, 10 % ISIN, 5 % CIC, 5 % qualité de crédit."},
+{p:1,q:"Selon l'enquête ACPR 2022, quelle part des organismes a mis en place un lignage des données ?",o:["Environ 10 %","40 %","62 %","Plus de 96 %"],a:1,e:"40 %. Plus de 96 % ont une politique formalisée ; moins de 62 % pratiquent des contrôles de niveau 2."},
+{p:2,q:"Pourquoi agréger d'abord les contrôles par donnée plutôt que de faire une moyenne directe de tous les contrôles ?",o:["Pour accélérer le calcul","Pour que l'importance d'une donnée ne dépende pas du nombre de contrôles qui la visent","Parce que l'ACPR interdit la moyenne directe","Pour éliminer les données non critiques"],a:1,e:"Exemple du mémoire : 96,92 % en agrégation directe contre 93,85 % par donnée."},
+{p:2,q:"Dans la méthode, une donnée est critique si…",o:["elle a au moins un contrôle en échec","sa sensibilité est au moins égale au seuil de significativité","elle provient d'un tiers","sa note QDD est inférieure à 90 %"],a:1,e:"Équation 5. La criticité peut aussi être fixée à dire d'expert."},
+{p:2,q:"Sensibilités 14,23 %, 5,74 % et 2,67 %, notes 99,90 %, 74,71 % et 81,72 %. Quelle est la note agrégée pondérée par les sensibilités ?",o:["85,44 %","90,04 %","91,37 %","93,37 %"],a:2,e:"Poids 62,87 %, 25,35 % et 11,78 %, d'où 91,37 % (tableau 5). 85,44 % serait la moyenne simple."},
+{p:2,q:"ΔSCR max = 0,5 % et sensibilité de la donnée = 14,23 %. Quelle est la note QDD minimum de la donnée ?",o:["99,50 %","96,49 %","93,37 %","85,77 %"],a:1,e:"1 − 0,5 % / 14,23 % = 96,49 % (tableau 6)."},
+{p:2,q:"En approche « donnée », quelle condition assure la cohérence entre tolérance et criticité ?",o:["ΔSCR max > seuil de significativité","ΔSCR max < seuil de significativité","ΔSCR max = sensibilité moyenne","Tolérance globale > 20 %"],a:1,e:"Équation 12 : sinon, une donnée critique peu sensible aurait une note minimum nulle ou négative."},
+{p:2,q:"Seuil de significativité 1 %, sensibilité moyenne des données critiques 5 %. Quelle est la tolérance globale maximale cohérente ?",o:["5 %","1 %","20 %","25 %"],a:2,e:"Équation 19 : tolérance < seuil / S̄ = 1 % / 5 % = 20 %."},
+{p:2,q:"En approche « tolérance globale », une donnée plus sensible que la moyenne a une tolérance…",o:["supérieure à la tolérance globale","égale à la tolérance globale","inférieure à la tolérance globale","nulle"],a:2,e:"Tol_d = Tol · S̄ / s_d < Tol si s_d > S̄."},
+{p:2,q:"Rapprochement entre trois sources : 196,33, 191,53 et 193,07, tous les écarts injustifiés. Quelle est la mesure de non-QDD ?",o:["2,45 %","2,51 %","1,66 %","0,80 %"],a:1,e:"Le maximum des écarts deux à deux vaut max/min − 1 = 196,33 / 191,53 − 1 = 2,51 % (tableau 16)."},
+{p:2,q:"Pour un contrôle de rapprochement formalisé par maille, quelle option le mémoire retient-il ?",o:["Écart des totaux par source","Moyenne simple des écarts par maille","Moyenne des écarts par maille pondérée par le maximum des |valeurs| de la maille","Écart maximum toutes mailles confondues"],a:2,e:"Option 3 (éq. 32) : elle évite à la fois la compensation de l'option 1 et le poids excessif des petites mailles de l'option 2."},
+{p:2,q:"Contrôle semestriel réalisé au 30/06/2022, campagne au 30/03/2023. Quelle est l'antériorité en base fréquence ?",o:["0","0,5","1","2"],a:2,e:"Une réalisation attendue (au 31/12/2022) a été manquée. En base annuelle, cela fait 0,5."},
+{p:2,q:"Dégradation simple, coefficient 20 %, antériorité 3, dernier résultat 100 %. Quel est le résultat retenu ?",o:["40 %","51,2 %","60 %","80 %"],a:0,e:"100 % × (1 − 0,2 × 3) = 40 %. En dégradation composée : 0,8³ = 51,2 %."},
+{p:2,q:"Un contrôle existant porte sur deux données critiques. Que préconise le mémoire ?",o:["L'exclure de la note","Le compter deux fois","Le scinder en points de contrôle, un par donnée","L'affecter à la donnée la plus sensible"],a:2,e:"Critère d'unicité (§2.3.1) : sinon on biaise les notes et on compte le contrôle deux fois."},
+{p:3,q:"Que dit le mémoire de la comparabilité des indicateurs QDD ?",o:["Ils sont comparables entre organismes","Ils sont propres à l'organisme et comparables dans le temps seulement si méthode et dispositif ne changent pas","Ils sont imposés par l'ACPR","Ils ne sont jamais comparables dans le temps"],a:1,e:"§3.1.3 : ce sont des mesures internes."},
+{p:3,q:"Comment fonctionne l'analyse de la variation de la note entre deux campagnes ?",o:["Régression linéaire sur l'historique","On fait évoluer les facteurs un par un dans un ordre fixé et on mesure la variation de note à chaque étape","On compare uniquement les contrôles en échec","On recalcule tout le passé"],a:1,e:"Tableau 20, présenté en cascade (figure 15)."},
+{p:3,q:"Lequel de ces facteurs est dynamique ?",o:["Le coefficient de dégradation","La méthode d'agrégation","Les sensibilités des données","Le seuil de significativité"],a:2,e:"Les sensibilités évoluent avec le portefeuille, et avec elles la criticité, les pondérations et les tolérances."},
+{p:3,q:"Pourquoi le prototype pondère-t-il les ratios d'anomalies en montant ?",o:["Pour améliorer la note","Pour que 1 − note soit homogène à un écart relatif sur la donnée, ce qui est la base de la tolérance ΔSCR","Parce que l'ACPR l'impose","Pour réduire le temps de calcul"],a:1,e:"Amélioration proposée : 2 % de lignes en anomalie ne signifient pas 2 % d'erreur sur le montant."},
+{p:3,q:"Avec une sensibilité de 10 % et l'hypothèse de linéarité, une hausse de 1 % de la donnée fait varier le SCR de…",o:["10 %","1 %","0,1 %","0,01 %"],a:2,e:"10 % × 1 % = 0,1 %. Le texte du mémoire (p. 54) dit 10 %, ses formules disent bien 0,1 %."}
+],
+
+vf: [
+{p:1,q:"Solvabilité 2 est entrée en vigueur le 1er janvier 2016.",a:true,e:"Elle a succédé à Solvabilité 1, jugée insuffisante après la crise de 2008."},
+{p:1,q:"Les données fournies par un tiers sont exemptées des exigences de QDD.",a:false,e:"Art. 126 de la directive : recourir à un tiers n'est un motif d'exemption d'aucune exigence."},
+{p:1,q:"La notice ACPR étend en bonne pratique les exigences QDD à toutes les données S2, y compris le SCR et le MCR.",a:true,e:"Notice, point 11. Le minimum légal reste provisions techniques, paramètres internes et modèle interne."},
+{p:1,q:"Les données en défaut doivent être enregistrées et conservées avant d'être ajustées.",a:true,e:"Notice, point 37 (traçabilité)."},
+{p:1,q:"Le document cadre du dispositif de maîtrise de la QDD est validé par la direction générale et revu au moins une fois par an.",a:true,e:"Notice, point 16."},
+{p:1,q:"Le lignage par donnée critique est une obligation stricte de la notice.",a:false,e:"C'est une bonne pratique recommandée, en complément des cartographies obligatoires."},
+{p:1,q:"L'audit interne doit intégrer le risque de non-QDD dans son univers d'audit.",a:true,e:"Notice, point 19 ; plan pluriannuel au point 72."},
+{p:1,q:"Selon l'enquête ACPR 2022, plus de 96 % des organismes disposent d'une politique QDD formalisée.",a:true,e:"Mais elle n'est souvent déployée que partiellement."},
+{p:2,q:"La criticité d'une donnée peut être déterminée à dire d'expert.",a:true,e:"C'est l'une des deux méthodes de la notice, la plus pratiquée sur le marché."},
+{p:2,q:"Une donnée non critique a une pondération nulle dans la note agrégée.",a:true,e:"Éq. 6 : l'indicateur de criticité vaut 0."},
+{p:2,q:"Plus une donnée critique est sensible, plus sa tolérance de non-QDD est élevée.",a:false,e:"C'est l'inverse : Tol_d = ΔSCR max / s_d diminue quand s_d augmente."},
+{p:2,q:"En approche « donnée », la note minimum agrégée vaut 1 − ΔSCR max / S̄.",a:true,e:"Éq. 14, où S̄ est la moyenne simple des sensibilités des données critiques."},
+{p:2,q:"Un contrôle peut porter sur plusieurs données critiques sans adaptation.",a:false,e:"Il faut respecter l'unicité, en scindant le contrôle en points de contrôle."},
+{p:2,q:"On peut changer la méthode de calcul du résultat d'un contrôle sans conséquence sur le suivi.",a:false,e:"Cela se traite comme la suppression du contrôle puis l'ajout d'un nouveau."},
+{p:2,q:"Un écart justifié entre deux sources est exclu de la mesure de non-QDD.",a:true,e:"Éq. 29-30 : on ne retient que les écarts injustifiés."},
+{p:2,q:"La dégradation composée finit par ramener le résultat d'un contrôle à 0 %.",a:false,e:"Elle tend vers 0 sans jamais l'atteindre. C'est la dégradation simple qui atteint 0."},
+{p:2,q:"L'antériorité en base annuelle permet de comparer des contrôles de fréquences différentes.",a:true,e:"Deux ans après, un contrôle annuel, semestriel ou trimestriel a la même antériorité : 2."},
+{p:2,q:"Le mémoire démontre que le SCR est linéaire par rapport à toutes les données.",a:false,e:"C'est une hypothèse forte, testée seulement sur les primes. Le prototype ajoute un test de linéarité."},
+{p:2,q:"Avec la formule de l'éq. 27 non bornée, un contrôle de rapprochement peut obtenir une note négative.",a:true,e:"C'est le cas si max/min − 1 dépasse 100 %. Le prototype borne le résultat entre 0 et 100 %."},
+{p:3,q:"La proratisation de la variation permet de prendre en compte la suppression d'un contrôle.",a:false,e:"Il manquerait le résultat du contrôle supprimé pour la campagne en cours."},
+{p:3,q:"Recalculer tout le passé ne permet pas de prendre en compte l'ajout d'un contrôle.",a:true,e:"Le nouveau contrôle n'a pas de résultat pour les campagnes passées."},
+{p:3,q:"Les sensibilités des données sont des facteurs statiques de la méthode.",a:false,e:"Elles sont dynamiques ; le mémoire évoque une mise à jour possible tous les trois ans en raison du coût de calcul."},
+{p:3,q:"La note agrégée d'une entité se calcule avec les seuls contrôles rattachés à cette entité.",a:true,e:"Éq. 40 : la condition d'agrégation filtre les contrôles."},
+{p:3,q:"La mission décrite dans le mémoire portait sur un groupe en formule standard pure.",a:false,e:"Le groupe utilise un modèle interne partiel approuvé par l'ACPR sur une branche."},
+{p:3,q:"Les tableaux 3 et 5 du mémoire donnent la même sensibilité pour les provisions mathématiques.",a:false,e:"4,57 % au tableau 3, 5,74 % au tableau 5. C'est une incohérence interne des exemples."}
+]
+};
+</script>
+<script>window.CAMPAGNES = {"campagnes":[{"campagne":"N-1","date_arrete":"2026-06-30","scr":157.11223514660995,"parametres":{"seuil_significativite":0.01,"mode_tolerance":"donnee","delta_scr_max":0.005,"tolerance_globale":0.05,"coef_degradation":0.05,"base_anteriorite":"frequence","methode_degradation":"simple","ponderation_donnees":"sensibilite","repartition_seuil":"uniforme","marge_alerte":0.02,"donnee_sans_controle":"exclure"},"indicateurs":{"nb_donnees_critiques":8,"sensibilite_moyenne":0.17262165955050965,"note_avant_degradation":0.9914020376162986,"note":0.9876118840720224,"note_min":0.9710349210347098,"ecart_objectif":0.016576963037312598,"degradation_moyenne":0.0038230237587459914,"taux_validation":0.8928571428571429,"anteriorite_moyenne":0.10714285714285714,"taux_conformite_controles":0.8928571428571429,"nb_donnees_hors_tolerance":2,"note_plancher":0.9627711656421877,"donnees_critiques_non_controlees":[],"tolerance_globale_effective":0.028965078965290214},"donnees":[{"donnee_id":"primes_acquises_RC_DECENNALE","libelle":"Primes acquises RC décennale","proprietaire":"Direction technique IARD","sensibilite":0.07802287759551349,"critique_expert":null,"valeur":60.64939390999991,"criteres_couverts":"EPX","note":0.9974376820982505,"note_min":0.9359162318272722,"statut":"vert"},{"donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","libelle":"Primes acquises dommages-ouvrage","proprietaire":"Direction technique IARD","sensibilite":0.00917313387890666,"critique_expert":null,"valeur":25.743569920000002,"criteres_couverts":"EPX","note":0.9955402427525651,"note_min":null,"statut":null},{"donnee_id":"primes_acquises_AUTO_FLOTTE","libelle":"Primes acquises flottes auto","proprietaire":"Direction technique IARD","sensibilite":0.005092561493465666,"critique_expert":null,"valeur":15.209454459999993,"criteres_couverts":"EPX","note":0.9986259273366449,"note_min":null,"statut":null},{"donnee_id":"provisions_sinistres_RC_DECENNALE","libelle":"Provisions sinistres RC décennale","proprietaire":"Direction sinistres","sensibilite":0.733746303008594,"critique_expert":null,"valeur":410.5926830099999,"criteres_couverts":"EPX","note":0.9927471273909831,"note_min":0.9931856556148925,"statut":"orange"},{"donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","libelle":"Provisions sinistres DO","proprietaire":"Direction sinistres","sensibilite":0.11484199345705888,"critique_expert":null,"valeur":124.18203149999994,"criteres_couverts":"EPX","note":0.9913230252916981,"note_min":0.9564619191161152,"statut":"vert"},{"donnee_id":"provisions_sinistres_AUTO_FLOTTE","libelle":"Provisions sinistres flottes auto","proprietaire":"Direction sinistres","sensibilite":0.010279859380446671,"critique_expert":null,"valeur":18.726143119999996,"criteres_couverts":"EPX","note":0.9941718629647979,"note_min":0.5136120237684861,"statut":"vert"},{"donnee_id":"taux_cession","libelle":"Taux de cession réassurance","proprietaire":"Service réassurance","sensibilite":0.21226341938138069,"critique_expert":null,"valeur":0.20220807493833123,"criteres_couverts":"PX","note":0.9871666666666666,"note_min":0.9764443632606505,"statut":"vert"},{"donnee_id":"placements_ACTIONS","libelle":"Placements actions (VM)","proprietaire":"Direction financière","sensibilite":0.02790176680585569,"critique_expert":null,"valeur":39.37480121,"criteres_couverts":"EPX","note":0.9754024210044351,"note_min":0.8207998785599964,"statut":"vert"},{"donnee_id":"placements_OBLIGATIONS","libelle":"Placements obligations (VM)","proprietaire":"Direction financière","sensibilite":0.03129539722471814,"critique_expert":null,"valeur":361.90719915999966,"criteres_couverts":"EPX","note":0.9778654555125786,"note_min":0.8402320966211979,"statut":"vert"},{"donnee_id":"date_survenance","libelle":"Date de survenance des sinistres","proprietaire":"Direction sinistres","sensibilite":0.17262165955050965,"critique_expert":true,"valeur":null,"criteres_couverts":"PX","note":0.9627711656421877,"note_min":0.9710349210347096,"statut":"orange"},{"donnee_id":"code_activite_btp","libelle":"Code activité BTP","proprietaire":"Direction technique IARD","sensibilite":0.0,"critique_expert":false,"valeur":null,"criteres_couverts":"P","note":0.9772355060596135,"note_min":null,"statut":null}],"controles":[{"controle_id":"C07|TOUS","libelle":"Survenance avant date d'effet","donnee_id":"date_survenance","maille":"TOUS","famille":"coherence","criteres":"P","frequence":"S","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9862,"anteriorite":1.0,"resultat":0.9368899999999999,"date_derniere_real":"2025-12-31"},{"controle_id":"R05|RC_DECENNALE","libelle":"Taux de cession traité vs modèle","donnee_id":"taux_cession","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"X,P","frequence":"A","etape":"Réassurance→Modèle SCR","responsable":"Service réassurance","poids":1.0,"resultat_brut":1.0,"anteriorite":0.0,"resultat":1.0,"date_derniere_real":"2025-12-31"},{"controle_id":"R05|DOMMAGES_OUVRAGE","libelle":"Taux de cession traité vs modèle","donnee_id":"taux_cession","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"X,P","frequence":"A","etape":"Réassurance→Modèle SCR","responsable":"Service réassurance","poids":1.0,"resultat_brut":0.9615,"anteriorite":0.0,"resultat":0.9615,"date_derniere_real":"2025-12-31"},{"controle_id":"R05|AUTO_FLOTTE","libelle":"Taux de cession traité vs modèle","donnee_id":"taux_cession","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"X,P","frequence":"A","etape":"Réassurance→Modèle SCR","responsable":"Service réassurance","poids":1.0,"resultat_brut":1.0,"anteriorite":0.0,"resultat":1.0,"date_derniere_real":"2025-12-31"},{"controle_id":"C08|ACTIONS","libelle":"ISIN absent ou mal formé","donnee_id":"placements_ACTIONS","maille":"ACTIONS","famille":"coherence","criteres":"E,X","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.989,"anteriorite":1.0,"resultat":0.93955,"date_derniere_real":"2026-03-31"},{"controle_id":"C08|OBLIGATIONS","libelle":"ISIN absent ou mal formé","donnee_id":"placements_OBLIGATIONS","maille":"OBLIGATIONS","famille":"coherence","criteres":"E,X","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9935,"anteriorite":1.0,"resultat":0.943825,"date_derniere_real":"2026-03-31"},{"controle_id":"R04|RC_DECENNALE","libelle":"Règlements gestion vs comptabilité","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9956405265412005,"anteriorite":0.0,"resultat":0.9956405265412005,"date_derniere_real":"2026-06-30"},{"controle_id":"R04|DOMMAGES_OUVRAGE","libelle":"Règlements gestion vs comptabilité","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9998592596177138,"anteriorite":0.0,"resultat":0.9998592596177138,"date_derniere_real":"2026-06-30"},{"controle_id":"R04|AUTO_FLOTTE","libelle":"Règlements gestion vs comptabilité","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.987597991294946,"anteriorite":0.0,"resultat":0.987597991294946,"date_derniere_real":"2026-06-30"},{"controle_id":"C04|RC_DECENNALE","libelle":"Sinistres orphelins","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"E,P","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.999549386346073,"anteriorite":0.0,"resultat":0.999549386346073,"date_derniere_real":"2026-06-30"},{"controle_id":"C04|DOMMAGES_OUVRAGE","libelle":"Sinistres orphelins","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"E,P","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9906187349930482,"anteriorite":0.0,"resultat":0.9906187349930482,"date_derniere_real":"2026-06-30"},{"controle_id":"C04|AUTO_FLOTTE","libelle":"Sinistres orphelins","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"E,P","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9987052055589046,"anteriorite":0.0,"resultat":0.9987052055589046,"date_derniere_real":"2026-06-30"},{"controle_id":"C05|AUTO_FLOTTE","libelle":"Provisions dossier négatives","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9990272406245128,"anteriorite":0.0,"resultat":0.9990272406245128,"date_derniere_real":"2026-06-30"},{"controle_id":"C05|DOMMAGES_OUVRAGE","libelle":"Provisions dossier négatives","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9974820866081001,"anteriorite":0.0,"resultat":0.9974820866081001,"date_derniere_real":"2026-06-30"},{"controle_id":"R03|AUTO_FLOTTE","libelle":"Provisions gestion vs entrepôt vs actuariat","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Entrepôt→Actuariat","responsable":"Actuariat","poids":3.0,"resultat_brut":0.9932335801034746,"anteriorite":0.0,"resultat":0.9932335801034746,"date_derniere_real":"2026-06-30"},{"controle_id":"C06|TOUS","libelle":"Survenance postérieure à la déclaration","donnee_id":"date_survenance","maille":"TOUS","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9886523312843755,"anteriorite":0.0,"resultat":0.9886523312843755,"date_derniere_real":"2026-06-30"},{"controle_id":"R06|ACTIONS","libelle":"Placements dépositaire vs comptabilité","donnee_id":"placements_ACTIONS","maille":"ACTIONS","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Dépositaire→Comptabilité","responsable":"Direction financière","poids":1.0,"resultat_brut":0.997927860358881,"anteriorite":0.0,"resultat":0.997927860358881,"date_derniere_real":"2026-06-30"},{"controle_id":"R06|OBLIGATIONS","libelle":"Placements dépositaire vs comptabilité","donnee_id":"placements_OBLIGATIONS","maille":"OBLIGATIONS","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Dépositaire→Comptabilité","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9996561380987972,"anteriorite":0.0,"resultat":0.9996561380987972,"date_derniere_real":"2026-06-30"},{"controle_id":"C09|ACTIONS","libelle":"CIC incohérent avec la classe d'actif","donnee_id":"placements_ACTIONS","maille":"ACTIONS","famille":"coherence","criteres":"P","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9887294026544242,"anteriorite":0.0,"resultat":0.9887294026544242,"date_derniere_real":"2026-06-30"},{"controle_id":"C05|RC_DECENNALE","libelle":"Provisions dossier négatives","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9966696403890167,"anteriorite":0.0,"resultat":0.9966696403890167,"date_derniere_real":"2026-06-30"},{"controle_id":"R03|DOMMAGES_OUVRAGE","libelle":"Provisions gestion vs entrepôt vs actuariat","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Entrepôt→Actuariat","responsable":"Actuariat","poids":3.0,"resultat_brut":0.9866593568437756,"anteriorite":0.0,"resultat":0.9866593568437756,"date_derniere_real":"2026-06-30"},{"controle_id":"C03|DOMMAGES_OUVRAGE","libelle":"Doublons de contrats","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"X,P","frequence":"S","etape":"Gestion","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9992862241256245,"anteriorite":0.0,"resultat":0.9992862241256245,"date_derniere_real":"2026-06-30"},{"controle_id":"C03|AUTO_FLOTTE","libelle":"Doublons de contrats","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"X,P","frequence":"S","etape":"Gestion","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9986684420772304,"anteriorite":0.0,"resultat":0.9986684420772304,"date_derniere_real":"2026-06-30"},{"controle_id":"R01|RC_DECENNALE","libelle":"Primes acquises gestion vs comptabilité","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9952857659493457,"anteriorite":0.0,"resultat":0.9952857659493457,"date_derniere_real":"2026-06-30"},{"controle_id":"R01|DOMMAGES_OUVRAGE","libelle":"Primes acquises gestion vs comptabilité","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9908036697810092,"anteriorite":0.0,"resultat":0.9908036697810092,"date_derniere_real":"2026-06-30"},{"controle_id":"R01|AUTO_FLOTTE","libelle":"Primes acquises gestion vs comptabilité","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.999961910533903,"anteriorite":0.0,"resultat":0.999961910533903,"date_derniere_real":"2026-06-30"},{"controle_id":"R02|RC_DECENNALE","libelle":"Primes acquises gestion vs entrepôt","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":2.0,"resultat_brut":0.9970928140404116,"anteriorite":0.0,"resultat":0.9970928140404116,"date_derniere_real":"2026-06-30"},{"controle_id":"R02|DOMMAGES_OUVRAGE","libelle":"Primes acquises gestion vs entrepôt","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":2.0,"resultat_brut":0.9951444070075022,"anteriorite":0.0,"resultat":0.9951444070075022,"date_derniere_real":"2026-06-30"},{"controle_id":"R02|AUTO_FLOTTE","libelle":"Primes acquises gestion vs entrepôt","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":2.0,"resultat_brut":0.9989371681557204,"anteriorite":0.0,"resultat":0.9989371681557204,"date_derniere_real":"2026-06-30"},{"controle_id":"R03|RC_DECENNALE","libelle":"Provisions gestion vs entrepôt vs actuariat","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Entrepôt→Actuariat","responsable":"Actuariat","poids":3.0,"resultat_brut":0.9882077370232027,"anteriorite":0.0,"resultat":0.9882077370232027,"date_derniere_real":"2026-06-30"},{"controle_id":"C01|RC_DECENNALE","libelle":"Contrats absents de l'entrepôt","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"E","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9983537024917386,"anteriorite":0.0,"resultat":0.9983537024917386,"date_derniere_real":"2026-06-30"},{"controle_id":"C01|AUTO_FLOTTE","libelle":"Contrats absents de l'entrepôt","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"E","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9987422299936124,"anteriorite":0.0,"resultat":0.9987422299936124,"date_derniere_real":"2026-06-30"},{"controle_id":"C02|RC_DECENNALE","libelle":"Primes acquises négatives ou > émises","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9977376179845479,"anteriorite":0.0,"resultat":0.9977376179845479,"date_derniere_real":"2026-06-30"},{"controle_id":"C02|DOMMAGES_OUVRAGE","libelle":"Primes acquises négatives ou > émises","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9966655871832782,"anteriorite":0.0,"resultat":0.9966655871832782,"date_derniere_real":"2026-06-30"},{"controle_id":"C02|AUTO_FLOTTE","libelle":"Primes acquises négatives ou > émises","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9965086451036832,"anteriorite":0.0,"resultat":0.9965086451036832,"date_derniere_real":"2026-06-30"},{"controle_id":"C03|RC_DECENNALE","libelle":"Doublons de contrats","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"X,P","frequence":"S","etape":"Gestion","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9990633780830471,"anteriorite":0.0,"resultat":0.9990633780830471,"date_derniere_real":"2026-06-30"},{"controle_id":"C09|OBLIGATIONS","libelle":"CIC incohérent avec la classe d'actif","donnee_id":"placements_OBLIGATIONS","maille":"OBLIGATIONS","famille":"coherence","criteres":"P","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.990115228438939,"anteriorite":0.0,"resultat":0.990115228438939,"date_derniere_real":"2026-06-30"},{"controle_id":"C01|DOMMAGES_OUVRAGE","libelle":"Contrats absents de l'entrepôt","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"E","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9961971614104737,"anteriorite":0.0,"resultat":0.9961971614104737,"date_derniere_real":"2026-06-30"},{"controle_id":"C10|TOUS","libelle":"Code activité hors nomenclature","donnee_id":"code_activite_btp","maille":"TOUS","famille":"coherence","criteres":"P","frequence":"S","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9772355060596135,"anteriorite":0.0,"resultat":0.9772355060596135,"date_derniere_real":"2026-06-30"}]},{"campagne":"N","date_arrete":"2026-09-30","scr":165.64225095944104,"parametres":{"seuil_significativite":0.01,"mode_tolerance":"donnee","delta_scr_max":0.005,"tolerance_globale":0.05,"coef_degradation":0.05,"base_anteriorite":"frequence","methode_degradation":"simple","ponderation_donnees":"sensibilite","repartition_seuil":"uniforme","marge_alerte":0.02,"donnee_sans_controle":"exclure"},"indicateurs":{"nb_donnees_critiques":8,"sensibilite_moyenne":0.17270190707173955,"note_avant_degradation":0.9842390236603262,"note":0.9744826407320405,"note_min":0.9710483799236622,"ecart_objectif":0.0034342608083782755,"degradation_moyenne":0.009912615425470839,"taux_validation":0.7857142857142857,"anteriorite_moyenne":0.2857142857142857,"taux_conformite_controles":0.8214285714285714,"nb_donnees_hors_tolerance":2,"note_plancher":0.9596835550889905,"donnees_critiques_non_controlees":[],"tolerance_globale_effective":0.02895162007633778},"donnees":[{"donnee_id":"primes_acquises_RC_DECENNALE","libelle":"Primes acquises RC décennale","proprietaire":"Direction technique IARD","sensibilite":0.07613403307214608,"critique_expert":null,"valeur":62.74734190000005,"criteres_couverts":"EPX","note":0.997702414508598,"note_min":0.9343263479124782,"statut":"vert"},{"donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","libelle":"Primes acquises dommages-ouvrage","proprietaire":"Direction technique IARD","sensibilite":0.008787986466403804,"critique_expert":null,"valeur":26.143349960000005,"criteres_couverts":"EPX","note":0.9822356218143747,"note_min":null,"statut":null},{"donnee_id":"primes_acquises_AUTO_FLOTTE","libelle":"Primes acquises flottes auto","proprietaire":"Direction technique IARD","sensibilite":0.0048314300408201175,"critique_expert":null,"valeur":15.355006360000015,"criteres_couverts":"EPX","note":0.997501129465438,"note_min":null,"statut":null},{"donnee_id":"provisions_sinistres_RC_DECENNALE","libelle":"Provisions sinistres RC décennale","proprietaire":"Direction sinistres","sensibilite":0.7301473275858497,"critique_expert":null,"valeur":431.6807935200002,"criteres_couverts":"EPX","note":0.9701736761249867,"note_min":0.9931520669718371,"statut":"rouge"},{"donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","libelle":"Provisions sinistres DO","proprietaire":"Direction sinistres","sensibilite":0.11676605830687156,"critique_expert":null,"valeur":132.71248525000007,"criteres_couverts":"EPX","note":0.985785855087833,"note_min":0.9571793372791642,"statut":"vert"},{"donnee_id":"provisions_sinistres_AUTO_FLOTTE","libelle":"Provisions sinistres flottes auto","proprietaire":"Direction sinistres","sensibilite":0.010136494586636262,"critique_expert":null,"valeur":19.466969270000014,"criteres_couverts":"EPX","note":0.9871996621224296,"note_min":0.5067328298490985,"statut":"vert"},{"donnee_id":"taux_cession","libelle":"Taux de cession réassurance","proprietaire":"Service réassurance","sensibilite":0.2119187437948357,"critique_expert":null,"valeur":0.2028269651988715,"criteres_couverts":"PX","note":0.9871666666666666,"note_min":0.9764060511568499,"statut":"vert"},{"donnee_id":"placements_ACTIONS","libelle":"Placements actions (VM)","proprietaire":"Direction financière","sensibilite":0.039784919783194934,"critique_expert":null,"valeur":50.621133915699986,"criteres_couverts":"EPX","note":0.9596835550889905,"note_min":0.8743242407613955,"statut":"vert"},{"donnee_id":"placements_OBLIGATIONS","libelle":"Placements obligations (VM)","proprietaire":"Direction financière","sensibilite":0.02402577237264263,"critique_expert":null,"valeur":338.9286469881,"criteres_couverts":"EPX","note":0.9633442226088972,"note_min":0.7918901451970244,"statut":"vert"},{"donnee_id":"date_survenance","libelle":"Date de survenance des sinistres","proprietaire":"Direction sinistres","sensibilite":0.17270190707173955,"critique_expert":true,"valeur":null,"criteres_couverts":"PX","note":0.9634696346910543,"note_min":0.9710483799236622,"statut":"orange"},{"donnee_id":"code_activite_btp","libelle":"Code activité BTP","proprietaire":"Direction technique IARD","sensibilite":0.0,"critique_expert":false,"valeur":null,"criteres_couverts":"P","note":0.9855940433797346,"note_min":null,"statut":null}],"controles":[{"controle_id":"C07|TOUS","libelle":"Survenance avant date d'effet","donnee_id":"date_survenance","maille":"TOUS","famille":"coherence","criteres":"P","frequence":"S","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9862,"anteriorite":1.0,"resultat":0.9368899999999999,"date_derniere_real":"2025-12-31"},{"controle_id":"R05|RC_DECENNALE","libelle":"Taux de cession traité vs modèle","donnee_id":"taux_cession","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"X,P","frequence":"A","etape":"Réassurance→Modèle SCR","responsable":"Service réassurance","poids":1.0,"resultat_brut":1.0,"anteriorite":0.0,"resultat":1.0,"date_derniere_real":"2025-12-31"},{"controle_id":"R05|DOMMAGES_OUVRAGE","libelle":"Taux de cession traité vs modèle","donnee_id":"taux_cession","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"X,P","frequence":"A","etape":"Réassurance→Modèle SCR","responsable":"Service réassurance","poids":1.0,"resultat_brut":0.9615,"anteriorite":0.0,"resultat":0.9615,"date_derniere_real":"2025-12-31"},{"controle_id":"R05|AUTO_FLOTTE","libelle":"Taux de cession traité vs modèle","donnee_id":"taux_cession","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"X,P","frequence":"A","etape":"Réassurance→Modèle SCR","responsable":"Service réassurance","poids":1.0,"resultat_brut":1.0,"anteriorite":0.0,"resultat":1.0,"date_derniere_real":"2025-12-31"},{"controle_id":"C08|ACTIONS","libelle":"ISIN absent ou mal formé","donnee_id":"placements_ACTIONS","maille":"ACTIONS","famille":"coherence","criteres":"E,X","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.989,"anteriorite":2.0,"resultat":0.8901,"date_derniere_real":"2026-03-31"},{"controle_id":"C08|OBLIGATIONS","libelle":"ISIN absent ou mal formé","donnee_id":"placements_OBLIGATIONS","maille":"OBLIGATIONS","famille":"coherence","criteres":"E,X","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9935,"anteriorite":2.0,"resultat":0.8941500000000001,"date_derniere_real":"2026-03-31"},{"controle_id":"R04|RC_DECENNALE","libelle":"Règlements gestion vs comptabilité","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9956405265412005,"anteriorite":1.0,"resultat":0.9458585002141404,"date_derniere_real":"2026-06-30"},{"controle_id":"R04|DOMMAGES_OUVRAGE","libelle":"Règlements gestion vs comptabilité","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9998592596177138,"anteriorite":1.0,"resultat":0.9498662966368281,"date_derniere_real":"2026-06-30"},{"controle_id":"R04|AUTO_FLOTTE","libelle":"Règlements gestion vs comptabilité","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.987597991294946,"anteriorite":1.0,"resultat":0.9382180917301987,"date_derniere_real":"2026-06-30"},{"controle_id":"R03|DOMMAGES_OUVRAGE","libelle":"Provisions gestion vs entrepôt vs actuariat","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Entrepôt→Actuariat","responsable":"Actuariat","poids":3.0,"resultat_brut":0.9888084980877752,"anteriorite":0.0,"resultat":0.9888084980877752,"date_derniere_real":"2026-09-30"},{"controle_id":"R03|AUTO_FLOTTE","libelle":"Provisions gestion vs entrepôt vs actuariat","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Entrepôt→Actuariat","responsable":"Actuariat","poids":3.0,"resultat_brut":0.9959329334564633,"anteriorite":0.0,"resultat":0.9959329334564633,"date_derniere_real":"2026-09-30"},{"controle_id":"C04|RC_DECENNALE","libelle":"Sinistres orphelins","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"E,P","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9972812304623357,"anteriorite":0.0,"resultat":0.9972812304623357,"date_derniere_real":"2026-09-30"},{"controle_id":"C04|DOMMAGES_OUVRAGE","libelle":"Sinistres orphelins","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"E,P","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9998930463498652,"anteriorite":0.0,"resultat":0.9998930463498652,"date_derniere_real":"2026-09-30"},{"controle_id":"C04|AUTO_FLOTTE","libelle":"Sinistres orphelins","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"E,P","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9975772375684749,"anteriorite":0.0,"resultat":0.9975772375684749,"date_derniere_real":"2026-09-30"},{"controle_id":"C05|AUTO_FLOTTE","libelle":"Provisions dossier négatives","donnee_id":"provisions_sinistres_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9996038430665142,"anteriorite":0.0,"resultat":0.9996038430665142,"date_derniere_real":"2026-09-30"},{"controle_id":"C05|DOMMAGES_OUVRAGE","libelle":"Provisions dossier négatives","donnee_id":"provisions_sinistres_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9985302932769793,"anteriorite":0.0,"resultat":0.9985302932769793,"date_derniere_real":"2026-09-30"},{"controle_id":"C06|TOUS","libelle":"Survenance postérieure à la déclaration","donnee_id":"date_survenance","maille":"TOUS","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9900492693821088,"anteriorite":0.0,"resultat":0.9900492693821088,"date_derniere_real":"2026-09-30"},{"controle_id":"R06|ACTIONS","libelle":"Placements dépositaire vs comptabilité","donnee_id":"placements_ACTIONS","maille":"ACTIONS","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Dépositaire→Comptabilité","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9999999991248711,"anteriorite":0.0,"resultat":0.9999999991248711,"date_derniere_real":"2026-09-30"},{"controle_id":"R06|OBLIGATIONS","libelle":"Placements dépositaire vs comptabilité","donnee_id":"placements_OBLIGATIONS","maille":"OBLIGATIONS","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Dépositaire→Comptabilité","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9998506789781574,"anteriorite":0.0,"resultat":0.9998506789781574,"date_derniere_real":"2026-09-30"},{"controle_id":"R03|RC_DECENNALE","libelle":"Provisions gestion vs entrepôt vs actuariat","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Entrepôt→Actuariat","responsable":"Actuariat","poids":3.0,"resultat_brut":0.9597508276151108,"anteriorite":0.0,"resultat":0.9597508276151108,"date_derniere_real":"2026-09-30"},{"controle_id":"C09|ACTIONS","libelle":"CIC incohérent avec la classe d'actif","donnee_id":"placements_ACTIONS","maille":"ACTIONS","famille":"coherence","criteres":"P","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9889506661421007,"anteriorite":0.0,"resultat":0.9889506661421007,"date_derniere_real":"2026-09-30"},{"controle_id":"C05|RC_DECENNALE","libelle":"Provisions dossier négatives","donnee_id":"provisions_sinistres_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction sinistres","poids":1.0,"resultat_brut":0.9986498432281112,"anteriorite":0.0,"resultat":0.9986498432281112,"date_derniere_real":"2026-09-30"},{"controle_id":"C03|AUTO_FLOTTE","libelle":"Doublons de contrats","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"X,P","frequence":"S","etape":"Gestion","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9986842105263158,"anteriorite":0.0,"resultat":0.9986842105263158,"date_derniere_real":"2026-09-30"},{"controle_id":"C01|RC_DECENNALE","libelle":"Contrats absents de l'entrepôt","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"E","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9962208397327451,"anteriorite":0.0,"resultat":0.9962208397327451,"date_derniere_real":"2026-09-30"},{"controle_id":"C03|RC_DECENNALE","libelle":"Doublons de contrats","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"X,P","frequence":"S","etape":"Gestion","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9990743597655045,"anteriorite":0.0,"resultat":0.9990743597655045,"date_derniere_real":"2026-09-30"},{"controle_id":"C02|AUTO_FLOTTE","libelle":"Primes acquises négatives ou > émises","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9992246156143795,"anteriorite":0.0,"resultat":0.9992246156143795,"date_derniere_real":"2026-09-30"},{"controle_id":"C02|DOMMAGES_OUVRAGE","libelle":"Primes acquises négatives ou > émises","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9959852134331595,"anteriorite":0.0,"resultat":0.9959852134331595,"date_derniere_real":"2026-09-30"},{"controle_id":"C02|RC_DECENNALE","libelle":"Primes acquises négatives ou > émises","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"coherence","criteres":"X","frequence":"T","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9987638112228379,"anteriorite":0.0,"resultat":0.9987638112228379,"date_derniere_real":"2026-09-30"},{"controle_id":"C01|AUTO_FLOTTE","libelle":"Contrats absents de l'entrepôt","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"coherence","criteres":"E","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9985809459358015,"anteriorite":0.0,"resultat":0.9985809459358015,"date_derniere_real":"2026-09-30"},{"controle_id":"C01|DOMMAGES_OUVRAGE","libelle":"Contrats absents de l'entrepôt","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"E","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9683792980414676,"anteriorite":0.0,"resultat":0.9683792980414676,"date_derniere_real":"2026-09-30"},{"controle_id":"R02|AUTO_FLOTTE","libelle":"Primes acquises gestion vs entrepôt","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":2.0,"resultat_brut":0.9980448100524351,"anteriorite":0.0,"resultat":0.9980448100524351,"date_derniere_real":"2026-09-30"},{"controle_id":"R02|DOMMAGES_OUVRAGE","libelle":"Primes acquises gestion vs entrepôt","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":2.0,"resultat_brut":0.9668998070016221,"anteriorite":0.0,"resultat":0.9668998070016221,"date_derniere_real":"2026-09-30"},{"controle_id":"R02|RC_DECENNALE","libelle":"Primes acquises gestion vs entrepôt","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"E,X","frequence":"T","etape":"Gestion→Entrepôt","responsable":"Équipe données","poids":2.0,"resultat_brut":0.9965073993936566,"anteriorite":0.0,"resultat":0.9965073993936566,"date_derniere_real":"2026-09-30"},{"controle_id":"R01|AUTO_FLOTTE","libelle":"Primes acquises gestion vs comptabilité","donnee_id":"primes_acquises_AUTO_FLOTTE","maille":"AUTO_FLOTTE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.992427384611261,"anteriorite":0.0,"resultat":0.992427384611261,"date_derniere_real":"2026-09-30"},{"controle_id":"R01|DOMMAGES_OUVRAGE","libelle":"Primes acquises gestion vs comptabilité","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9959553217104242,"anteriorite":0.0,"resultat":0.9959553217104242,"date_derniere_real":"2026-09-30"},{"controle_id":"R01|RC_DECENNALE","libelle":"Primes acquises gestion vs comptabilité","donnee_id":"primes_acquises_RC_DECENNALE","maille":"RC_DECENNALE","famille":"rapprochement","criteres":"X","frequence":"T","etape":"Gestion→Comptabilité","responsable":"Contrôle de gestion","poids":1.0,"resultat_brut":0.9991406775431877,"anteriorite":0.0,"resultat":0.9991406775431877,"date_derniere_real":"2026-09-30"},{"controle_id":"C09|OBLIGATIONS","libelle":"CIC incohérent avec la classe d'actif","donnee_id":"placements_OBLIGATIONS","maille":"OBLIGATIONS","famille":"coherence","criteres":"P","frequence":"T","etape":"Dépositaire","responsable":"Direction financière","poids":1.0,"resultat_brut":0.9960319888485342,"anteriorite":0.0,"resultat":0.9960319888485342,"date_derniere_real":"2026-09-30"},{"controle_id":"C03|DOMMAGES_OUVRAGE","libelle":"Doublons de contrats","donnee_id":"primes_acquises_DOMMAGES_OUVRAGE","maille":"DOMMAGES_OUVRAGE","famille":"coherence","criteres":"X,P","frequence":"S","etape":"Gestion","responsable":"Équipe données","poids":1.0,"resultat_brut":0.9992942836979535,"anteriorite":0.0,"resultat":0.9992942836979535,"date_derniere_real":"2026-09-30"},{"controle_id":"C10|TOUS","libelle":"Code activité hors nomenclature","donnee_id":"code_activite_btp","maille":"TOUS","famille":"coherence","criteres":"P","frequence":"S","etape":"Gestion","responsable":"Direction technique","poids":1.0,"resultat_brut":0.9855940433797346,"anteriorite":0.0,"resultat":0.9855940433797346,"date_derniere_real":"2026-09-30"}]}],"variation":[{"etape":"Note QDD agrégée N-1","note":0.9876118840720224,"impact":null},{"etape":"Suppression de contrôles","note":0.9876118840720224,"impact":0.0},{"etape":"Sortie de données critiques","note":0.9876118840720224,"impact":0.0},{"etape":"QDD mesurée par les contrôles (antériorité intacte)","note":0.9804321143592672,"impact":-0.007179769712755135},{"etape":"Antériorité des contrôles","note":0.9745612585158323,"impact":-0.005870855843434941},{"etape":"Coefficient de dégradation","note":0.9745612585158323,"impact":0.0},{"etape":"Pondération des contrôles","note":0.9745612585158323,"impact":0.0},{"etape":"Ajout de contrôles","note":0.9745612585158323,"impact":0.0},{"etape":"Sensibilités des données critiques","note":0.9744826407320405,"impact":-7.861778379181228e-05},{"etape":"Entrée de données critiques","note":0.9744826407320405,"impact":0.0},{"etape":"Note QDD agrégée N","note":0.9744826407320405,"impact":null}]};</script>
+<script>
+(function(){
+const C = window.CONTENU, Q = window.QDD, DATA = window.CAMPAGNES;
+const $ = (s, el=document) => el.querySelector(s);
+const pct = (x, d=2) => (x==null || !isFinite(x)) ? "—" : (x*100).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d})+" %";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = { get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}} };
+const pill = s => `<span class="pill ${s||"na"}">${s||"n.c."}</span>`;
+
+/* ---------- Onglets ---------- */
+const tabs = [...document.querySelectorAll("[data-tab]")];
+function show(t){
+  if(!document.querySelector(`[data-panel="${t}"]`)) t="fiches";
+  tabs.forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===t));
+  document.querySelectorAll("[data-panel]").forEach(p=>p.hidden = p.dataset.panel!==t);
+  store.set("qdd-tab", t);
+  if(t==="campagne") renderCampagne();
+  if(t==="simulateur") renderSim();
+}
+tabs.forEach(b=>b.addEventListener("click",()=>{show(b.dataset.tab); window.scrollTo({top:0});}));
+
+/* ---------- Fiches ---------- */
+const done = new Set(store.get("qdd-fiches", []));
+function renderFiches(){
+  $("#fiches").innerHTML = C.fiches.map(f=>`
+    <article class="card fiche" id="f-${f.id}">
+      <header><div style="display:grid;gap:4px"><span class="eyebrow">${esc(f.partie)}</span><h3>${esc(f.titre)}</h3></div>
+      <label class="chk"><input type="checkbox" data-f="${f.id}" ${done.has(f.id)?"checked":""}> Révisée</label></header>
+      <ul>${f.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>
+      ${f.formule?`<div class="formula">${esc(f.formule)}</div>`:""}
+      ${f.retenir?`<div class="note ret"><b>À retenir</b><span>${esc(f.retenir)}</span></div>`:""}
+      ${f.piege?`<div class="note pie"><b>Piège</b><span>${esc(f.piege)}</span></div>`:""}
+    </article>`).join("");
+  renderToc();
+  $("#fiches").addEventListener("change", e=>{ const id=e.target.dataset.f; if(!id) return;
+    e.target.checked?done.add(id):done.delete(id); store.set("qdd-fiches",[...done]); renderToc(); });
+}
+function renderToc(){
+  $("#toc").innerHTML = `<div class="prog">${done.size} / ${C.fiches.length} révisées</div>` +
+    C.fiches.map(f=>`<a href="#f-${f.id}" class="${done.has(f.id)?"done":""}" data-goto="f-${f.id}">${esc(f.titre)}</a>`).join("");
+}
+$("#toc").addEventListener("click", e=>{ const a=e.target.closest("a"); if(!a) return; e.preventDefault();
+  document.getElementById(a.dataset.goto).scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); });
+
+/* ---------- Quiz (QCM et Vrai/Faux) ---------- */
+function quiz(kind){
+  const bank = kind==="qcm" ? C.qcm : C.vf.map(x=>({p:x.p,q:x.q,o:["Vrai","Faux"],a:x.a?0:1,e:x.e}));
+  const box = $(`#${kind}-box`), ctrl = $(`#${kind}-ctrl`);
+  let st = {partie:0, n:10};
+  ctrl.innerHTML = `<div class="seg" data-k="partie"><button data-v="0">Toutes parties</button><button data-v="1">Partie 1</button><button data-v="2">Partie 2</button><button data-v="3">Partie 3</button></div>
+    <div class="seg" data-k="n"><button data-v="10">10 questions</button><button data-v="999">Toutes</button></div>
+    <button class="btn primary" data-start>Nouvelle série</button><span class="muted" style="font-size:13px" data-best></span>`;
+  const sync = () => { ctrl.querySelectorAll(".seg").forEach(s=>s.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", String(st[s.dataset.k])===b.dataset.v)));
+    const best = store.get(`qdd-best-${kind}`, null); ctrl.querySelector("[data-best]").textContent = best ? `Meilleur score : ${best}` : ""; };
+  ctrl.addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return;
+    const s=b.closest(".seg"); if(s){ st[s.dataset.k]=+b.dataset.v; sync(); start(); } if(b.hasAttribute("data-start")) start(); });
+  let serie=[], i=0, ok=0, errs=[];
+  function start(){
+    serie = bank.filter(q=>!st.partie || q.p===st.partie).map(q=>({q, r:Math.random()})).sort((a,b)=>a.r-b.r).map(x=>x.q).slice(0, st.n);
+    i=0; ok=0; errs=[]; step();
+  }
+  function step(){
+    if(i>=serie.length) return end();
+    const q=serie[i];
+    box.innerHTML = `<div class="row" style="justify-content:space-between"><span class="eyebrow">Question ${i+1} / ${serie.length} · partie ${q.p}</span><span class="eyebrow">${ok} bonne${ok>1?"s":""}</span></div>
+      <div class="progress"><i style="width:${i/serie.length*100}%"></i></div>
+      <h3 style="font-size:20px">${esc(q.q)}</h3>
+      <div class="opts ${kind==="vf"?"vfopts":""}">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${kind==="qcm"?`<span class="l">${"ABCD"[k]}</span>`:""}<span>${esc(o)}</span></button>`).join("")}</div>
+      <div data-after></div>`;
+    box.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+      const k=+b.dataset.k, good = k===q.a; if(good) ok++; else errs.push(q);
+      box.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("good"); });
+      if(!good) b.classList.add("bad");
+      box.querySelector("[data-after]").innerHTML = `<div class="expl"><b>${good?"Exact.":"Non."}</b> ${esc(q.e)}</div>
+        <div class="row" style="margin-top:12px"><button class="btn primary" data-next>${i+1<serie.length?"Question suivante":"Voir le score"}</button></div>`;
+      box.querySelector("[data-next]").addEventListener("click",()=>{i++;step();});
+      box.querySelector("[data-next]").focus();
+    }));
+  }
+  function end(){
+    const s = `${ok} / ${serie.length}`, prev = store.get(`qdd-best-${kind}`, null);
+    if(!prev || ok/serie.length > +prev.split(" / ")[0]/+prev.split(" / ")[1]) store.set(`qdd-best-${kind}`, s);
+    box.innerHTML = `<span class="eyebrow">Résultat</span><div class="score num">${s}</div>
+      <p class="muted">${ok===serie.length?"Sans faute.":ok/serie.length>=.7?"Solide. Relis les explications ci-dessous.":"Repasse par les fiches concernées puis relance une série."}</p>
+      ${errs.length?`<div style="display:grid;gap:10px">${errs.map(q=>`<div class="expl"><b>${esc(q.q)}</b><br>Réponse : ${esc(q.o[q.a])}. ${esc(q.e)}</div>`).join("")}</div>`:""}
+      <div class="row"><button class="btn primary" data-again>Nouvelle série</button></div>`;
+    box.querySelector("[data-again]").addEventListener("click", start); sync();
+  }
+  sync(); start();
+}
+
+/* ---------- Simulateur ---------- */
+const PRESETS = {
+  memoire: {seuil:1, mode:"donnee", dscr:0.5, tol:5, rows:[["Primes acquises",14.23,99.90],["Provisions math.",5.74,74.71],["Sexe (H/F)",2.67,81.72],["Taux de cession",0.52,68.96]]},
+};
+function presetBTP(){
+  const c = DATA.campagnes[DATA.campagnes.length-1];
+  const rows = c.donnees.filter(d=>d.sensibilite>0).map(d=>[d.libelle, +(d.sensibilite*100).toFixed(2), +(d.note*100).toFixed(2)]);
+  return {seuil:1, mode:"donnee", dscr:0.5, tol:5, rows};
+}
+let sim = JSON.parse(JSON.stringify(PRESETS.memoire));
+function simEval(){
+  const p = {seuil:sim.seuil/100, mode:sim.mode, dscr:sim.dscr/100, tol:sim.tol/100, coef:0, degradation:"simple", marge:0.02};
+  const don = sim.rows.map((r,k)=>({donnee_id:"d"+k, libelle:r[0], sensibilite:r[1]/100, critique_expert:null}));
+  const ctl = sim.rows.map((r,k)=>({controle_id:"c"+k, donnee_id:"d"+k, poids:1, resultat_brut:r[2]/100, anteriorite:0}));
+  return Q.evaluer(don, ctl, p);
+}
+function renderSim(){
+  $("#s-seuil").value = sim.seuil; $("#s-dscr").value = sim.dscr; $("#s-tol").value = sim.tol;
+  $("#s-mode").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===sim.mode));
+  $("#f-dscr").hidden = sim.mode!=="donnee"; $("#f-tol").hidden = sim.mode!=="globale";
+  const ev = simEval();
+  const tot = ev.donnees.filter(d=>d.critique).reduce((a,d)=>a+d.sensibilite,0);
+  $("#s-rows").innerHTML = ev.donnees.map((d,k)=>`<tr>
+    <td><input class="txt" data-k="${k}" data-c="0" value="${esc(sim.rows[k][0])}" aria-label="Nom"></td>
+    <td class="r"><input type="number" step="0.01" data-k="${k}" data-c="1" value="${sim.rows[k][1]}" aria-label="Sensibilité"></td>
+    <td class="r"><input type="number" step="0.01" data-k="${k}" data-c="2" value="${sim.rows[k][2]}" aria-label="Note"></td>
+    <td>${d.critique?"Oui":"Non"}</td><td class="r num">${d.critique?pct(d.note_min):"—"}</td>
+    <td class="r num">${d.critique?pct(d.sensibilite/tot,1):"0 %"}</td><td>${pill(d.statut)}</td>
+    <td><button class="x" data-del="${k}" aria-label="Supprimer">✕</button></td></tr>`).join("");
+  const coh = $("#s-coh");
+  if(sim.mode==="donnee"){ coh.className="coh "+(ev.coherent?"ok":"ko"); coh.textContent = ev.coherent?`Cohérent : ΔSCR max (${sim.dscr} %) < seuil (${sim.seuil} %).`:`Incohérent : ΔSCR max doit rester sous le seuil de significativité (éq. 12).`; }
+  else { const b = sim.seuil/100/ev.S; coh.className="coh "+(ev.coherent?"ok":"ko"); coh.textContent = `Tolérance globale < seuil / S̄ = ${pct(b)} : ${ev.coherent?"cohérent":"incohérent, des notes minimum deviennent négatives"} (éq. 19).`; }
+  const I = ev.indicateurs;
+  $("#s-kpis").innerHTML = [["Note agrégée",pct(I.note)],["Note min agrégée",pct(I.note_min)],["Écart à l'objectif",pct(I.ecart_objectif)],["Sensibilité moyenne S̄",pct(ev.S)]]
+    .map(([a,b],k)=>`<div class="card kpi ${k===2&&I.ecart_objectif<0?"alert":""}"><small>${a}</small><b>${b}</b></div>`).join("");
+  drawFig11(ev);
+}
+function drawFig11(ev){
+  const W=680,H=380,m={l:52,r:16,t:16,b:40};
+  const xs = ev.donnees.map(d=>d.sensibilite).concat([sim.seuil/100]);
+  const xmax = Math.max(...xs)*1.12 || 0.1;
+  const crit = ev.donnees.filter(d=>d.critique);
+  const ys = ev.donnees.map(d=>d.note).filter(isFinite).concat(crit.map(d=>d.note_min).filter(isFinite));
+  let ymin = Math.min(0.9, ...ys); ymin = Math.max(0, Math.floor(ymin*20)/20 - 0.05);
+  const X = v => m.l + v/xmax*(W-m.l-m.r), Y = v => m.t + (1-(v-ymin)/(1-ymin))*(H-m.t-m.b);
+  const p = {dscr:sim.dscr/100, tol:sim.tol/100}, S = ev.S;
+  const tolAt = s => sim.mode==="donnee" ? 1 - p.dscr/s : 1 - p.tol*S/s;
+  let curve="", area="";
+  const x0 = sim.seuil/100, N=120;
+  for(let k=0;k<=N;k++){ const s = x0 + (xmax-x0)*k/N; const y = Math.max(ymin, Math.min(1, tolAt(s))); curve += (k?"L":"M")+X(s).toFixed(1)+","+Y(y).toFixed(1); }
+  area = curve + `L${X(xmax)},${Y(ymin)}L${X(x0)},${Y(ymin)}Z`;
+  const ticksY=[]; for(let v=ymin; v<=1.0001; v+= (1-ymin)>0.3?0.1:0.05) ticksY.push(+v.toFixed(2));
+  const stepX = xmax>0.5?0.1:xmax>0.2?0.05:xmax>0.08?0.02:0.01; const ticksX=[]; for(let v=0; v<=xmax; v+=stepX) ticksX.push(+v.toFixed(3));
+  let g = `<rect class="greyz" x="${X(0)}" y="${m.t}" width="${X(x0)-X(0)}" height="${H-m.t-m.b}"/>`;
+  g += `<path class="badz" d="${area}"/>`;
+  g += ticksY.map(v=>`<line class="grid" x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l-6}" y="${Y(v)+4}" text-anchor="end">${Math.round(v*100)} %</text>`).join("");
+  g += ticksX.map(v=>`<text x="${X(v)}" y="${H-m.b+16}" text-anchor="middle">${(v*100).toLocaleString("fr-FR",{maximumFractionDigits:1})} %</text>`).join("");
+  g += `<line class="axis" x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}"/><text x="${W-m.r}" y="${H-6}" text-anchor="end">Sensibilité du SCR</text><text x="${m.l}" y="${m.t-4}" text-anchor="start" style="dominant-baseline:auto">Note QDD</text>`;
+  g += `<path class="curve" d="${curve}"/>`;
+  if(isFinite(ev.indicateurs.note_min)) g += `<line class="minline" x1="${X(x0)}" x2="${W-m.r}" y1="${Y(Math.max(ymin,ev.indicateurs.note_min))}" y2="${Y(Math.max(ymin,ev.indicateurs.note_min))}"/>`;
+  ev.donnees.forEach(d=>{ if(!isFinite(d.note)) return; const cx=X(d.sensibilite), cy=Y(Math.max(ymin,d.note));
+    const right = cx > W-170;
+    g += `<circle class="pt ${d.statut||"na"}" cx="${cx}" cy="${cy}" r="6"/><text class="lbl" x="${right?cx-9:cx+9}" y="${cy-8}" text-anchor="${right?"end":"start"}">${esc(d.libelle)}</text>`; });
+  if(isFinite(ev.indicateurs.note) && S>0){ const cx=X(S), cy=Y(Math.max(ymin,ev.indicateurs.note));
+    g += `<path class="cross" d="M${cx-7},${cy-7}L${cx+7},${cy+7}M${cx-7},${cy+7}L${cx+7},${cy-7}"/>`; }
+  $("#s-chart").innerHTML = g;
+}
+$("#s-rows").addEventListener("change", e=>{ const t=e.target; if(t.dataset.k==null) return; const k=+t.dataset.k, c=+t.dataset.c;
+  sim.rows[k][c] = c===0 ? t.value : (parseFloat(t.value)||0); renderSim(); });
+$("#s-rows").addEventListener("click", e=>{ const b=e.target.closest("[data-del]"); if(!b) return; sim.rows.splice(+b.dataset.del,1); renderSim(); });
+$("#s-add").addEventListener("click", ()=>{ sim.rows.push(["Nouvelle donnée", 2, 95]); renderSim(); });
+$("#s-mode").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; sim.mode=b.dataset.v; renderSim(); });
+["seuil","dscr","tol"].forEach(k=>$("#s-"+k).addEventListener("change", e=>{ sim[k]=parseFloat(e.target.value)||0; renderSim(); }));
+$("#preset-memoire").addEventListener("click", ()=>{ sim = JSON.parse(JSON.stringify(PRESETS.memoire)); renderSim(); });
+$("#preset-btp").addEventListener("click", ()=>{ sim = presetBTP(); renderSim(); });
+
+function renderRappro(){
+  const v = ["#r1","#r2","#r3"].map(s=>parseFloat($(s).value)).filter(isFinite);
+  const a = Q.mesureRapprochement(v,"memoire"), b = Q.mesureRapprochement(v,"symetrique");
+  const ra = 1-a, rb = Math.max(0,1-b);
+  $("#r-out").innerHTML = `Mémoire (éq. 30) : non-QDD ${pct(a)} → résultat <b>${pct(ra)}</b>${ra<0?` <span class="pill rouge">négatif</span>`:""}<br>Symétrique borné : non-QDD ${pct(b)} → résultat <b>${pct(rb)}</b>`;
+}
+["#r1","#r2","#r3"].forEach(s=>$(s).addEventListener("input", renderRappro));
+function renderDeg(){
+  const r = (parseFloat($("#d-res").value)||0)/100, c=(parseFloat($("#d-coef").value)||0)/100;
+  const W=480,H=170,m={l:40,r:10,t:10,b:26}, n=8;
+  const X=k=>m.l+k/n*(W-m.l-m.r), Y=v=>m.t+(1-v)*(H-m.t-m.b);
+  let s1="",s2="",g="";
+  for(let k=0;k<=n;k++){ s1+=(k?"L":"M")+X(k)+","+Y(Q.degrader(r,k,c,"simple")); s2+=(k?"L":"M")+X(k)+","+Y(Q.degrader(r,k,c,"composee")); g+=`<text x="${X(k)}" y="${H-8}" text-anchor="middle">${k}</text>`; }
+  [0,.5,1].forEach(v=>g+=`<line class="grid" x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l-5}" y="${Y(v)+4}" text-anchor="end">${v*100} %</text>`);
+  $("#d-chart").innerHTML = g + `<path class="s1" d="${s1}"/><path class="s2" d="${s2}"/><text x="${W-m.r}" y="${m.t+10}" text-anchor="end">antériorité →</text>`;
+}
+["#d-res","#d-coef"].forEach(s=>$(s).addEventListener("input", renderDeg));
+
+/* ---------- Campagne ---------- */
+const defP = c => ({seuil:c.parametres.seuil_significativite, mode:c.parametres.mode_tolerance, dscr:c.parametres.delta_scr_max,
+  tol:c.parametres.tolerance_globale, coef:c.parametres.coef_degradation, degradation:c.parametres.methode_degradation, marge:c.parametres.marge_alerte});
+let ci = DATA.campagnes.length-1, cp = defP(DATA.campagnes[ci]);
+$("#c-camp").innerHTML = DATA.campagnes.map((c,k)=>`<button data-k="${k}">${c.campagne} · ${c.date_arrete.split("-").reverse().join("/")}</button>`).join("");
+$("#c-camp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; ci=+b.dataset.k; renderCampagne(); });
+function readCP(){ cp.seuil=(parseFloat($("#c-seuil").value)||0)/100; cp.dscr=(parseFloat($("#c-dscr").value)||0)/100; cp.coef=(parseFloat($("#c-coef").value)||0)/100; cp.degradation=$("#c-deg").value; renderCampagne(true); }
+["#c-seuil","#c-dscr","#c-coef","#c-deg"].forEach(s=>$(s).addEventListener("change", readCP));
+$("#c-reset").addEventListener("click", ()=>{ cp = defP(DATA.campagnes[ci]); renderCampagne(); });
+$("#c-axe").addEventListener("change", ()=>renderCampagne(true));
+$("#c-fstat").addEventListener("change", ()=>renderCampagne(true));
+let lastEv=null;
+function renderCampagne(keep){
+  const c = DATA.campagnes[ci];
+  if(!keep){ $("#c-seuil").value=+(cp.seuil*100).toFixed(2); $("#c-dscr").value=+(cp.dscr*100).toFixed(3); $("#c-coef").value=+(cp.coef*100).toFixed(1); $("#c-deg").value=cp.degradation; }
+  $("#c-camp").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.k===ci));
+  const ev = Q.evaluer(c.donnees, c.controles, cp); lastEv = ev;
+  const I = ev.indicateurs;
+  const prev = ci>0 ? Q.evaluer(DATA.campagnes[ci-1].donnees, DATA.campagnes[ci-1].controles, cp).indicateurs : null;
+  const delta = (k)=> prev ? `${I[k]-prev[k]>=0?"+":"−"}${(Math.abs(I[k]-prev[k])*100).toFixed(2).replace(".",",")} pt vs N-1` : "Première campagne";
+  const tiles = [
+    ["Note QDD agrégée", pct(I.note), delta("note"), false],
+    ["Objectif (note min)", pct(I.note_min), `ΔSCR max ${pct(cp.dscr)} · S̄ ${pct(ev.S,1)}`, false],
+    ["Écart à l'objectif", pct(I.ecart_objectif), I.ecart_objectif>=0?"Tolérance globale respectée":"Tolérance globale dépassée", I.ecart_objectif<0],
+    ["Données hors tolérance", I.nb_donnees_hors_tolerance+" / "+I.nb_donnees_critiques, "Règle du maillon faible", I.nb_donnees_hors_tolerance>0],
+    ["Contrôles à jour", pct(I.taux_validation,0), `Dégradation moyenne ${pct(I.degradation_moyenne)}`, false],
+    ["Contrôles conformes", pct(I.taux_conformite_controles,0), "Résultat ≥ seuil d'acceptation", false],
+  ];
+  $("#c-kpis").innerHTML = tiles.map(([a,b,s,al])=>`<div class="card kpi ${al?"alert":""}"><small>${a}</small><b>${b}</b><small>${s}</small></div>`).join("");
+  const D = [...ev.donnees].sort((a,b)=>(b.critique-a.critique)||(b.sensibilite-a.sensibilite));
+  const lo = 0.5;
+  $("#c-don").innerHTML = D.map(d=>{ const w = Math.max(0,(d.note-lo)/(1-lo))*100, mk = isFinite(d.note_min)?Math.max(0,(d.note_min-lo)/(1-lo))*100:null;
+    return `<tr><td><div>${esc(d.libelle)}</div><div class="muted mono" style="font-size:11.5px">${esc(d.donnee_id)}</div></td><td>${esc(d.proprietaire)}</td>
+    <td class="r num">${d.critique?pct(d.sensibilite):`<span class="muted">${pct(d.sensibilite)}</span>`}${d.critique_expert===true?' <span class="muted" title="Critique à dire d\'expert">(exp.)</span>':""}</td>
+    <td class="r num">${pct(d.note)}</td><td class="r num">${d.critique?pct(d.note_min):"—"}</td>
+    <td><div class="meter"><i class="${d.statut||"na"}" style="width:${w}%"></i>${mk!=null?`<b style="left:${mk}%"></b>`:""}</div></td>
+    <td>${pill(d.statut)}</td><td class="mono">${esc(c.donnees.find(x=>x.donnee_id===d.donnee_id).criteres_couverts||"")}</td><td class="r num">${d.nb_controles}</td></tr>`; }).join("");
+  drawWaterfall(); drawAxes(ev); renderCtrl(ev);
+}
+function drawWaterfall(){
+  const v = DATA.variation; const steps = v.filter((s,k)=>k===0||k===v.length-1||Math.abs(s.impact)>1e-9);
+  const W=520,H=300,m={l:200,r:58,t:6,b:6}, rh=(H-m.t-m.b)/steps.length;
+  const notes = v.map(s=>s.note); let lo=Math.min(...notes), hi=Math.max(...notes); const pad=(hi-lo)*0.25||0.002; lo-=pad; hi+=pad;
+  const X = x=>m.l+(x-lo)/(hi-lo)*(W-m.l-m.r);
+  let g="", prev=null;
+  steps.forEach((s,k)=>{ const y=m.t+k*rh+rh*0.2, h=rh*0.6; const tot = k===0||k===steps.length-1;
+    let x1,x2,cls,lab;
+    if(tot){ x1=X(lo); x2=X(s.note); cls="bar-tot"; lab=pct(s.note); }
+    else { const a=s.note-s.impact, b=s.note; x1=X(Math.min(a,b)); x2=X(Math.max(a,b)); cls=s.impact>=0?"bar-pos":"bar-neg"; lab=(s.impact>=0?"+":"−")+(Math.abs(s.impact)*100).toFixed(2).replace(".",",")+" pt"; }
+    const name = s.etape.replace(" (antériorité intacte)","").replace("Note QDD agrégée ","Note ");
+    g+=`<text class="lbl" x="${m.l-8}" y="${y+h/2+4}" text-anchor="end">${esc(name)}</text><rect class="${cls}" x="${x1}" y="${y}" width="${Math.max(2,x2-x1)}" height="${h}" rx="2"/><text x="${Math.max(x1,x2)+5}" y="${y+h/2+4}">${lab}</text>`;
+  });
+  $("#c-wf").setAttribute("viewBox",`0 0 ${W} ${H}`); $("#c-wf").innerHTML=g;
+}
+function drawAxes(ev){
+  const rows = Q.parAxe(ev, $("#c-axe").value).sort((a,b)=>a.note-b.note);
+  const W=520, rh=34, H=Math.max(120, rows.length*rh+30), m={l:170,r:62,t:6,b:22};
+  const lo = Math.max(0, Math.floor(Math.min(...rows.map(r=>Math.min(r.note,r.note_min)))*20)/20-0.05);
+  const X = x=>m.l+(x-lo)/(1-lo)*(W-m.l-m.r);
+  let g="";
+  for(let t=lo;t<=1.0001;t+=(1-lo)>0.2?0.1:0.05) g+=`<line class="grid" x1="${X(t)}" x2="${X(t)}" y1="${m.t}" y2="${H-m.b}"/><text x="${X(t)}" y="${H-6}" text-anchor="middle">${Math.round(t*100)} %</text>`;
+  const lab = {E:"Exhaustivité",X:"Exactitude",P:"Pertinence",TOUS:"Transverse"};
+  rows.forEach((r,k)=>{ const y=m.t+k*rh+6, h=rh-14; const st=Q.statut(r.note,r.note_min,cp.marge);
+    g+=`<text class="lbl" x="${m.l-8}" y="${y+h/2+4}" text-anchor="end">${esc(lab[r.modalite]||r.modalite.replaceAll("_"," ").toLowerCase().replace(/^./,c=>c.toUpperCase()))}</text>
+      <rect class="bar ${st}" x="${X(lo)}" y="${y}" width="${Math.max(1,X(r.note)-X(lo))}" height="${h}" rx="2"/>
+      <line class="tick" x1="${X(r.note_min)}" x2="${X(r.note_min)}" y1="${y-3}" y2="${y+h+3}"/><text x="${X(Math.max(r.note,r.note_min))+6}" y="${y+h/2+4}">${pct(r.note,1)}</text>`; });
+  $("#c-axes").setAttribute("viewBox",`0 0 ${W} ${H}`); $("#c-axes").innerHTML=g;
+}
+function renderCtrl(ev){
+  const f = $("#c-fstat").value;
+  const rows = ev.controles.filter(c=> !f || (f==="retard"? c.anteriorite>0 : c.statut===f))
+    .sort((a,b)=>({rouge:0,orange:1,vert:2}[a.statut]??3)-({rouge:0,orange:1,vert:2}[b.statut]??3) || a.resultat-b.resultat);
+  $("#c-ctrl").innerHTML = rows.map(c=>`<tr><td class="mono">${esc(c.controle_id)}</td><td>${esc(c.libelle)}</td><td class="mono" style="font-size:12px">${esc(c.donnee_id)}</td><td>${esc(c.etape)}</td>
+    <td class="r num">${pct(c.resultat_brut)}</td><td class="r num">${c.anteriorite>0?`<b style="color:var(--warn)">${c.anteriorite}</b>`:"0"}</td><td class="r num">${pct(c.resultat)}</td>
+    <td class="r num">${c.critique?pct(c.seuil):"—"}</td><td>${pill(c.statut)}</td></tr>`).join("") || `<tr><td colspan="9" class="muted">Aucun point de contrôle pour ce filtre.</td></tr>`;
+}
+
+/* ---------- Démarrage ---------- */
+renderFiches(); quiz("qcm"); quiz("vf"); renderRappro(); renderDeg();
+const h = (location.hash||"").replace("#","");
+show(document.querySelector(`[data-panel="${h}"]`) ? h : store.get("qdd-tab","fiches"));
+})();
+</script>
