@@ -44,7 +44,8 @@
            p.anteriorite   as ant_p, c.anteriorite  as ant_c,
            p.poids         as po_p, c.poids         as po_c,
            (not missing(p.point_id)) as in_p, (not missing(c.point_id)) as in_c
-    from QDD.controles_&prec as p full join QDD.controles_&cour as c
+    from QDD.controles_&prec(where=(inclus_note = 1)) as p
+         full join QDD.controles_&cour(where=(inclus_note = 1)) as c
          on c.point_id = p.point_id;
 
     create table work._vd as

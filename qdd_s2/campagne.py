@@ -18,6 +18,8 @@ import pandas as pd
 
 from .mesures import mesure_rapprochement, ratio_anomalie, resultat_controle
 from .moteur import Etat, Evaluation, Parametres, analyse_variation, evaluer
+from .gouvernance import (couverture_lignage, entree_journal, indicateurs_anomalies, indicateurs_couverture,
+                          maj_registre)
 from .sensibilite import SIGMA, scr_formule_standard_simplifiee, sensibilites
 
 RACINE = Path(__file__).resolve().parents[1]
@@ -41,6 +43,22 @@ def charger_referentiels(cfg: Config):
     plan = pd.read_csv(cfg.referentiels / "plan_campagnes.csv")
     hist = pd.read_csv(cfg.referentiels / "historique_resultats.csv")
     return rep, ref, plan, hist
+
+
+def charger_lignage(cfg: Config):
+    flux = pd.read_csv(cfg.referentiels / "lignage_flux.csv")
+    lig = pd.read_csv(cfg.referentiels / "lignage_donnees.csv")
+    return lig, flux
+
+
+def volumetries(con, arrete: str) -> dict:
+    """Nombre de lignes par table source pour l'arrêté (piste d'audit)."""
+    out = {}
+    for (t,) in con.execute("SHOW TABLES").fetchall():
+        cols = [c[0] for c in con.execute(f"DESCRIBE {t}").fetchall()]
+        if "arrete" in cols:
+            out[t] = con.execute(f"SELECT COUNT(*) FROM {t} WHERE arrete = $a", {"a": arrete}).fetchone()[0]
+    return out
 
 
 def executer_controle(con, ligne: pd.Series, arrete: str, cfg: Config) -> pd.DataFrame:
@@ -90,10 +108,16 @@ class ResultatCampagne:
     scr_ref: float
     points: pd.DataFrame
     etat: Etat
+    couverture: pd.DataFrame = None
+    registre: pd.DataFrame = None
+    gouvernance: dict = None
+    journal: dict = None
 
 
 def lancer_campagnes(cfg: Config = Config()) -> tuple[list[ResultatCampagne], pd.DataFrame]:
     rep, ref, plan, hist = charger_referentiels(cfg)
+    lig, flux = charger_lignage(cfg)
+    registre = None
     con = duckdb.connect(str(cfg.base), read_only=True)
     historique = hist.rename(columns={"commentaire": "detail"}).assign(mesure_non_qdd=np.nan)
     sorties = []
@@ -101,11 +125,13 @@ def lancer_campagnes(cfg: Config = Config()) -> tuple[list[ResultatCampagne], pd
         arrete = camp.date_arrete
         non_real = set(str(camp.controles_non_realises).split(";")) if pd.notna(camp.controles_non_realises) else set()
         # 1. exécution des contrôles réalisés
+        nb_exec = 0
         for ligne in ref.itertuples():
             if ligne.controle_id in non_real:
                 continue
             pts = executer_controle(con, pd.Series(ligne._asdict()), arrete, cfg)
             pts["date_realisation"] = arrete
+            nb_exec += 1
             historique = pd.concat([historique, pts], ignore_index=True)
         # 2. dernier résultat connu de chaque point à la date de campagne
         h = historique[pd.to_datetime(historique["date_realisation"]) <= pd.Timestamp(arrete)]
@@ -118,7 +144,7 @@ def lancer_campagnes(cfg: Config = Config()) -> tuple[list[ResultatCampagne], pd
                 "controle_id": pid, "controle": cid, "libelle": rc.libelle, "famille": rc.famille,
                 "donnee_id": rc.donnee_id.format(maille=maille), "maille": maille,
                 "criteres": rc.criteres, "frequence": rc.frequence, "poids": rc.poids, "etape": rc.etape,
-                "responsable": rc.responsable, "resultat_brut": r.resultat_brut,
+                "responsable": rc.responsable, "flux": rc.flux, "seuil_fixe": rc.get("seuil_fixe"), "inclus_note": rc.get("inclus_note", 1), "resultat_brut": r.resultat_brut,
                 "mesure_non_qdd": r.get("mesure_non_qdd"),
                 "date_derniere_real": r.date_realisation, "detail": r.get("detail"),
                 "realise_campagne": r.date_realisation == arrete,
@@ -138,8 +164,15 @@ def lancer_campagnes(cfg: Config = Config()) -> tuple[list[ResultatCampagne], pd
         don["non_linearite"] = sens["non_linearite"].reindex(don.index)
         ev = evaluer(don, ctrl, cfg.params, date_campagne=arrete)
         etat = Etat(don[["sensibilite", "critique_expert"]], ev.controles[["controle_id", "donnee_id",
-                    "resultat_brut", "anteriorite", "poids"]], cfg.params)
-        sorties.append(ResultatCampagne(camp.campagne, arrete, ev, sens, sens.attrs["scr_ref"], ctrl, etat))
+                    "resultat_brut", "anteriorite", "poids", "inclus_note"]], cfg.params)
+        # 4. gouvernance : couverture du lignage, registre des anomalies, journal
+        couv = couverture_lignage(lig, flux, ev.controles, ev.donnees)
+        registre = maj_registre(registre, camp.campagne, arrete, ev.controles, ev.donnees, couv)
+        gouv = indicateurs_couverture(couv) | indicateurs_anomalies(registre, arrete)
+        journal = entree_journal(camp.campagne, arrete, cfg.params, RACINE, cfg.referentiels,
+                                 volumetries(con, arrete), nb_exec, len(ctrl), ev.indicateurs)
+        sorties.append(ResultatCampagne(camp.campagne, arrete, ev, sens, sens.attrs["scr_ref"], ctrl, etat,
+                                        couv, registre.copy(), gouv, journal))
     con.close()
     variation = analyse_variation(sorties[-2].etat, sorties[-1].etat) if len(sorties) >= 2 else pd.DataFrame()
     return sorties, variation

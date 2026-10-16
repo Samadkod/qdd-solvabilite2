@@ -1,17 +1,21 @@
-controle_id,libelle,famille,donnee_id,criteres,frequence,poids,etape,responsable,fichier_sql
-R01,Primes acquises gestion vs comptabilité,rapprochement,primes_acquises_{maille},X,T,1,Gestion→Comptabilité,Contrôle de gestion,R01_primes_gestion_vs_compta.sql
-R02,Primes acquises gestion vs entrepôt,rapprochement,primes_acquises_{maille},"E,X",T,2,Gestion→Entrepôt,Équipe données,R02_primes_gestion_vs_dwh.sql
-C01,Contrats absents de l'entrepôt,coherence,primes_acquises_{maille},E,T,1,Gestion→Entrepôt,Équipe données,C01_contrats_absents_dwh.sql
-C02,Primes acquises négatives ou > émises,coherence,primes_acquises_{maille},X,T,1,Gestion,Direction technique,C02_primes_negatives.sql
-C03,Doublons de contrats,coherence,primes_acquises_{maille},"X,P",S,1,Gestion,Équipe données,C03_doublons_contrats.sql
-R03,Provisions gestion vs entrepôt vs actuariat,rapprochement,provisions_sinistres_{maille},"E,X",T,3,Entrepôt→Actuariat,Actuariat,R03_provisions_3_sources.sql
-R04,Règlements gestion vs comptabilité,rapprochement,provisions_sinistres_{maille},X,T,1,Gestion→Comptabilité,Contrôle de gestion,R04_reglements_gestion_vs_compta.sql
-C04,Sinistres orphelins,coherence,provisions_sinistres_{maille},"E,P",T,1,Gestion,Direction sinistres,C04_sinistres_orphelins.sql
-C05,Provisions dossier négatives,coherence,provisions_sinistres_{maille},X,T,1,Gestion,Direction sinistres,C05_provisions_negatives.sql
-C06,Survenance postérieure à la déclaration,coherence,date_survenance,X,T,1,Gestion,Direction sinistres,C06_survenance_apres_declaration.sql
-C07,Survenance avant date d'effet,coherence,date_survenance,P,S,1,Gestion,Direction sinistres,C07_survenance_hors_garantie.sql
-R05,Taux de cession traité vs modèle,rapprochement,taux_cession,"X,P",A,1,Réassurance→Modèle SCR,Service réassurance,R05_taux_cession_traite_vs_modele.sql
-R06,Placements dépositaire vs comptabilité,rapprochement,placements_{maille},X,T,1,Dépositaire→Comptabilité,Direction financière,R06_placements_depositaire_vs_compta.sql
-C08,ISIN absent ou mal formé,coherence,placements_{maille},"E,X",T,1,Dépositaire,Direction financière,C08_isin_manquant.sql
-C09,CIC incohérent avec la classe d'actif,coherence,placements_{maille},P,T,1,Dépositaire,Direction financière,C09_cic_incoherent.sql
-C10,Code activité hors nomenclature,coherence,code_activite_btp,P,S,1,Gestion,Direction technique,C10_activite_hors_nomenclature.sql
+controle_id,libelle,famille,donnee_id,criteres,frequence,poids,etape,responsable,fichier_sql,flux,seuil_fixe,inclus_note
+R01,Primes acquises gestion vs comptabilité,rapprochement,primes_acquises_{maille},X,T,1,Gestion→Comptabilité,Contrôle de gestion,R01_primes_gestion_vs_compta.sql,F02,,1
+R02,Primes acquises gestion vs entrepôt,rapprochement,primes_acquises_{maille},"E,X",T,2,Gestion→Entrepôt,Équipe données,R02_primes_gestion_vs_dwh.sql,F01,,1
+C01,Contrats absents de l'entrepôt,coherence,primes_acquises_{maille},E,T,1,Gestion→Entrepôt,Équipe données,C01_contrats_absents_dwh.sql,F01,,1
+C02,Primes acquises négatives ou > émises,coherence,primes_acquises_{maille},X,T,1,Gestion,Direction technique,C02_primes_negatives.sql,F14,,1
+C03,Doublons de contrats,coherence,primes_acquises_{maille},"X,P",S,1,Gestion,Équipe données,C03_doublons_contrats.sql,F14,,1
+R03,Provisions gestion vs entrepôt vs actuariat,rapprochement,provisions_sinistres_{maille},"E,X",T,3,Entrepôt→Actuariat,Actuariat,R03_provisions_3_sources.sql,"F05,F06",,1
+R04,Règlements gestion vs comptabilité,rapprochement,provisions_sinistres_{maille},X,T,1,Gestion→Comptabilité,Contrôle de gestion,R04_reglements_gestion_vs_compta.sql,F07,,1
+C04,Sinistres orphelins,coherence,provisions_sinistres_{maille},"E,P",T,1,Gestion,Direction sinistres,C04_sinistres_orphelins.sql,F14,,1
+C05,Provisions dossier négatives,coherence,provisions_sinistres_{maille},X,T,1,Gestion,Direction sinistres,C05_provisions_negatives.sql,F14,,1
+C06,Survenance postérieure à la déclaration,coherence,date_survenance,X,T,1,Gestion,Direction sinistres,C06_survenance_apres_declaration.sql,F14,,1
+C07,Survenance avant date d'effet,coherence,date_survenance,P,S,1,Gestion,Direction sinistres,C07_survenance_hors_garantie.sql,F14,,1
+R05,Taux de cession traité vs modèle,rapprochement,taux_cession,"X,P",A,1,Réassurance→Modèle SCR,Service réassurance,R05_taux_cession_traite_vs_modele.sql,F10,,1
+R06,Placements dépositaire vs comptabilité,rapprochement,placements_{maille},X,T,1,Dépositaire→Comptabilité,Direction financière,R06_placements_depositaire_vs_compta.sql,F11,,1
+C08,ISIN absent ou mal formé,coherence,placements_{maille},"E,X",T,1,Dépositaire,Direction financière,C08_isin_manquant.sql,F11,,1
+C09,CIC incohérent avec la classe d'actif,coherence,placements_{maille},P,T,1,Dépositaire,Direction financière,C09_cic_incoherent.sql,F11,,1
+C10,Code activité hors nomenclature,coherence,code_activite_btp,P,S,1,Gestion,Direction technique,C10_activite_hors_nomenclature.sql,F14,,1
+Q01,Bilan S.02.01 vs liste des actifs S.06.02,rapprochement,placements_{maille},"E,X",T,1,Comptabilité→QRT,Équipe QDD,Q01_s0201_vs_s0602.sql,F12,0.999,0
+Q02,BE sinistres S.17.01 vs outil de provisionnement,rapprochement,provisions_sinistres_{maille},X,T,2,Actuariat→QRT,Équipe QDD,Q02_s1701_vs_provisionnement.sql,F08,0.999,0
+Q03,Triangle S.19.01 vs règlements de gestion,rapprochement,provisions_sinistres_{maille},"E,X",T,1,Actuariat→QRT,Équipe QDD,Q03_s1901_vs_gestion.sql,F08,0.999,0
+Q04,Primes S.05.01 vs comptabilité,rapprochement,primes_acquises_{maille},X,T,1,Comptabilité→QRT,Équipe QDD,Q04_s0501_vs_compta.sql,F03,0.999,0

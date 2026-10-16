@@ -1,0 +1,15 @@
+flux_id;systeme_source;systeme_cible;traitement;mode;zone_risque
+F01;Outil de gestion contrats;Entrepôt de données;Chargement nocturne des contrats;Automatique;True
+F02;Outil de gestion contrats;Comptabilité;Interface de comptabilisation des primes;Automatique;True
+F03;Comptabilité;État S.05.01;Agrégation des primes par ligne d'activité;Semi-automatique;True
+F04;Entrepôt de données;Outil SCR;Agrégation des volumes de primes par segment;Automatique;True
+F05;Outil de gestion sinistres;Entrepôt de données;Chargement nocturne des sinistres;Automatique;True
+F06;Entrepôt de données;Outil de provisionnement;Extraction des provisions et constitution des triangles;Semi-automatique;True
+F07;Outil de gestion sinistres;Comptabilité;Interface de comptabilisation des règlements;Automatique;True
+F08;Outil de provisionnement;États S.17.01 / S.19.01;Report du BE et des triangles;Manuel;True
+F09;Outil de provisionnement;Outil SCR;Volumes de réserves par segment;Manuel;True
+F10;Traités de réassurance;Paramètres du modèle SCR;Saisie des taux de cession;Manuel;True
+F11;Relevé dépositaire;Comptabilité placements;Intégration des valorisations;Automatique;True
+F12;Comptabilité placements;États S.02.01 / S.06.02;Production des états placements;Semi-automatique;True
+F13;Relevé dépositaire;Outil SCR;Transparisation et chocs de marché;Semi-automatique;True
+F14;Saisie gestionnaire;Outil de gestion;Saisie des contrats et des sinistres (point d'entrée);Manuel;True

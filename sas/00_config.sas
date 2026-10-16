@@ -17,7 +17,25 @@
 %let SORTIE = &RACINE./sas/sorties;           /* rapports Excel                 */
 
 options dlcreatedir;                          /* crée les dossiers si besoin    */
-libname SI  "&RACINE./sas/lib_si";            /* tables source                  */
+libname SI  "&RACINE./sas/lib_si";            /* tables source (démo)           */
+
+/* ---------- PRODUCTION : bases distantes via ODBC (gabarit, à adapter avec la DSI) ----------
+   Les noms de DSN, schémas et comptes ci-dessous sont des EXEMPLES. Ne jamais écrire de mot de
+   passe en clair : utiliser un DSN système, un authdomain SAS ou un fichier de paramètres protégé.
+
+   libname GEST odbc dsn="DSN_GESTION" schema="PROD" readbuff=10000;      -- outil de gestion
+   libname DWH  odbc dsn="DSN_ENTREPOT" schema="DWH" readbuff=10000;      -- entrepôt
+
+   Requête passée directement au SGBD (pass-through) pour filtrer à la source :
+   proc sql;
+     connect to odbc as cx (dsn="DSN_ENTREPOT" authdomain="QDD_AUTH");
+     create table SI.dwh_sinistres as
+     select * from connection to cx
+       (select arrete, sinistre_id, segment, provision_dossier, reglements_cumules
+        from dwh.sinistres where arrete = '2026-09-30');
+     disconnect from cx;
+   quit;
+   Les contrôles de 02_controles.sas lisent ensuite SI.<table> sans modification. */
 libname QDD "&RACINE./sas/lib_qdd";           /* référentiels + résultats QDD   */
 libname _tmp "&SORTIE."; libname _tmp clear;  /* crée le dossier des rapports */
 

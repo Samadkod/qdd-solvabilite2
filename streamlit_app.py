@@ -26,7 +26,10 @@ st.set_page_config(page_title="Atelier QDD Solvabilité 2", page_icon="🛡️",
 
 @st.cache_resource
 def base_fictive() -> Path:
-    chemin = Path(tempfile.gettempdir()) / "btp_fictif.duckdb"
+    # le nom porte l'empreinte du générateur : toute évolution du SI fictif force une régénération
+    import hashlib
+    emp = hashlib.sha256((RACINE / "scripts" / "generer_donnees_btp.py").read_bytes()).hexdigest()[:10]
+    chemin = Path(tempfile.gettempdir()) / f"btp_fictif_{emp}.duckdb"
     if not chemin.exists():
         generer(chemin)
     return chemin
@@ -48,7 +51,8 @@ def campagnes(seuil, dscr, coef, degradation, ecart, montant):
                     "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"}),
                     "controles": ev.controles,
                     "axes": {a: ev.par_axe(a).reset_index() for a in ("maille", "etape", "criteres", "responsable")},
-                    "sens": c.sensibilites.reset_index()})
+                    "sens": c.sensibilites.reset_index(), "gouv": c.gouvernance,
+                    "couverture": c.couverture, "registre": c.registre, "journal": c.journal})
     return out, var, xlsx
 
 
@@ -63,7 +67,7 @@ st.title("Atelier QDD Solvabilité 2")
 st.caption("Méthode du mémoire de C. Motard (ISFA / Grant Thornton, 2024), corrigée et industrialisée — "
            "données **fictives** d'un assureur dommages BTP.")
 
-t1, t2, t3 = st.tabs(["📚 Atelier (révision)", "⚙️ Campagne live", "🧾 Code SAS / SQL"])
+t1, t2, t4, t3 = st.tabs(["📚 Atelier (révision)", "⚙️ Campagne live", "🗂️ Gouvernance", "🧾 Code SAS / SQL"])
 
 # ---------------------------------------------------------------- Atelier
 with t1:
@@ -105,6 +109,15 @@ with t2:
     m[3].metric("Données hors tolérance", f"{I['nb_donnees_hors_tolerance']} / {I['nb_donnees_critiques']}")
     m[4].metric("Contrôles à jour", pct(I["taux_validation"], 0))
     m[5].metric("Contrôles conformes", pct(I["taux_conformite_controles"], 0))
+    g = c["gouv"]
+    m2 = st.columns(6)
+    m2[0].metric("Restitutions QRT conformes", pct(I["taux_conformite_restitutions"], 0))
+    m2[1].metric("Zones de risque couvertes", pct(g["taux_couverture_zones_risque"], 0),
+                 help="Flux sans contrôle : " + ", ".join(g["flux_non_couverts"]))
+    m2[2].metric("Anomalies ouvertes", g["nb_anomalies_ouvertes"])
+    m2[3].metric("dont gravité haute", g["nb_anomalies_haute"])
+    m2[4].metric("dont échéance dépassée", g["nb_anomalies_en_retard"])
+    m2[5].metric("Anomalies clôturées", g["nb_anomalies_cloturees"])
 
     st.subheader("Données")
     d = c["donnees"][["libelle", "donnee_id", "proprietaire", "sensibilite", "critique", "note", "note_min",
@@ -179,10 +192,31 @@ with t2:
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 # ---------------------------------------------------------------- Code
+with t4:
+    st.markdown("**Ce que l'offre appelle le dispositif** : dictionnaire, lignage, contrôles, suivi des anomalies, "
+                "piste d'audit. Valeurs de la campagne sélectionnée dans l'onglet *Campagne live*.")
+    st.subheader("Registre des anomalies")
+    reg = c["registre"]
+    st.dataframe(reg.style.map(lambda v: {"Récurrente": COULEUR["rouge"], "Ouverte": COULEUR["orange"],
+                                          "Clôturée": COULEUR["vert"]}.get(v, ""), subset=["statut"]),
+                 hide_index=True, width="stretch")
+    st.subheader("Lignage et couverture des zones de risque")
+    cv = c["couverture"]
+    seul = st.toggle("Seulement les zones de risque non couvertes (données critiques)", value=True)
+    if seul:
+        cv = cv[cv["zone_risque"] & cv["critique"] & ~cv["couvert"]]
+    st.dataframe(cv[["donnee_id", "ordre", "flux_id", "systeme_source", "systeme_cible", "traitement", "mode",
+                     "couvert", "controles", "proprietaire"]], hide_index=True, width="stretch")
+    st.subheader("Dictionnaire des données")
+    st.dataframe(c["donnees"][["donnee_id", "libelle", "proprietaire", "regle_gestion", "format_attendu",
+                               "etats_qrt", "frequence_maj", "critique"]], hide_index=True, width="stretch")
+    st.subheader("Journal d'exécution (piste d'audit)")
+    st.json(c["journal"], expanded=False)
+
 with t3:
     st.markdown("**La version production est en SAS / PROC SQL.** Le Python sert de référence testée ; "
                 "le SAS reprend les mêmes formules (voir `sas/README_SAS.md`).")
-    sas = sorted((RACINE / "sas").glob("*.sas"))
+    sas = sorted((RACINE / "sas").glob("*.sas")) + [RACINE / "app" / "chargement_qdd.qvs"]
     fichier = st.selectbox("Programme SAS", sas, format_func=lambda p: p.name)
     st.code(fichier.read_text(encoding="utf-8"), language="sql", line_numbers=True)
     st.divider()

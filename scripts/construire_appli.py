@@ -9,7 +9,7 @@ R = Path(__file__).resolve().parents[1]
 GARDER_D = ["donnee_id", "libelle", "proprietaire", "sensibilite", "critique_expert", "valeur", "criteres_couverts",
             "note", "note_min", "statut"]
 GARDER_C = ["controle_id", "libelle", "donnee_id", "maille", "famille", "criteres", "frequence", "etape", "responsable",
-            "poids", "resultat_brut", "anteriorite", "resultat", "date_derniere_real"]
+            "poids", "resultat_brut", "anteriorite", "resultat", "date_derniere_real", "inclus_note", "seuil_fixe"]
 
 
 def main():
@@ -18,6 +18,9 @@ def main():
         c["donnees"] = [{k: d.get(k) for k in GARDER_D} for d in c["donnees"]]
         c["controles"] = [{k: x.get(k) for k in GARDER_C} for x in c["controles"]]
         c.pop("axes", None)
+        c.pop("couverture", None)
+        c["registre"] = [{k: r.get(k) for k in ("anomalie_id", "type", "objet", "libelle", "gravite", "proprietaire",
+                                                "echeance", "statut", "constat")} for r in c["registre"]]
     data["variation"] = [{"etape": v["etape"], "note": v["note"], "impact": v["impact"]} for v in data["variation"]]
     html = (R / "app" / "template.html").read_text(encoding="utf-8")
     html = html.replace("/*__MOTEUR__*/", (R / "app" / "moteur.js").read_text(encoding="utf-8"))

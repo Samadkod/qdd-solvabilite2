@@ -49,19 +49,26 @@
       const r = degrader(c.resultat_brut, c.anteriorite, p.coef, p.degradation);
       const d = byId[c.donnee_id];
       const critique = !!(d && d.critique);
-      const seuil = critique ? d.note_min : NaN;
-      return Object.assign({}, c, { resultat: r, critique, seuil, conforme: critique ? r >= seuil : null,
-        statut: critique ? statut(r, seuil, p.marge) : null });
+      const inclus = c.inclus_note === undefined || c.inclus_note === null ? true : !!Number(c.inclus_note);
+      const fixe = c.seuil_fixe === undefined || c.seuil_fixe === null ? null : Number(c.seuil_fixe);
+      const evalue = critique || fixe !== null;
+      const seuil = fixe !== null ? fixe : (critique ? d.note_min : NaN);
+      /* seuil fixe (contrôle de restitution QRT) : binaire, pas de zone orange */
+      const st = !evalue ? null : (fixe !== null ? (r >= seuil ? "vert" : "rouge") : statut(r, seuil, p.marge));
+      return Object.assign({}, c, { resultat: r, critique, inclus_note: inclus, seuil,
+        conforme: evalue ? r >= seuil : null, statut: st });
     });
+    const CN = C.filter((c) => c.inclus_note);
     for (const d of D) {
-      const cs = C.filter((c) => c.donnee_id === d.donnee_id);
+      const cs = CN.filter((c) => c.donnee_id === d.donnee_id);
       d.nb_controles = cs.length;
       d.note = moyPond(cs, (c) => c.resultat, (c) => c.poids);
       d.note_avant_degradation = moyPond(cs, (c) => c.resultat_brut, (c) => c.poids);
       d.statut = d.critique ? statut(d.note, d.note_min, p.marge) : null;
     }
-    const agg = agreger(D, C);
-    const cc = C.filter((c) => c.critique);
+    const agg = agreger(D, CN);
+    const cc = CN.filter((c) => c.critique);
+    const cres = C.filter((c) => !c.inclus_note && c.conforme !== null);
     const critd = D.filter((d) => d.critique);
     return {
       donnees: D, controles: C, S, coherent,
@@ -73,6 +80,7 @@
         anteriorite_moyenne: cc.reduce((a, c) => a + c.anteriorite, 0) / cc.length,
         taux_conformite_controles: cc.filter((c) => c.conforme).length / cc.length,
         nb_donnees_hors_tolerance: critd.filter((d) => d.note < d.note_min).length,
+        taux_conformite_restitutions: cres.length ? cres.filter((c) => c.conforme).length / cres.length : NaN,
       },
     };
   }
@@ -80,7 +88,7 @@
   function agreger(D, C) {
     const crit = new Set(D.filter((d) => d.critique).map((d) => d.donnee_id));
     const groupes = {};
-    for (const c of C) if (crit.has(c.donnee_id)) (groupes[c.donnee_id] = groupes[c.donnee_id] || []).push(c);
+    for (const c of C) if (crit.has(c.donnee_id) && c.inclus_note !== false) (groupes[c.donnee_id] = groupes[c.donnee_id] || []).push(c);
     const ids = Object.keys(groupes);
     const byId = Object.fromEntries(D.map((d) => [d.donnee_id, d]));
     const notes = ids.map((id) => ({ d: byId[id],
@@ -102,7 +110,7 @@
     }
     return Object.entries(mod).map(([m, cs]) => {
       const a = agreger(ev.donnees, cs);
-      const cc = cs.filter((c) => c.critique);
+      const cc = cs.filter((c) => c.critique && c.inclus_note !== false);
       return { modalite: m, note: a.note, note_min: a.note_min, nb_donnees: a.nb, nb_controles: cc.length,
         taux_conformite: cc.length ? cc.filter((c) => c.conforme).length / cc.length : NaN };
     }).filter((r) => r.nb_donnees > 0);

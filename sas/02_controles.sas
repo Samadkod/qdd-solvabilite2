@@ -277,3 +277,52 @@
     where g.arrete = "&arrete"d;
   quit;
 %mend;
+
+/* ---------------- Contrôles de restitution : états QRT vs sources ----------------
+   Seuil fixe (référentiel : seuil_fixe = 0.999) et exclus de la note (inclus_note = 0) :
+   un écart entre un état et sa source est une erreur de production, pas une incertitude. */
+%macro Q01(arrete);  /* Bilan S.02.01 (placements) vs liste des actifs S.06.02, par classe */
+  proc sql;
+    create table work._c as
+    select b.classe as maille length=32, b.montant as v1, l.v2, . as v3
+    from (select substr(poste, 12) as classe length=32, montant
+          from SI.qrt_s0201 where arrete = "&arrete"d and poste like 'PLACEMENTS_%') as b
+         inner join
+         (select classe, sum(valeur_marche) as v2
+          from SI.qrt_s0602 where arrete = "&arrete"d group by classe) as l
+         on l.classe = b.classe;
+  quit;
+%mend;
+
+%macro Q02(arrete);  /* BE sinistres S.17.01 vs outil de provisionnement */
+  proc sql;
+    create table work._c as
+    select q.segment as maille length=32, a.be_sinistres_brut as v1, q.be_sinistres_brut as v2, . as v3
+    from SI.qrt_s1701 as q
+         inner join SI.actuariat_be as a on a.segment = q.segment and a.arrete = q.arrete
+    where q.arrete = "&arrete"d;
+  quit;
+%mend;
+
+%macro Q03(arrete);  /* Triangle S.19.01 (dernière diagonale) vs règlements cumulés de gestion */
+  proc sql;
+    create table work._c as
+    select g.segment as maille length=32, g.v1, t.v2, . as v3
+    from (select segment, sum(reglements_cumules) as v1
+          from SI.gestion_sinistres where arrete = "&arrete"d group by segment) as g
+         inner join
+         (select segment, sum(paiements_cumules) as v2
+          from SI.qrt_s1901_diagonale where arrete = "&arrete"d group by segment) as t
+         on t.segment = g.segment;
+  quit;
+%mend;
+
+%macro Q04(arrete);  /* Primes S.05.01 vs comptabilité */
+  proc sql;
+    create table work._c as
+    select c.segment as maille length=32, c.prime_acquise as v1, q.primes_acquises_brutes as v2, . as v3
+    from SI.compta_primes as c
+         inner join SI.qrt_s0501 as q on q.segment = c.segment and q.arrete = c.arrete
+    where c.arrete = "&arrete"d;
+  quit;
+%mend;

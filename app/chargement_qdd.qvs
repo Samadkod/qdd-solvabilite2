@@ -1,0 +1,19 @@
+// =====================================================================
+// Chargement du modèle QDD Solvabilité 2 dans Qlik Sense
+// Prérequis : une connexion de type dossier nommée QDD_EXPORT pointant sur le dossier des CSV
+// (export Python : output/qlik/ ; export SAS : sas/sorties/qlik/).
+// =====================================================================
+SET ThousandSep=' '; SET DecimalSep='.';
+
+D_CAMPAGNE:    LOAD * FROM [lib://QDD_EXPORT/D_CAMPAGNE.csv]    (txt, utf8, embedded labels, delimiter is ';', msq);
+D_DONNEE:      LOAD * FROM [lib://QDD_EXPORT/D_DONNEE.csv]      (txt, utf8, embedded labels, delimiter is ';', msq);
+D_CONTROLE:    LOAD * FROM [lib://QDD_EXPORT/D_CONTROLE.csv]    (txt, utf8, embedded labels, delimiter is ';', msq);
+D_FLUX:        LOAD * FROM [lib://QDD_EXPORT/D_FLUX.csv]        (txt, utf8, embedded labels, delimiter is ';', msq);
+B_LIGNAGE:     LOAD * FROM [lib://QDD_EXPORT/B_LIGNAGE.csv]     (txt, utf8, embedded labels, delimiter is ';', msq);
+F_NOTE_DONNEE: LOAD * FROM [lib://QDD_EXPORT/F_NOTE_DONNEE.csv] (txt, utf8, embedded labels, delimiter is ';', msq);
+F_RESULTAT:    LOAD * FROM [lib://QDD_EXPORT/F_RESULTAT.csv]    (txt, utf8, embedded labels, delimiter is ';', msq);
+F_INDICATEUR:  LOAD * FROM [lib://QDD_EXPORT/F_INDICATEUR.csv]  (txt, utf8, embedded labels, delimiter is ';', msq);
+F_ANOMALIE:    LOAD * FROM [lib://QDD_EXPORT/F_ANOMALIE.csv]    (txt, utf8, embedded labels, delimiter is ';', msq);
+F_VARIATION:   LOAD * FROM [lib://QDD_EXPORT/F_VARIATION.csv]   (txt, utf8, embedded labels, delimiter is ';', msq);
+
+// Contrôle du modèle : aucune table $Syn ne doit apparaître dans le visionneur de modèle.

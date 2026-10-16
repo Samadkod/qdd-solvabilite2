@@ -143,6 +143,8 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
         vc = vm * np.where(rng.random(k) < 0.02, rng.uniform(0.9, 1.1, k), 1.0)
         tables["placements_compta"].append(pd.DataFrame({"arrete": arrete, "actif_id": aid, "valeur_marche": vc.round(2)}))
 
+    tables.update(_generer_qrt(tables, graine))
+
     con = duckdb.connect(str(chemin))
     for nom, morceaux in tables.items():
         df = pd.concat(morceaux, ignore_index=True)
@@ -152,6 +154,55 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
     con.execute("CREATE TABLE ref_activites_btp AS SELECT unnest($a) AS code_activite", {"a": ACTIVITES})
     con.close()
     return chemin
+
+
+FACTEUR_BE = {"RC_DECENNALE": 1.18, "DOMMAGES_OUVRAGE": 1.09, "AUTO_FLOTTE": 1.03}  # dossier/dossier -> BE (IBNR, frais)
+
+
+def _generer_qrt(tables: dict, graine: int) -> dict:
+    """États QRT SIMPLIFIÉS (contenu inspiré de S.02.01, S.05.01, S.06.02, S.17.01, S.19.01 ;
+    pas la taxonomie EIOPA). Générés après le SI, avec un RNG distinct : les tables
+    existantes et leurs résultats ne changent pas.
+
+    Les états sont exacts par construction, sauf UNE anomalie injectée en N : le BE
+    dommages-ouvrage de S.17.01 provient d'une version antérieure du calcul (écart d'environ
+    -3 % avec l'outil de provisionnement).
+    """
+    cat = {k: pd.concat(v, ignore_index=True) for k, v in tables.items()}
+    out = {k: [] for k in ["actuariat_be", "qrt_s0501", "qrt_s1701", "qrt_s1901_diagonale",
+                           "qrt_s0602", "qrt_s0201"]}
+    for arrete, i in ARRETES.items():
+        act = cat["actuariat_inputs"].query("arrete == @arrete").set_index("segment")
+        cp = cat["compta_primes"].query("arrete == @arrete").set_index("segment")["prime_acquise"]
+        ds = cat["dwh_sinistres"].query("arrete == @arrete")
+        gs = cat["gestion_sinistres"].query("arrete == @arrete")
+        for seg in SEGMENTS:
+            be = round(act.loc[seg, "provision_dossier_total"] * FACTEUR_BE[seg], 2)
+            out["actuariat_be"].append({"arrete": arrete, "segment": seg, "be_sinistres_brut": be})
+            be_qrt = be * (0.97 if (i == 1 and seg == "DOMMAGES_OUVRAGE") else 1.0)
+            out["qrt_s1701"].append({"arrete": arrete, "segment": seg, "be_sinistres_brut": round(be_qrt, 2)})
+            out["qrt_s0501"].append({"arrete": arrete, "segment": seg,
+                                     "primes_acquises_brutes": round(cp[seg], 2)})
+            # dernière diagonale du triangle de paiements cumulés, construite depuis l'entrepôt
+            g = gs[gs.segment == seg].assign(annee_survenance=lambda x: pd.to_datetime(x.date_survenance).dt.year)
+            g = g.merge(ds[["sinistre_id", "reglements_cumules"]].rename(columns={"reglements_cumules": "r_dwh"}),
+                        on="sinistre_id")
+            diag = g.groupby("annee_survenance")["r_dwh"].sum().round(2)
+            for a, v in diag.items():
+                out["qrt_s1901_diagonale"].append({"arrete": arrete, "segment": seg, "annee_survenance": int(a),
+                                                   "paiements_cumules": float(v)})
+        pc = cat["placements_compta"].query("arrete == @arrete")
+        pdp = cat["placements_depositaire"].query("arrete == @arrete")[["actif_id", "classe", "isin", "cic"]]
+        s0602 = pc.merge(pdp, on="actif_id")[["arrete", "actif_id", "classe", "isin", "cic", "valeur_marche"]]
+        out["qrt_s0602"].append(s0602)
+        tot = s0602.groupby("classe")["valeur_marche"].sum()
+        for cl, v in tot.items():
+            out["qrt_s0201"].append({"arrete": arrete, "poste": f"PLACEMENTS_{cl}",
+                                     "montant": round(v, 2)})
+    res = {}
+    for k, v in out.items():
+        res[k] = [pd.concat(v, ignore_index=True)] if isinstance(v[0], pd.DataFrame) else [pd.DataFrame(v)]
+    return res
 
 
 if __name__ == "__main__":

@@ -69,7 +69,7 @@ class Evaluation:
     def _agreger(self, ctrl: pd.DataFrame, col_resultat: str = "resultat", global_: bool = False) -> dict:
         """Note agrégée sur un sous-ensemble de contrôles (éq. 40-42)."""
         crit = self.donnees[self.donnees["critique"]]
-        c = ctrl[ctrl["donnee_id"].isin(crit.index)]
+        c = ctrl[ctrl["donnee_id"].isin(crit.index) & ctrl["inclus_note"]]
         if c.empty:
             return {"note": np.nan, "note_min": np.nan, "nb_donnees": 0}
         notes = c.groupby("donnee_id").apply(lambda g: _moy_pond(g[col_resultat], g["poids"]),
@@ -99,7 +99,9 @@ class Evaluation:
         for modalite, g in c.groupby(axe):
             r = self._agreger(g)
             rb = self._agreger(g, "resultat_brut")
-            gc = g[g["critique"]]
+            if r["nb_donnees"] == 0:
+                continue
+            gc = g[g["critique"] & g["inclus_note"]]
             lignes.append({
                 axe: modalite, "note": r["note"], "note_avant_degradation": rb["note"],
                 "note_min": r["note_min"], "ecart_objectif": r["note"] - r["note_min"],
@@ -172,27 +174,34 @@ def evaluer(
     ]
     c["resultat_brut"] = c["resultat_brut"].fillna(0.0)
     c["critique"] = c["donnee_id"].map(d["critique"]).fillna(False).astype(bool)
+    # AMÉLIORATION : les contrôles de restitution (état QRT vs sa source) vérifient la production de
+    # l'état, pas la donnée. Ils sont suivis (seuil, statut, registre) mais exclus de la note QDD,
+    # sinon des contrôles parfaits en aval diluent un défaut amont (moyennes compensatoires).
+    if "inclus_note" not in c:
+        c["inclus_note"] = True
+    c["inclus_note"] = c["inclus_note"].map(lambda v: True if pd.isna(v) else bool(int(v))).astype(bool)
+    cn = c[c["inclus_note"]]
 
     # Notes par donnée (éq. 22) avant / après dégradation
     def _note(col):
-        return c.groupby("donnee_id").apply(lambda g: _moy_pond(g[col], g["poids"]), include_groups=False)
+        return cn.groupby("donnee_id").apply(lambda g: _moy_pond(g[col], g["poids"]), include_groups=False)
     d["note"] = _note("resultat")
     d["note_avant_degradation"] = _note("resultat_brut")
-    d["nb_controles"] = c.groupby("donnee_id").size()
+    d["nb_controles"] = cn.groupby("donnee_id").size()
     d["nb_controles"] = d["nb_controles"].fillna(0).astype(int)
     if p.donnee_sans_controle == "zero":
         mask = d["critique"] & (d["nb_controles"] == 0)
         d.loc[mask, ["note", "note_avant_degradation"]] = 0.0
     # Couverture des critères S2 (E = exhaustivité, X = exactitude, P = pertinence)
     if "criteres" in c:
-        cov = c.groupby("donnee_id")["criteres"].apply(
+        cov = cn.groupby("donnee_id")["criteres"].apply(
             lambda x: "".join(sorted({k.strip() for v in x for k in str(v).split(",")})))
         d["criteres_couverts"] = cov
 
     # Poids des contrôles (éq. 23-24) et seuils d'acceptation (éq. 38-39)
-    somme_p = c.groupby("donnee_id")["poids"].transform("sum")
-    moy_p = c.groupby("donnee_id")["poids"].transform("mean")
-    c["poids_dans_donnee"] = c["poids"] / somme_p
+    somme_p = c["donnee_id"].map(cn.groupby("donnee_id")["poids"].sum())
+    moy_p = c["donnee_id"].map(cn.groupby("donnee_id")["poids"].mean())
+    c["poids_dans_donnee"] = (c["poids"] / somme_p).where(c["inclus_note"], 0.0)
     inclus = d["critique"] & ((d["nb_controles"] > 0) | (p.donnee_sans_controle == "zero"))
     wd = d["poids_donnee"] / d.loc[inclus, "poids_donnee"].sum()
     d["poids_dans_note"] = wd.where(inclus, 0.0)
@@ -202,19 +211,30 @@ def evaluer(
         c["seuil"] = 1 - tol
     else:
         c["seuil"] = 1 - tol * moy_p / c["poids"]
-    c["conforme"] = (c["resultat"] >= c["seuil"]).where(c["critique"])
+    # AMÉLIORATION : seuil fixe pour les contrôles de restitution (QRT vs source). Un écart entre un état
+    # réglementaire et sa source est une erreur, pas une incertitude : il ne doit pas hériter de la
+    # tolérance dérivée de la sensibilité. Ces contrôles sont évalués même si la donnée n'est pas critique.
+    if "seuil_fixe" not in c:
+        c["seuil_fixe"] = np.nan
+    fixe = pd.to_numeric(c["seuil_fixe"], errors="coerce")
+    c["seuil"] = fixe.where(fixe.notna(), c["seuil"])
+    c["evalue"] = c["critique"] | fixe.notna()
+    c["conforme"] = (c["resultat"] >= c["seuil"]).where(c["evalue"])
 
     def _statut(note, mini):
         if pd.isna(note) or pd.isna(mini):
             return None
         return "vert" if note >= mini else ("orange" if note >= mini - p.marge_alerte else "rouge")
     d["statut"] = [_statut(n, m) if cr else None for n, m, cr in zip(d["note"], d["note_min"], d["critique"])]
-    c["statut"] = [_statut(r, s_) if cr else None for r, s_, cr in zip(c["resultat"], c["seuil"], c["critique"])]
+    # seuil fixe (restitution) : binaire, tout dépassement est rouge (pas de zone orange)
+    c["statut"] = [(("vert" if r >= s_ else "rouge") if pd.notna(fx) else _statut(r, s_)) if ev_ else None
+                   for r, s_, ev_, fx in zip(c["resultat"], c["seuil"], c["evalue"], fixe)]
 
     ev = Evaluation(p, d, c, S)
     g = ev._agreger(c, global_=True)
     gb = ev._agreger(c, "resultat_brut", global_=True)
-    cc = c[c["critique"]]
+    cc = c[c["critique"] & c["inclus_note"]]
+    cres = c[~c["inclus_note"] & c["evalue"]]
     critd = d[d["critique"]]
     ev.indicateurs = {
         "nb_donnees_critiques": int(len(critd)),
@@ -232,6 +252,8 @@ def evaluer(
         "note_plancher": float(critd["note"].min()) if len(critd) else np.nan,
         "donnees_critiques_non_controlees": critd.index[critd["nb_controles"] == 0].tolist(),
         "tolerance_globale_effective": 1 - g["note_min"],
+        "nb_controles_restitution": int(len(cres)),
+        "taux_conformite_restitutions": float(cres["conforme"].mean()) if len(cres) else np.nan,
     }
     return ev
 

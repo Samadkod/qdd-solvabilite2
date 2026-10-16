@@ -12,11 +12,15 @@ for (const camp of data.campagnes) {
     tol: pp.tolerance_globale, coef: pp.coef_degradation, degradation: pp.methode_degradation, marge: pp.marge_alerte };
   const ev = QDD.evaluer(camp.donnees, camp.controles, p);
   for (const k of ["note", "note_min", "note_avant_degradation", "taux_validation", "taux_conformite_controles",
-                   "nb_donnees_critiques", "nb_donnees_hors_tolerance", "anteriorite_moyenne"]) {
+                   "nb_donnees_critiques", "nb_donnees_hors_tolerance", "anteriorite_moyenne", "taux_conformite_restitutions"]) {
     const a = ev.indicateurs[k], b = camp.indicateurs[k];
     const ok = Math.abs(a - b) < 1e-10;
     if (!ok) ko++;
     console.log(`${camp.campagne} ${k.padEnd(28)} js=${a.toFixed(8)} py=${Number(b).toFixed(8)} ${ok ? "OK" : "ÉCART"}`);
+  }
+  for (const c of camp.controles) {
+    const j = ev.controles.find((x) => x.controle_id === c.controle_id);
+    if ((c.statut ?? null) !== (j.statut ?? null)) { ko++; console.log("statut contrôle diff", c.controle_id, c.statut, j.statut); }
   }
   for (const d of camp.donnees) {
     const j = ev.donnees.find((x) => x.donnee_id === d.donnee_id);

@@ -47,7 +47,9 @@ def test_parite_sql_python(campagnes):
     camps, _ = campagnes
     ev = camps[-1].evaluation
     con = duckdb.connect()
-    con.register("points", ev.controles[["controle_id", "donnee_id", "poids", "resultat_brut", "anteriorite"]])
+    pts = ev.controles[["controle_id", "donnee_id", "poids", "resultat_brut", "anteriorite", "inclus_note"]].copy()
+    pts["inclus_note"] = pts["inclus_note"].astype(int)
+    con.register("points", pts)
     don = ev.donnees.reset_index().rename(columns={"index": "donnee_id"})
     don["critique"] = don["critique"].astype(int)
     con.register("donnees", don[["donnee_id", "sensibilite", "critique"]])
@@ -69,3 +71,18 @@ def test_linearite_scr_jouet():
     s = sensibilites(scr_formule_standard_simplifiee, x)
     assert s.loc["provisions_sinistres_RC_DECENNALE", "sensibilite"] > s.loc["primes_acquises_RC_DECENNALE", "sensibilite"]
     assert s["lineaire"].dtype == bool
+
+
+def test_parite_javascript(campagnes, tmp_path):
+    """Le moteur JavaScript de l'atelier donne exactement les mêmes résultats (si Node est disponible)."""
+    import json
+    import shutil
+    import subprocess
+    if shutil.which("node") is None:
+        pytest.skip("Node non disponible")
+    from qdd_s2.__main__ import exporter_json
+    camps, var = campagnes
+    f = tmp_path / "r.json"
+    exporter_json(camps, var, f)
+    r = subprocess.run(["node", str(RACINE / "tests" / "parite_js.mjs"), str(f)], capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout[-2000:]

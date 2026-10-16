@@ -210,21 +210,21 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
 
 <!-- FICHES -->
 <section class="panel" id="p-fiches" data-panel="fiches">
-  <div class="intro"><span class="eyebrow">14 fiches · 3 parties</span><h2>Fiches de révision</h2>
+  <div class="intro"><span class="eyebrow">17 fiches · mémoire + offre</span><h2>Fiches de révision</h2>
   <p class="muted">Chaque fiche reprend une section du mémoire : l'essentiel, la formule, ce qu'il faut retenir et le piège à éviter. Coche « Révisée » pour suivre ta progression (enregistrée dans ce navigateur).</p></div>
   <div class="fiches"><nav class="toc" id="toc"></nav><div id="fiches" style="display:grid;gap:14px"></div></div>
 </section>
 
 <!-- QCM -->
 <section class="panel" id="p-qcm" data-panel="qcm" hidden>
-  <div class="intro"><span class="eyebrow">27 questions</span><h2>QCM</h2><p class="muted">Une seule bonne réponse par question. L'explication s'affiche après chaque réponse.</p></div>
+  <div class="intro"><span class="eyebrow">32 questions</span><h2>QCM</h2><p class="muted">Une seule bonne réponse par question. L'explication s'affiche après chaque réponse.</p></div>
   <div class="row" id="qcm-ctrl"></div>
   <div class="card quiz" id="qcm-box"></div>
 </section>
 
 <!-- VRAI / FAUX -->
 <section class="panel" id="p-vf" data-panel="vf" hidden>
-  <div class="intro"><span class="eyebrow">QCB · 25 affirmations</span><h2>Vrai ou faux ?</h2><p class="muted">Questions à choix binaire, pour vérifier vite les réflexes réglementaires et les formules.</p></div>
+  <div class="intro"><span class="eyebrow">QCB · 30 affirmations</span><h2>Vrai ou faux ?</h2><p class="muted">Questions à choix binaire, pour vérifier vite les réflexes réglementaires et les formules.</p></div>
   <div class="row" id="vf-ctrl"></div>
   <div class="card quiz" id="vf-box"></div>
 </section>
@@ -264,7 +264,7 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
 <!-- CAMPAGNE -->
 <section class="panel" id="p-campagne" data-panel="campagne" hidden>
   <div class="intro"><span class="eyebrow">Assureur dommages BTP fictif · arrêtés 30/06 et 30/09/2026</span><h2>Campagne QDD</h2>
-  <p class="muted">16 contrôles SQL, 39 points de contrôle, 11 données au répertoire. En N, un incident de migration vers l'entrepôt altère les provisions dossier de la RC décennale. Les paramètres sont modifiables : tout se recalcule ici, avec les mêmes formules que le moteur Python.</p></div>
+  <p class="muted">20 contrôles (dont 4 de restitution QRT), 50 points de contrôle, 11 données au dictionnaire, 14 flux au lignage. En N, deux incidents : la migration vers l'entrepôt altère les provisions dossier de la RC décennale, et l'état S.17.01 dommages-ouvrage reprend un BE périmé. Les paramètres sont modifiables : la note et les statuts se recalculent ici avec les mêmes formules que le moteur Python. Couverture et registre sont ceux du moteur, aux paramètres par défaut.</p></div>
   <div class="card pad row" style="gap:16px;align-items:end">
     <div class="field">Campagne<div class="seg" id="c-camp"></div></div>
     <label class="field" style="width:130px">Seuil signif. (%)<input id="c-seuil" type="number" step="0.1"></label>
@@ -283,6 +283,8 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
   <div class="card"><div class="pad row" style="justify-content:space-between;padding-bottom:10px"><h3>Points de contrôle</h3>
     <div class="row"><select id="c-fstat" class="btn"><option value="">Tous les statuts</option><option value="rouge">Rouge</option><option value="orange">Orange</option><option value="vert">Vert</option><option value="retard">En retard (antériorité > 0)</option></select></div></div>
     <div class="tablebox" style="border:0;border-top:1px solid var(--line);border-radius:0"><table><thead><tr><th>Point</th><th>Libellé</th><th>Donnée</th><th>Étape</th><th class="r">Brut</th><th class="r">Ant.</th><th class="r">Retenu</th><th class="r">Seuil</th><th>Statut</th></tr></thead><tbody id="c-ctrl"></tbody></table></div></div>
+  <div class="card"><div class="pad" style="padding-bottom:8px"><h3>Registre des anomalies</h3><p class="muted" style="font-size:13.5px">Cycle de vie entre campagnes : ouverte, récurrente si toujours constatée, clôturée seulement après un contrôle refait et repassé au vert. Échéance : 30 jours (haute) ou 60 jours (moyenne).</p></div>
+    <div class="tablebox" style="border:0;border-top:1px solid var(--line);border-radius:0"><table><thead><tr><th>Id</th><th>Type</th><th>Objet</th><th>Gravité</th><th>Propriétaire</th><th>Échéance</th><th>Statut</th><th>Constat</th></tr></thead><tbody id="c-reg"></tbody></table></div></div>
 </section>
 
 <!-- AVIS -->
@@ -299,7 +301,7 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
       <li>Analyse de variation en cascade : c'est l'outil qui fait vivre la note en comité.</li></ul></div>
     <div class="card pad" style="display:grid;gap:10px"><h3>Faiblesses</h3><ul class="list">
       <li><span class="sev h">Majeur</span>« 1 − note » est traité comme une incertitude relative sur la valeur de la donnée. C'est vrai pour un rapprochement, faux pour un ratio d'anomalies compté en lignes. Toute la tolérance ΔSCR repose sur cette assimilation.</li>
-      <li><span class="sev h">Majeur</span>Moyennes compensatoires : une donnée critique en échec peut se cacher derrière une bonne note agrégée.</li>
+      <li><span class="sev h">Majeur</span>Moyennes compensatoires : une donnée critique en échec peut se cacher derrière une bonne note agrégée. Vérifié sur le cas fictif : ajouter deux contrôles QRT parfaits faisait passer les provisions RC décennale du rouge à l'orange sans que la donnée change.</li>
       <li><span class="sev m">Moyen</span>Formule d'écart max/min − 1 : non bornée, fausse avec des montants négatifs, et l'éq. 27 peut alors produire une note négative.</li>
       <li><span class="sev m">Moyen</span>Linéarité du SCR supposée, testée sur les primes uniquement.</li>
       <li><span class="sev m">Moyen</span>Partie « outil » (§3.2) sans architecture, sans modèle de données, sans SQL.</li>
@@ -321,42 +323,59 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
       <tr><td>Linéarité</td><td>Sensibilité calculée avec 4 chocs et indicateur de non-linéarité (alerte au-delà de 10 %)</td></tr>
       <tr><td>Couverture</td><td>Couverture E/X/P par donnée ; données critiques sans contrôle signalées</td></tr>
       <tr><td>Cohérence</td><td>Vérification bloquante ΔSCR < seuil (éq. 12) ou tolérance < seuil / S̄ (éq. 19)</td></tr>
-      <tr><td>Industrialisation</td><td>Contrôles SQL sans CTE (portables en PROC SQL), historique des résultats, rapport Excel vivant, tests de non-régression sur les tableaux du mémoire</td></tr>
+      <tr><td>Restitution QRT</td><td>Contrôles état / source à seuil fixe (0,1 %) et statut binaire, suivis à part et exclus de la note pour éviter la dilution</td></tr>
+      <tr><td>Gouvernance</td><td>Dictionnaire enrichi, lignage des flux, taux de couverture des zones de risque, registre des anomalies avec cycle de vie, journal d'exécution</td></tr>
+      <tr><td>Restitution Qlik</td><td>Modèle en étoile sans clé synthétique ni boucle (vérifié par un test), identique en Python et en SAS</td></tr>
+      <tr><td>Industrialisation</td><td>Version SAS complète vérifiée statiquement et comparée automatiquement au Python (98_verifier.sas), contrôles SQL sans CTE, rapport Excel vivant, 32 tests de non-régression</td></tr>
     </tbody></table></div></div>
 </section>
 
 <!-- PLAN -->
 <section class="panel" id="p-plan" data-panel="plan" hidden>
-  <div class="intro"><span class="eyebrow">À partir de la prise de poste</span><h2>Plan à 90 jours</h2>
-  <p class="muted">Une trajectoire réaliste pour un analyste qualité des données / Solvabilité 2 rattaché à l'actuariat. Les éléments propres à l'organisme sont à vérifier sur place : modèle de SCR, outils, comitologie.</p></div>
+  <div class="intro"><span class="eyebrow">À partir de la prise de poste · posture d'observateur d'abord</span><h2>Plan à 90 jours</h2>
+  <p class="muted">Construit à partir de l'offre : piloter le dispositif QDD, maintenir dictionnaire, lignage et contrôles, fiabiliser les QRT, coordonner les anomalies, développer en SAS et SQL, restituer dans Qlik Sense. Ordre retenu : observer, puis contribuer à l'existant, puis proposer. La méthode quantitative du mémoire n'arrive qu'en dernier, comme proposition.</p></div>
   <div class="cols3">
-    <div class="card phase"><span class="eyebrow">Jours 1 à 30 · comprendre</span><h3>Cartographier l'existant</h3><ul class="list">
-      <li>Lire la politique QDD, le document cadre, le dernier rapport de la fonction actuarielle, le RSR et le SFCR.</li>
-      <li>Vérifier dans le SFCR : formule standard ou USP, segments S2 principaux, poids de la RC décennale dans le best estimate.</li>
-      <li>Inventorier les contrôles existants (programmes SAS, fiches Excel) avec, pour chacun, la donnée, les critères, la fréquence et le responsable.</li>
-      <li>Dessiner la chaîne de la donnée : gestion, entrepôt, comptabilité, outil de provisionnement, outil SCR, QRT.</li></ul>
-      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> référentiel des contrôles et répertoire des données, version 0.</p></div>
-    <div class="card phase"><span class="eyebrow">Jours 31 à 60 · prototyper</span><h3>Première note sur un arrêté pilote</h3><ul class="list">
-      <li>Criticité : sensibilités par relance du moteur SCR, ou à dire d'expert faute de mieux, validées avec le responsable actuariat.</li>
-      <li>Rendre chaque contrôle quantitatif : rapprochement en écart relatif, cohérence en ratio pondéré en montant.</li>
-      <li>Porter les SQL du prototype en PROC SQL sur les vraies tables et calculer la première note.</li>
-      <li>Proposer les paramètres (seuil, ΔSCR max, coefficient) en documentant chaque choix.</li></ul>
-      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> note méthodologique et rapport de campagne pilote.</p></div>
-    <div class="card phase"><span class="eyebrow">Jours 61 à 90 · industrialiser</span><h3>Campagnes trimestrielles</h3><ul class="list">
-      <li>Historiser les résultats dans une table ; planifier l'exécution après chaque arrêté.</li>
-      <li>Présenter la note et l'analyse de variation au comité, avec les données rouges et un plan d'action par propriétaire.</li>
-      <li>Formaliser les choix dans la politique QDD (notice ACPR, point 17).</li>
-      <li>Ouvrir les chantiers suivants : contrôles de niveau 2, lignage des données critiques, données externes.</li></ul>
-      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> rapport de campagne et mise à jour de la politique.</p></div>
+    <div class="card phase"><span class="eyebrow">Jours 1 à 30 · observer</span><h3>Comprendre sans rien changer</h3><ul class="list">
+      <li>Lire la politique QDD, le document cadre, le dernier rapport de la fonction actuarielle, le RSR et le SFCR. Noter les recommandations de l'ACPR ou des commissaires aux comptes encore ouvertes.</li>
+      <li>Assister aux arrêtés et aux remises QRT : qui produit quoi, avec quel programme SAS, à quelle date.</li>
+      <li>Lire les programmes SAS existants et leurs logs ; repérer les conventions de l'équipe (noms, macros, bibliothèques, connexions ODBC).</li>
+      <li>Ouvrir le dictionnaire, la cartographie et le référentiel des contrôles tels qu'ils existent. Noter les écarts sans les corriger.</li>
+      <li>Parcourir les applications Qlik Sense de l'actuariat.</li></ul>
+      <p class="muted" style="font-size:13.5px"><b>Livrable personnel :</b> carnet d'observation (chaîne de la donnée, outils, interlocuteurs, irritants). Rien n'est diffusé sans l'accord de ton responsable.</p></div>
+    <div class="card phase"><span class="eyebrow">Jours 31 à 60 · contribuer</span><h3>Fiabiliser l'existant</h3><ul class="list">
+      <li>Prendre en charge l'exécution des contrôles existants et le suivi de leurs anomalies, dans le format de l'équipe.</li>
+      <li>Compléter le dictionnaire (règle de gestion, format, états QRT) et le lignage des données les plus sensibles, avec les propriétaires.</li>
+      <li>Ajouter des contrôles de restitution QRT (S.02.01 / S.06.02, S.17.01 / outil de provisionnement, S.19.01 / gestion, S.05.01 / comptabilité) s'ils n'existent pas.</li>
+      <li>Documenter chaque programme modifié : en-tête, paramètres, journal d'exécution.</li></ul>
+      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> dictionnaire et lignage enrichis, contrôles QRT, registre des anomalies à jour.</p></div>
+    <div class="card phase"><span class="eyebrow">Jours 61 à 90 · proposer</span><h3>Quantifier, si le terrain le permet</h3><ul class="list">
+      <li>Mesurer la couverture des zones de risque par les contrôles et présenter les trous à ton responsable.</li>
+      <li>Proposer, sur un arrêté pilote, la notation du mémoire (criticité par sensibilité, note par donnée, tolérance), en la présentant comme une option et non comme une décision.</li>
+      <li>Si elle est retenue : paramètres validés par la fonction actuarielle et inscrits dans la politique QDD (notice, point 17).</li>
+      <li>Préparer l'export vers Qlik Sense dans le modèle de l'équipe.</li></ul>
+      <p class="muted" style="font-size:13.5px"><b>Livrable :</b> note de proposition (méthode, paramètres, limites) et maquette de restitution.</p></div>
   </div>
-  <div class="card pad" style="display:grid;gap:12px"><span class="eyebrow">Présenter en comité, en trois minutes</span><h3>Le script</h3>
+  <div class="grid2">
+    <div class="card pad" style="display:grid;gap:10px"><span class="eyebrow">Phase d'observation</span><h3>Questions à poser</h3><ul class="list">
+      <li>Quelles données alimentent le SCR et les QRT, et où sont-elles contrôlées aujourd'hui ?</li>
+      <li>Quelles anomalies sont récurrentes, et qui les corrige ?</li>
+      <li>Quelles recommandations ACPR ou CAC sur la qualité des données sont encore ouvertes ?</li>
+      <li>Qui relance le moteur SCR, et une analyse de sensibilité aux données existe-t-elle ?</li>
+      <li>Quand et comment le comité qualité des données se réunit-il ?</li></ul></div>
+    <div class="card pad" style="display:grid;gap:10px"><span class="eyebrow">À éviter</span><h3>Pièges des premières semaines</h3><ul class="list">
+      <li>Arriver avec une méthode toute faite : l'existant a ses raisons, il faut les connaître avant de proposer.</li>
+      <li>Modifier un programme de production sans le référent, sans recette et sans trace dans le journal.</li>
+      <li>Présenter une note agrégée sans le registre des anomalies et la couverture : un chiffre sans plan d'action ne sert pas.</li>
+      <li>Clôturer une anomalie sans contrôle refait.</li></ul></div>
+  </div>
+  <div class="card pad" style="display:grid;gap:12px"><span class="eyebrow">Le jour où l'on te demande de présenter · trois minutes</span><h3>Le script</h3>
     <div class="script">
       <p><b>30 s</b>Le chiffre : « La note QDD agrégée est de 97,4 %, pour un objectif de 97,1 %. Elle respecte la tolérance mais a perdu 1,3 point en un trimestre. »</p>
       <p><b>60 s</b>Pourquoi : on montre la cascade. « −0,7 point vient de la qualité mesurée, −0,6 point des contrôles non réalisés. »</p>
-      <p><b>60 s</b>Le maillon faible : « Les provisions RC décennale sont au rouge : 97,0 % pour un minimum de 99,3 %. C'est la donnée la plus sensible : +1 % sur ces provisions fait varier le SCR d'environ 0,73 %. La cause est un écart entre l'entrepôt et l'outil de gestion apparu après la migration. »</p>
-      <p><b>30 s</b>La décision attendue : « Je propose une correction par l'équipe données avant l'arrêté du 31/12, et la réalisation des trois contrôles en retard. »</p>
+      <p><b>60 s</b>Les maillons faibles : « Les provisions RC décennale sont au rouge, 97,0 % pour un minimum de 99,3 %, à cause d'un écart entre l'entrepôt et l'outil de gestion apparu après la migration. Côté restitution, l'état S.17.01 dommages-ouvrage diffère de 3 % de l'outil de provisionnement. »</p>
+      <p><b>30 s</b>Les décisions attendues : « Corriger la source avant l'arrêté du 31/12, aligner S.17.01 avant la remise, réaliser les trois contrôles en retard. Les 14 anomalies ouvertes et leurs propriétaires sont dans le registre. »</p>
     </div>
-    <p class="muted" style="font-size:13.5px">Une règle à garder : un chiffre, une cause, une décision. Les formules restent en annexe, et les questions de méthode trouvent leur réponse dans les fiches.</p></div>
+    <p class="muted" style="font-size:13.5px">Une règle à garder : un chiffre, une cause, une décision. Les formules restent en annexe.</p></div>
 </section>
 
 </div></main>
@@ -576,6 +595,9 @@ function renderCampagne(keep){
     ["Données hors tolérance", I.nb_donnees_hors_tolerance+" / "+I.nb_donnees_critiques, "Règle du maillon faible", I.nb_donnees_hors_tolerance>0],
     ["Contrôles à jour", pct(I.taux_validation,0), `Dégradation moyenne ${pct(I.degradation_moyenne)}`, false],
     ["Contrôles conformes", pct(I.taux_conformite_controles,0), "Résultat ≥ seuil d'acceptation", false],
+    ["Restitutions QRT conformes", pct(I.taux_conformite_restitutions,0), "État QRT = source (seuil fixe 0,1 %)", I.taux_conformite_restitutions < 1],
+    ["Zones de risque couvertes", pct(c.gouvernance.taux_couverture_zones_risque,0), `${c.gouvernance.nb_zones_non_couvertes} sans contrôle : ${c.gouvernance.flux_non_couverts.join(", ")}`, c.gouvernance.nb_zones_non_couvertes>0],
+    ["Anomalies ouvertes", String(c.gouvernance.nb_anomalies_ouvertes), `${c.gouvernance.nb_anomalies_haute} hautes · ${c.gouvernance.nb_anomalies_en_retard} échéance dépassée`, c.gouvernance.nb_anomalies_haute>0],
   ];
   $("#c-kpis").innerHTML = tiles.map(([a,b,s,al])=>`<div class="card kpi ${al?"alert":""}"><small>${a}</small><b>${b}</b><small>${s}</small></div>`).join("");
   const D = [...ev.donnees].sort((a,b)=>(b.critique-a.critique)||(b.sensibilite-a.sensibilite));
@@ -586,7 +608,7 @@ function renderCampagne(keep){
     <td class="r num">${pct(d.note)}</td><td class="r num">${d.critique?pct(d.note_min):"—"}</td>
     <td><div class="meter"><i class="${d.statut||"na"}" style="width:${w}%"></i>${mk!=null?`<b style="left:${mk}%"></b>`:""}</div></td>
     <td>${pill(d.statut)}</td><td class="mono">${esc(c.donnees.find(x=>x.donnee_id===d.donnee_id).criteres_couverts||"")}</td><td class="r num">${d.nb_controles}</td></tr>`; }).join("");
-  drawWaterfall(); drawAxes(ev); renderCtrl(ev);
+  drawWaterfall(); drawAxes(ev); renderCtrl(ev); renderRegistre(c);
 }
 function drawWaterfall(){
   const v = DATA.variation; const steps = v.filter((s,k)=>k===0||k===v.length-1||Math.abs(s.impact)>1e-9);
@@ -624,6 +646,15 @@ function renderCtrl(ev){
   $("#c-ctrl").innerHTML = rows.map(c=>`<tr><td class="mono">${esc(c.controle_id)}</td><td>${esc(c.libelle)}</td><td class="mono" style="font-size:12px">${esc(c.donnee_id)}</td><td>${esc(c.etape)}</td>
     <td class="r num">${pct(c.resultat_brut)}</td><td class="r num">${c.anteriorite>0?`<b style="color:var(--warn)">${c.anteriorite}</b>`:"0"}</td><td class="r num">${pct(c.resultat)}</td>
     <td class="r num">${c.critique?pct(c.seuil):"—"}</td><td>${pill(c.statut)}</td></tr>`).join("") || `<tr><td colspan="9" class="muted">Aucun point de contrôle pour ce filtre.</td></tr>`;
+}
+
+function renderRegistre(c){
+  const ord = {"Haute":0,"Moyenne":1}, st = {"Récurrente":0,"Ouverte":1,"Clôturée":2};
+  const rows = [...(c.registre||[])].sort((a,b)=>(st[a.statut]-st[b.statut])||(ord[a.gravite]-ord[b.gravite])||a.anomalie_id.localeCompare(b.anomalie_id));
+  const cls = s => s==="Récurrente"?"rouge":s==="Ouverte"?"orange":"vert";
+  $("#c-reg").innerHTML = rows.map(r=>`<tr><td class="mono" style="white-space:nowrap">${esc(r.anomalie_id)}</td><td>${esc(r.type)}</td><td>${esc(r.libelle)}<div class="muted mono" style="font-size:11.5px">${esc(r.objet)}</div></td>
+    <td><span class="pill ${r.gravite==="Haute"?"rouge":"orange"}">${esc(r.gravite)}</span></td><td>${esc(r.proprietaire)}</td>
+    <td class="num" style="white-space:nowrap">${esc(r.echeance)}</td><td><span class="pill ${cls(r.statut)}">${esc(r.statut)}</span></td><td style="font-size:13px">${esc(r.constat)}</td></tr>`).join("");
 }
 
 /* ---------- Démarrage ---------- */

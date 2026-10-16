@@ -130,7 +130,33 @@ fiches: [
    "Données hiérarchisées par niveau (une donnée de niveau 1 alimente directement le modèle). Une soixantaine de données critiques ont été identifiées.",
    "Revue du dispositif : une donnée critique par contrôle, les critères E/X/P de chaque contrôle identifiés, un résultat quantitatif calculable en Excel ou en SQL, la couverture des zones de risque vérifiée grâce au lignage.",
    "L'outil développé gère les habilitations, des référentiels reliés entre eux, les calculs et des visuels dynamiques."],
-  retenir:"Le mémoire conclut que c'est « complexe et coûteux ». Le prototype réduit ce coût en écrivant les contrôles en SQL et en automatisant l'agrégation." }
+  retenir:"Le mémoire conclut que c'est « complexe et coûteux ». Le prototype réduit ce coût en écrivant les contrôles en SQL et en automatisant l'agrégation." },
+{ id:"lignage", partie:"Offre · gouvernance", titre:"Dictionnaire et lignage des flux",
+  points:[
+   "Le dictionnaire des données reprend le répertoire de la notice ACPR (points 47-48 : description, localisation, source, usage, criticité, propriétaire, modalités, fréquence de mise à jour). En pratique on y ajoute la règle de gestion, le format attendu et les états QRT qui utilisent la donnée.",
+   "Le lignage décrit le chemin de chaque donnée de flux en flux : saisie, outil de gestion, entrepôt, outils de provisionnement et SCR, puis QRT. Chaque flux précise sa source, sa cible, son traitement, son mode (automatique, manuel) et s'il constitue une zone de risque.",
+   "Le référentiel des contrôles indique, pour chaque contrôle, le ou les flux qu'il sécurise. Le croisement avec le lignage fait apparaître les zones de risque sans aucun contrôle.",
+   "Dans le cas fictif, 8 zones de risque sur 33 ne sont pas couvertes, dont les transferts vers l'outil SCR (F04, F09, F13). Ce sont souvent les flux manuels de fin de chaîne qui échappent aux contrôles."],
+  formule:"Couverture = zones de risque (donnée critique × flux) contrôlées / zones de risque",
+  retenir:"Cartographie des flux = vue globale (obligatoire). Lignage par donnée critique = vue fine (bonne pratique). Les deux font le lien avec le référentiel des contrôles.",
+  piege:"Une donnée peut avoir une excellente note et un trou de couverture : la note ne mesure que ce qui est contrôlé." },
+{ id:"qrt", partie:"Offre · fiabilité des QRT", titre:"Contrôles de restitution QRT",
+  points:[
+   "États à connaître : S.02.01 (bilan prudentiel), S.05.01 (primes, sinistres et dépenses par ligne d'activité), S.06.02 (liste des actifs), S.17.01 (provisions techniques non-vie), S.19.01 (triangles de sinistres non-vie).",
+   "Contrôles inter-états : les placements du bilan S.02.01 sont recoupés avec la somme de S.06.02, le BE de S.17.01 avec l'outil de provisionnement, la dernière diagonale de S.19.01 avec les règlements de gestion, et les primes de S.05.01 avec la comptabilité. L'EIOPA applique elle-même des règles de validation entre états.",
+   "Un écart entre un état et sa source est une erreur de production, pas une incertitude. Ces contrôles ont donc un seuil fixe (0,1 % dans le prototype) et un statut binaire, vert ou rouge.",
+   "Ils sont suivis à part et exclus de la note QDD. Sinon, des contrôles parfaits en aval diluent un défaut amont : dans le cas fictif, ajouter deux contrôles QRT à 100 % faisait passer à tort les provisions RC décennale du rouge à l'orange."],
+  formule:"Statut restitution = vert si résultat ≥ 99,9 %, sinon rouge (anomalie de gravité haute si l'écart est significatif)",
+  retenir:"Dans le cas fictif en N, le BE dommages-ouvrage de S.17.01 diffère de 3 % de l'outil de provisionnement. La note QDD ne le voit pas, le contrôle de restitution si.",
+  piege:"Ne jamais régler un écart QRT en ajustant l'état à la main sans tracer l'ajustement (notice, point 37)." },
+{ id:"anomalies", partie:"Offre · coordination", titre:"Registre des anomalies et piste d'audit",
+  points:[
+   "Chaque point de contrôle rouge ou orange, et chaque zone de risque non couverte, ouvre une anomalie avec un propriétaire, une gravité, une échéance (30 jours si haute, 60 si moyenne), un constat et une action attendue.",
+   "Une anomalie toujours constatée à la campagne suivante devient « récurrente ». Une anomalie de qualité n'est clôturée que si le contrôle a été refait et repasse au vert : un ancien résultat ne prouve pas la correction.",
+   "Le journal d'exécution enregistre, pour chaque campagne, qui l'a lancée, quand, avec quels paramètres, quelle version du code, l'empreinte des référentiels et la volumétrie de chaque table source. C'est ce que demandent l'ACPR et les commissaires aux comptes.",
+   "Le registre transforme un indicateur en plan d'action : c'est le support naturel d'un comité opérationnel."],
+  retenir:"Coordonner la résolution des anomalies, c'est suivre leur cycle de vie (ouverte, récurrente, clôturée) et relancer les propriétaires à l'échéance. Ce n'est pas corriger soi-même.",
+  piege:"Clôturer une anomalie parce que le contrôle n'a pas été refait et qu'aucune alerte ne remonte." }
 ],
 
 qcm: [
@@ -160,6 +186,13 @@ qcm: [
 {p:3,q:"Lequel de ces facteurs est dynamique ?",o:["Le coefficient de dégradation","La méthode d'agrégation","Les sensibilités des données","Le seuil de significativité"],a:2,e:"Les sensibilités évoluent avec le portefeuille, et avec elles la criticité, les pondérations et les tolérances."},
 {p:3,q:"Pourquoi le prototype pondère-t-il les ratios d'anomalies en montant ?",o:["Pour améliorer la note","Pour que 1 − note soit homogène à un écart relatif sur la donnée, ce qui est la base de la tolérance ΔSCR","Parce que l'ACPR l'impose","Pour réduire le temps de calcul"],a:1,e:"Amélioration proposée : 2 % de lignes en anomalie ne signifient pas 2 % d'erreur sur le montant."},
 {p:3,q:"Avec une sensibilité de 10 % et l'hypothèse de linéarité, une hausse de 1 % de la donnée fait varier le SCR de…",o:["10 %","1 %","0,1 %","0,01 %"],a:2,e:"10 % × 1 % = 0,1 %. Le texte du mémoire (p. 54) dit 10 %, ses formules disent bien 0,1 %."}
+,
+{p:3,q:"Quel état QRT contient la liste ligne à ligne des actifs détenus ?",o:["S.02.01","S.06.02","S.17.01","S.19.01"],a:1,e:"S.06.02 est la liste des actifs. S.02.01 est le bilan, S.17.01 les provisions techniques non-vie, S.19.01 les triangles de sinistres non-vie."},
+{p:3,q:"Dans quel état QRT sont déclarés les triangles de développement des sinistres non-vie ?",o:["S.05.01","S.12.01","S.19.01","S.06.02"],a:2,e:"S.19.01 : sinistres non-vie, triangles de développement."},
+{p:3,q:"Pourquoi le prototype exclut-il les contrôles de restitution QRT de la note QDD ?",o:["Parce qu'ils sont trop nombreux","Pour éviter que des contrôles parfaits en aval diluent un défaut de la donnée en amont","Parce que l'ACPR l'interdit","Parce qu'ils n'ont pas de résultat quantitatif"],a:1,e:"Constaté sur le cas fictif : deux contrôles QRT à 100 % faisaient passer les provisions RC décennale du rouge à l'orange sans que la donnée change. Ils sont suivis à part, avec un seuil fixe."},
+{p:3,q:"Quand une anomalie de qualité est-elle clôturée dans le registre ?",o:["Dès que le statut paraît vert","Quand le contrôle a été refait dans la campagne et repasse au vert","Après 60 jours","Quand le propriétaire le demande"],a:1,e:"Un ancien résultat dégradé ou un contrôle non refait ne prouve pas la correction."},
+{p:3,q:"Que révèle le croisement du lignage avec le référentiel des contrôles ?",o:["Les données non critiques","Les zones de risque traversées par une donnée critique sans aucun contrôle","Les erreurs de calcul du SCR","Les doublons de contrats"],a:1,e:"C'est l'indicateur de couverture : 25 zones sur 33 couvertes dans le cas fictif."},
+{p:3,q:"Lequel de ces éléments n'a PAS sa place dans un journal d'exécution destiné à l'audit ?",o:["Les paramètres de la campagne","La version du code","L'empreinte des référentiels","Le mot de passe de connexion ODBC"],a:3,e:"Aucun secret dans les journaux : on utilise un DSN système ou un authdomain SAS."}
 ],
 
 vf: [
@@ -187,6 +220,11 @@ vf: [
 {p:3,q:"Les sensibilités des données sont des facteurs statiques de la méthode.",a:false,e:"Elles sont dynamiques ; le mémoire évoque une mise à jour possible tous les trois ans en raison du coût de calcul."},
 {p:3,q:"La note agrégée d'une entité se calcule avec les seuls contrôles rattachés à cette entité.",a:true,e:"Éq. 40 : la condition d'agrégation filtre les contrôles."},
 {p:3,q:"La mission décrite dans le mémoire portait sur un groupe en formule standard pure.",a:false,e:"Le groupe utilise un modèle interne partiel approuvé par l'ACPR sur une branche."},
-{p:3,q:"Les tableaux 3 et 5 du mémoire donnent la même sensibilité pour les provisions mathématiques.",a:false,e:"4,57 % au tableau 3, 5,74 % au tableau 5. C'est une incohérence interne des exemples."}
+{p:3,q:"Les tableaux 3 et 5 du mémoire donnent la même sensibilité pour les provisions mathématiques.",a:false,e:"4,57 % au tableau 3, 5,74 % au tableau 5. C'est une incohérence interne des exemples."},
+{p:3,q:"S.02.01 correspond au bilan prudentiel.",a:true,e:"S.02.01 : bilan Solvabilité 2."},
+{p:3,q:"Un écart de 0,5 % entre S.17.01 et l'outil de provisionnement est acceptable si la donnée est peu sensible.",a:false,e:"Un écart de restitution est une erreur de production : seuil fixe, quasi nul, quelle que soit la sensibilité."},
+{p:3,q:"Avec une moyenne pondérée, ajouter des contrôles parfaits en aval peut améliorer la note d'une donnée défaillante en amont.",a:true,e:"C'est l'effet de dilution. Le prototype l'évite en excluant les contrôles de restitution de la note."},
+{p:3,q:"Une zone de risque d'une donnée critique sans contrôle ouvre une anomalie de type « Couverture ».",a:true,e:"Elle est confiée au propriétaire de la donnée, avec une échéance de 60 jours."},
+{p:3,q:"Un contrôle non refait dont l'ancien résultat est vert suffit à clôturer une anomalie de qualité.",a:false,e:"La clôture exige un contrôle réalisé dans la campagne et repassé au vert."}
 ]
 };

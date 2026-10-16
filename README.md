@@ -1,88 +1,90 @@
-# qdd-s2 — Évaluation quantitative de la qualité des données Solvabilité 2
+# qdd-s2 — Dispositif de qualité des données Solvabilité 2
 
-Prototype industrialisable de la méthode du mémoire de **Camille Motard** (*Analyse quantitative de la qualité des données sous Solvabilité 2*, ISFA / Grant Thornton, mars 2024). La méthode y est **corrigée et complétée**, puis appliquée à un **assureur dommages BTP fictif**.
+Prototype d'un dispositif QDD pour un assureur dommages, construit à partir de deux sources :
+- les missions d'un poste d'**analyste qualité des données / Solvabilité 2** : dictionnaire, lignage, contrôles, fiabilité des QRT, coordination des anomalies, SAS/SQL, Qlik Sense ;
+- la méthode de notation quantitative du mémoire de **Camille Motard** (*Analyse quantitative de la qualité des données sous Solvabilité 2*, ISFA / Grant Thornton, 2024), **corrigée** et appliquée en surcouche.
 
-> Toutes les données du dossier `data/` sont **simulées**. Le SCR utilisé est une formule standard **simplifiée et non réglementaire** : il faut la remplacer par le moteur SCR de l'organisme.
+> Toutes les données sont **fictives** (assureur dommages BTP simulé, graine fixe). Le SCR est une formule standard **simplifiée et non réglementaire** : en production, les sensibilités viennent des relances du moteur SCR de l'organisme.
 
-## Ce que fait l'outil
+## Ce que fait le dispositif
 
 ```
-Référentiels (répertoire de données, référentiel des contrôles, plan de campagne)
-  + base (SI gestion / entrepôt / comptabilité / actuariat / placements)
-  → contrôles SQL (rapprochement | cohérence) → points de contrôle (1 donnée chacun)
-  → historique des résultats → antériorité + dégradation des contrôles non réalisés
-  → sensibilités du SCR → criticité, pondération, tolérance, seuils d'acceptation
-  → note QDD par donnée → note QDD agrégée (+ par axe : segment, étape SI, critère, responsable)
-  → analyse de variation N-1 → N → rapport Excel vivant + export JSON (tableau de bord)
+Dictionnaire des données ─┐
+Lignage (14 flux)        ─┼─> Référentiel des contrôles (20 contrôles SQL / SAS, dont 4 de restitution QRT)
+                          │        │ exécution par arrêté, historisation
+                          │        v
+                          │   Points de contrôle (50) : résultat, antériorité, dégradation
+                          │        │
+                          ├────────┼─> Couverture des zones de risque (lignage x contrôles)
+                          │        ├─> Registre des anomalies (cycle de vie entre campagnes)
+                          │        └─> Note QDD (méthode du mémoire) : criticité, tolérance, analyse de variation
+                          └─> Journal d'exécution (paramètres, version, empreintes, volumétries)
+Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en étoile) · application Streamlit
 ```
 
-## Application en ligne (Streamlit)
+## Deux versions, une même logique
+| | Rôle | Vérification |
+|---|---|---|
+| **SAS / PROC SQL** (`sas/`) | Version **production** | Vérification statique (`scripts/lint_sas.py`) ; comparaison automatique de 43 valeurs à la référence Python (`sas/98_verifier.sas`) |
+| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 32 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
+| JavaScript (`app/moteur.js`) | Calculs de l'atelier HTML | Parité avec le Python testée sur toutes les valeurs |
+| Excel (rapport) | Restitution | Les 11 indicateurs calculés par formules sont égaux à ceux du moteur |
 
-```bash
-pip install -r requirements.txt
-streamlit run streamlit_app.py
-```
-Elle a trois onglets : l'**Atelier** (fiches, QCM, vrai/faux, simulateur, avis critique, plan 90 jours), la **Campagne live** (le moteur tourne en direct, avec des paramètres modifiables et un rapport Excel téléchargeable) et le **Code SAS / SQL**.
-
-## Version production : SAS / PROC SQL
-Le dossier `sas/` est un portage complet : contrôles, campagne, variation et rapport ODS EXCEL. Voir `sas/README_SAS.md`.
+⚠️ Le SAS **n'a pas pu être exécuté** dans l'environnement de développement (SAS n'y est pas installé). Il faut le lancer une première fois sur SAS OnDemand ou en entreprise avec `99_executer.sas` ; `98_verifier.sas` signale alors tout écart avec la référence.
 
 ## Démarrage
-
 ```bash
-pip install pandas numpy openpyxl duckdb pytest
-python scripts/generer_donnees_btp.py      # base fictive data/btp_fictif.duckdb
-python -m qdd_s2                           # campagnes N-1 et N -> output/
-python -m qdd_s2 --symetrique              # variante : écart symétrique borné
-python -m pytest -q                        # 19 tests
+pip install -r requirements.txt
+python scripts/generer_donnees_btp.py     # SI fictif (DuckDB)
+python -m qdd_s2                          # campagnes N-1 et N -> output/
+python -m pytest -q                       # 32 tests
+python scripts/lint_sas.py                # vérification statique du SAS
+streamlit run streamlit_app.py            # application
 ```
 
-## Arborescence
+## Résultats de la campagne fictive N (30/09/2026)
+| Indicateur | Valeur |
+|---|---|
+| Note QDD agrégée / objectif | 97,45 % / 97,10 % |
+| Données critiques hors tolérance | 2 sur 8 (provisions RC décennale rouge, date de survenance orange) |
+| Restitutions QRT conformes | 10 sur 11 (S.17.01 dommages-ouvrage : BE périmé, écart de 3,1 %) |
+| Zones de risque couvertes | 25 sur 33 (flux vers l'outil SCR F04, F09, F13 non contrôlés) |
+| Anomalies ouvertes | 14, dont 4 de gravité haute et 11 à échéance dépassée |
 
+## Arborescence
 | Chemin | Rôle |
 |---|---|
-| `qdd_s2/mesures.py` | Résultat quantitatif d'un contrôle (éq. 27-33) + écart symétrique, ratio pondéré en montant |
-| `qdd_s2/anteriorite.py` | Antériorité (base fréquence / annuelle) et dégradation simple / composée (éq. 34-37) |
-| `qdd_s2/moteur.py` | Criticité, notes, tolérance (2 approches), seuils, indicateurs, axes, analyse de variation |
-| `qdd_s2/sensibilite.py` | Sensibilités du SCR + **test de linéarité** + SCR jouet |
-| `qdd_s2/campagne.py` | Orchestration : exécution SQL, historique, campagnes |
-| `qdd_s2/rapport_excel.py` | Rapport Excel : les onglets Paramètres / Contrôles / Données critiques sont recalculés par des formules |
-| `sql/controles/*.sql` | 16 contrôles (ANSI, sans CTE : transposables en SAS PROC SQL) |
-| `sql/agregation_note_qdd.sql` | Note agrégée en SQL pur (parité testée avec Python) |
-| `referentiels/*.csv` | Répertoire des données (ACPR, points 47-48), référentiel des contrôles (points 67-70), plan, historique |
-| `tests/test_memoire.py` | **Reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22, 24 du mémoire** |
+| `referentiels/` | Dictionnaire, référentiel des contrôles (flux, seuil fixe, inclusion dans la note), lignage (flux et chemins), plan de campagne, historique |
+| `sql/controles/` | 20 contrôles SQL ANSI sans CTE |
+| `sas/00`–`07` | Configuration (avec gabarit ODBC), import démo, contrôles, campagne, variation, rapport, gouvernance, export Qlik |
+| `sas/98_verifier.sas`, `sas/99_executer.sas` | Vérification contre la référence ; exécution complète |
+| `qdd_s2/moteur.py` | Méthode du mémoire, corrigée |
+| `qdd_s2/gouvernance.py` | Couverture du lignage, registre des anomalies, journal |
+| `qdd_s2/export_qlik.py`, `app/chargement_qdd.qvs` | Modèle en étoile et script de chargement Qlik |
+| `app/` | Atelier HTML : fiches, QCM, vrai/faux, simulateur, campagne, avis, plan 90 jours |
 
-## Corrections et améliorations par rapport au mémoire
-
-| # | Constat dans le mémoire | Traitement ici |
+## Écarts au mémoire, et pourquoi
+| # | Constat | Traitement |
 |---|---|---|
-| 1 | `1 − note` est interprété comme une incertitude relative sur la donnée, alors que, pour un contrôle de cohérence, le ratio d'anomalies est un **nombre** de lignes | Ratio d'anomalies **pondéré en montant** par défaut (`montant en anomalie / montant total`), ce qui le rend homogène avec un écart de rapprochement |
-| 2 | L'écart `max/min − 1` (éq. 31) n'est pas borné et devient faux avec des montants négatifs ; l'éq. 27 peut alors donner une note négative | Résultat borné dans [0 ; 1] + option `ecart_symetrique` = `min(1, \|a−b\| / max(\|a\|,\|b\|))` |
-| 3 | Les moyennes compensent : une donnée critique très dégradée peut se cacher derrière une bonne note agrégée | Règle du **maillon faible** : statut tricolore par donnée et par contrôle, nombre de données hors tolérance, note plancher |
-| 4 | Linéarité du SCR posée comme « hypothèse forte », jamais testée (sauf sur les primes) | Sensibilité calculée avec 4 chocs (−15 %, +5 %, +15 %, +30 %) et indicateur de non-linéarité |
-| 5 | Le mémoire suppose qu'il n'existe pas de donnée critique sans contrôle | Ces données sont signalées ; option `donnee_sans_controle="zero"` (approche prudente) |
-| 6 | Cohérence tolérance / criticité (éq. 12, 19) énoncée mais pas outillée | Vérification bloquante dans `Parametres.verifier_coherence` |
-| 7 | La formule de la « variation proratisée » (p. 84) ne laisse pas la note inchangée quand la qualité est stable | Non implémentée ; c'est l'analyse de variation par substitutions (tableau 20) qui est retenue, conformément à la conclusion du mémoire |
-| 8 | Partie « outil » (§3.2.1) sans architecture | Modèle de données, contrôles SQL, rapport, tests, JSON pour tableau de bord |
+| 1 | `1 − note` est lu comme une incertitude relative, alors qu'un ratio d'anomalies compte des lignes | Ratio pondéré en montant par défaut |
+| 2 | `max/min − 1` n'est pas borné et faux avec des montants négatifs ; une note peut devenir négative | Résultat borné ; écart symétrique en option |
+| 3 | Moyennes compensatoires | Statuts par donnée et par contrôle, nombre de données hors tolérance, note plancher |
+| 4 | Dilution **constatée** : deux contrôles QRT parfaits faisaient passer une donnée du rouge à l'orange | Les contrôles de restitution sont exclus de la note et ont un seuil fixe (0,1 %) avec un statut binaire |
+| 5 | Linéarité du SCR non testée | Sensibilité à 4 chocs et indicateur de non-linéarité |
+| 6 | Données critiques sans contrôle supposées absentes | Signalées ; option prudente « note 0 » |
+| 7 | Cohérence tolérance / criticité non outillée | Vérification bloquante (éq. 12 et 19) |
+| 8 | Formule de proratisation (p. 84) incohérente | Non retenue ; analyse de variation par substitutions |
+| 9 | Pas de gouvernance (lignage, anomalies, audit) | Couverture des zones de risque, registre avec cycle de vie, journal d'exécution |
 
-Erreurs relevées dans le texte du mémoire (sans effet sur le code) :
-- p. 21 : le ratio de solvabilité est écrit SCR / fonds propres ; c'est fonds propres / SCR.
-- p. 54 : avec une sensibilité de 10 %, une variation de 1 % de la donnée fait varier le SCR de **0,1 %**, pas de 10 %.
-- Sensibilité des provisions mathématiques : 4,57 % (tableaux 3 et 14) mais 5,74 % (tableaux 5 à 9).
-- Le tableau 4 reprend les pondérations du tableau 2 au lieu des sensibilités.
+Erreurs relevées dans le texte du mémoire :
+- p. 21 : le ratio de solvabilité est fonds propres / SCR, et non l'inverse.
+- p. 54 : une sensibilité de 10 % signifie que +1 % sur la donnée donne +0,1 % de SCR, et non +10 %.
+- Les tableaux 3 à 9 utilisent tantôt 4,57 %, tantôt 5,74 % pour les provisions mathématiques.
+- Le tableau 4 reprend les pondérations du tableau 2.
 - Le tableau 19 a des colonnes décalées.
 
-## Passage en production (cible : actuariat d'un assureur BTP)
-
-1. **Périmètre et criticité** : remplacer `scr_formule_standard_simplifiee` par des relances du moteur SCR réel. Pour la formule standard, les volumes de primes et réserves par segment, le BE de la décennale, les taux de cession et les placements sont les premiers candidats. Faire valider le seuil de significativité et le ΔSCR max par la fonction actuarielle, puis les formaliser dans la politique QDD (notice ACPR, point 17).
-2. **Données** : remplacer les tables DuckDB par des vues sur les extractions réelles (SAS, base de gestion). Les SQL sont écrits sans CTE, ils passent tels quels en PROC SQL (seule la syntaxe des paramètres change).
-3. **Référentiels** : compléter `repertoire_donnees.csv` et `referentiel_controles.csv` avec les propriétaires de données et les relais. Une ligne = un contrôle ; `{maille}` génère automatiquement les points de contrôle.
-4. **Campagnes** : planification trimestrielle (après l'arrêté). Historisation des résultats dans une table, plus de CSV.
-5. **Restitution** : rapport Excel pour le comité de pilotage S2 et tableau de bord (export JSON) pour le comité opérationnel.
-6. **Gouvernance** : tout changement de paramètre ou de contrôle passe par l'analyse de variation, présentée en comité.
-
 ## Limites connues
-
-- Le SCR est un SCR jouet ; les corrélations entre segments sont illustratives.
-- Une donnée critique à dire d'expert qui n'a pas de sensibilité calculable reçoit par convention la sensibilité moyenne des données critiques. Cette convention doit être validée.
-- L'analyse de variation couvre la note agrégée, pas la note minimum.
+- Le SCR est un jouet ; les corrélations entre segments sont illustratives.
+- Une donnée critique à dire d'expert reçoit par convention la sensibilité moyenne : c'est un choix à valider.
+- Les états QRT sont simplifiés ; ils ne suivent pas la taxonomie EIOPA.
+- Le script Qlik et le gabarit ODBC sont fournis non testés, faute de Qlik et de bases distantes dans l'environnement.

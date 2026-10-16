@@ -13,7 +13,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .campagne import RACINE, Config, lancer_campagnes
+from .campagne import RACINE, Config, charger_lignage, lancer_campagnes
+from .export_qlik import SCRIPT_QLIK, exporter_qlik
 from .rapport_excel import ecrire_rapport
 
 
@@ -39,6 +40,9 @@ def exporter_json(campagnes, variation, chemin: Path):
             "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"}).to_dict(orient="records"),
             "controles": ev.controles.drop(columns=["detail"], errors="ignore").to_dict(orient="records"),
             "axes": {a: ev.par_axe(a).reset_index().to_dict(orient="records") for a in ("maille", "etape", "criteres", "responsable")},
+            "gouvernance": r.gouvernance,
+            "couverture": r.couverture.to_dict(orient="records"),
+            "registre": r.registre.to_dict(orient="records"),
         })
     chemin.write_text(json.dumps(out, default=_json_safe, ensure_ascii=False, indent=1).replace("NaN", "null"), encoding="utf-8")
 
@@ -57,8 +61,20 @@ def main(argv=None):
     sortie = Path(a.sortie); sortie.mkdir(parents=True, exist_ok=True)
     x = ecrire_rapport(camps, variation, sortie / f"rapport_qdd_{camps[-1].date_arrete}.xlsx")
     exporter_json(camps, variation, sortie / "resultats_campagnes.json")
+    # Registre des anomalies, lignage couvert, journal d'exécution (append), export Qlik
+    camps[-1].registre.to_csv(sortie / "registre_anomalies.csv", sep=";", index=False)
+    camps[-1].couverture.to_csv(sortie / "lignage_couverture.csv", sep=";", index=False)
+    jrn = sortie / "journal_executions.csv"
+    pd.DataFrame([c.journal for c in camps]).to_csv(jrn, sep=";", index=False, mode="a", header=not jrn.exists())
+    ref = pd.read_csv(cfg.referentiels / "referentiel_controles.csv")
+    _, flux = charger_lignage(cfg)
+    exporter_qlik(camps, variation, ref, flux, sortie / "qlik")
+    (sortie / "qlik" / "chargement_qdd.qvs").write_text(SCRIPT_QLIK, encoding="utf-8")
     ind = camps[-1].evaluation.indicateurs
-    print(f"Note QDD agrégée {camps[-1].campagne} : {ind['note']:.2%} (objectif {ind['note_min']:.2%}) -> {x}")
+    g = camps[-1].gouvernance
+    print(f"Note QDD agrégée {camps[-1].campagne} : {ind['note']:.2%} (objectif {ind['note_min']:.2%}) | "
+          f"restitutions QRT conformes {ind['taux_conformite_restitutions']:.0%} | couverture zones de risque "
+          f"{g['taux_couverture_zones_risque']:.0%} | anomalies ouvertes {g['nb_anomalies_ouvertes']} -> {x}")
 
 
 if __name__ == "__main__":

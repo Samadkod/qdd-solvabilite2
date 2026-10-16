@@ -33,6 +33,8 @@
 /* ---------- 2. Exécution des contrôles réalisés et historisation ---------- */
 %macro qdd_executer_controles(arrete=, non_realises=);
   %local n i id fam;
+  %global _nb_exec;
+  %let _nb_exec = 0;
   proc sql noprint;
     select controle_id, famille into :cid1-, :fam1- from QDD.referentiel_controles;
     %let n = &sqlobs;
@@ -47,6 +49,7 @@
       %else %mesure_coherence(&id);
       data work._pts; set work._pts; date_realisation = "&arrete"d; format date_realisation date9.; run;
       proc append base=QDD.hist_resultats data=work._pts force; run;
+      %let _nb_exec = %eval(&_nb_exec + 1);
     %end;
     %else %put NOTE: [QDD] contrôle &id non réalisé au &arrete : son dernier résultat sera dégradé.;
   %end;
@@ -71,6 +74,7 @@
     select d.point_id, d.controle, d.maille, d.resultat_brut, d.mesure, d.detail,
            d.date_realisation as date_derniere_real format=date9.,
            r.libelle, r.famille, r.criteres, r.frequence, r.poids, r.etape, r.responsable,
+           r.flux, r.seuil_fixe, coalesce(r.inclus_note, 1) as inclus_note,
            tranwrd(r.donnee_id, '{maille}', strip(d.maille)) as donnee_id length=60
     from work._dern as d
          inner join QDD.referentiel_controles as r
@@ -140,12 +144,12 @@
            sum(poids * resultat)      / sum(poids) as note,
            sum(poids * resultat_brut) / sum(poids) as note_avant_degradation,
            count(*) as nb_controles
-    from work._points group by donnee_id;
+    from work._points where inclus_note = 1 group by donnee_id;
   quit;
 
   /* Couverture des critères E / X / P par donnée */
   data work._crit;
-    set work._points(keep=donnee_id criteres);
+    set work._points(keep=donnee_id criteres inclus_note where=(inclus_note = 1));
     length critere $1;
     do k = 1 to countw(criteres, ',');
       critere = strip(scan(criteres, k, ','));
@@ -192,8 +196,11 @@
   /* 3f. Seuil d'acceptation des contrôles = note min de la donnée (éq. 38) */
   proc sql;
     create table QDD.controles_&camp as
-    select p.*, d.critique, d.note_min as seuil,
-           case when d.critique = 1 then (p.resultat >= d.note_min) end as conforme
+    select p.*, coalesce(d.critique, 0) as critique,
+           /* seuil fixe pour les contrôles de restitution QRT, sinon note min de la donnée */
+           case when not missing(p.seuil_fixe) then p.seuil_fixe else d.note_min end as seuil,
+           (calculated critique = 1 or not missing(p.seuil_fixe)) as evalue,
+           case when calculated evalue = 1 then (p.resultat >= calculated seuil) end as conforme
     from work._points as p
          left join QDD.donnees_&camp as d on d.donnee_id = p.donnee_id
     order by p.donnee_id, p.point_id;
@@ -201,12 +208,13 @@
   data QDD.controles_&camp;
     set QDD.controles_&camp;
     length statut $6;
-    if critique = 1 then do;
+    if evalue = 1 then do;
       if resultat >= seuil then statut = 'vert';
+      else if not missing(seuil_fixe) then statut = 'rouge';     /* restitution : binaire */
       else if resultat >= seuil - &MARGE then statut = 'orange';
       else statut = 'rouge';
     end;
-    format resultat_brut resultat seuil mesure percent10.2;
+    format resultat_brut resultat seuil seuil_fixe mesure percent10.2;
   run;
 
   /* 3g. Indicateurs (tableau 18 + améliorations) */
@@ -231,17 +239,22 @@
     select mean(anteriorite = 0)   as taux_validation,
            mean(anteriorite)       as anteriorite_moyenne,
            mean(conforme)          as taux_conformite_controles
-    from QDD.controles_&camp where critique = 1;
+    from QDD.controles_&camp where critique = 1 and inclus_note = 1;
+
+    create table work._i4 as
+    select count(*) as nb_controles_restitution,
+           mean(conforme) as taux_conformite_restitutions
+    from QDD.controles_&camp where inclus_note = 0 and evalue = 1;
 
     create table QDD.indicateurs_&camp as
     select "&camp" as campagne length=8, "&arrete"d as date_arrete format=date9., *
-    from work._i1, work._i2, work._i3;
+    from work._i1, work._i2, work._i3, work._i4;
   quit;
 
   data QDD.indicateurs_&camp;
     set QDD.indicateurs_&camp;
     format note note_min note_avant_degradation ecart_objectif degradation_moyenne note_plancher
-           sensibilite_moyenne taux_validation taux_conformite_controles percent10.2;
+           sensibilite_moyenne taux_validation taux_conformite_controles taux_conformite_restitutions percent10.2;
   run;
 
   title "QDD — campagne &camp (arrêté &arrete)";
@@ -253,7 +266,7 @@
 /* axe : maille | etape | criteres | responsable (criteres multi-valué : éclaté) */
 %macro qdd_axe(camp=, axe=, out=);
   data work._ax;
-    set QDD.controles_&camp(where=(critique = 1));
+    set QDD.controles_&camp(where=(critique = 1 and inclus_note = 1));
     length modalite $60;
     %if &axe = criteres %then %do;
       do k = 1 to countw(criteres, ',');

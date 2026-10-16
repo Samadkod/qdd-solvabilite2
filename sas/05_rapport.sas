@@ -16,10 +16,20 @@
       options(sheet_name='Synthèse' embedded_titles='yes' frozen_headers='yes' autofilter='none');
 
   title "Qualité des données Solvabilité 2 — campagne &camp";
-  data work._synth; set QDD.indicateurs_&prec QDD.indicateurs_&camp; run;
+  data work._synth;
+    merge QDD.indicateurs_&prec QDD.gouv_couverture_&prec QDD.gouv_anomalies_&prec;
+    by campagne;
+  run;
+  data work._synth2;
+    merge QDD.indicateurs_&camp QDD.gouv_couverture_&camp QDD.gouv_anomalies_&camp;
+    by campagne;
+  run;
+  data work._synth; set work._synth work._synth2; run;
   proc report data=work._synth;
     columns campagne date_arrete note note_min ecart_objectif note_avant_degradation degradation_moyenne
-            nb_donnees_critiques nb_donnees_hors_tolerance taux_validation taux_conformite_controles;
+            nb_donnees_critiques nb_donnees_hors_tolerance taux_validation taux_conformite_controles
+            taux_conformite_restitutions taux_couverture_zones_risque nb_anomalies_ouvertes
+            nb_anomalies_haute nb_anomalies_en_retard;
     define campagne / display 'Campagne';
     define date_arrete / display 'Arrêté';
     define note / display 'Note QDD agrégée';
@@ -31,6 +41,11 @@
     define nb_donnees_hors_tolerance / display 'Hors tolérance';
     define taux_validation / display 'Contrôles à jour';
     define taux_conformite_controles / display 'Contrôles conformes';
+    define taux_conformite_restitutions / display 'Restitutions QRT conformes';
+    define taux_couverture_zones_risque / display 'Couverture zones de risque';
+    define nb_anomalies_ouvertes / display 'Anomalies ouvertes';
+    define nb_anomalies_haute / display 'dont haute';
+    define nb_anomalies_en_retard / display 'dont en retard';
   run;
 
   ods excel options(sheet_name='Variation');
@@ -92,6 +107,38 @@
   ods excel options(sheet_name='Sensibilités');
   title "Sensibilités du SCR et test de linéarité";
   proc print data=QDD.sens_&camp noobs; format sensibilite non_linearite percent10.2; run;
+
+  ods excel options(sheet_name='Lignage & couverture');
+  title "Lignage des données et couverture des zones de risque (notice ACPR, points 55-60)";
+  proc report data=QDD.couverture_&camp;
+    columns donnee_id libelle_donnee critique ordre flux_id systeme_source systeme_cible traitement mode
+            zone_risque couvert controles proprietaire;
+    define couvert / display 'Couvert';
+    compute couvert;
+      if couvert = 0 and zone_risque = 1 and critique = 1 then
+        call define(_row_, 'style', 'style={background=#F8DEDE}');
+    endcomp;
+  run;
+
+  ods excel options(sheet_name='Registre des anomalies');
+  title "Registre des anomalies (cycle de vie entre campagnes)";
+  proc report data=QDD.registre_anomalies;
+    columns anomalie_id type objet donnee_id libelle gravite proprietaire campagne_detection date_detection
+            echeance derniere_campagne nb_campagnes statut date_cloture constat action_attendue;
+    compute statut;
+      if statut = 'Récurrente' then call define(_col_, 'style', 'style={background=#F8DEDE}');
+      else if statut = 'Ouverte' then call define(_col_, 'style', 'style={background=#FBEBCB}');
+      else if statut = 'Clôturée' then call define(_col_, 'style', 'style={background=#DCF1E4}');
+    endcomp;
+  run;
+
+  ods excel options(sheet_name='Dictionnaire');
+  title "Dictionnaire des données";
+  proc print data=QDD.repertoire_donnees noobs; run;
+
+  ods excel options(sheet_name='Journal');
+  title "Journal d'exécution (piste d'audit)";
+  proc print data=QDD.journal_executions noobs; run;
 
   title;
   ods excel close;

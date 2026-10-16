@@ -4,7 +4,8 @@
 -- (remplacer $coef / $dscr par des macro-variables &coef. / &dscr.).
 --
 -- Entrées :
---   points(controle_id, donnee_id, poids, resultat_brut, anteriorite)
+--   points(controle_id, donnee_id, poids, resultat_brut, anteriorite, inclus_note)
+--   inclus_note = 0 : contrôle de restitution (QRT vs source), suivi à part, exclu de la note
 --   donnees(donnee_id, sensibilite, critique)   -- critique : 1 / 0
 -- Paramètres : $coef (coefficient de dégradation), $dscr (ΔSCR max)
 -- =====================================================================
@@ -19,6 +20,7 @@ JOIN (SELECT donnee_id,
                                               THEN 1 - $coef * anteriorite ELSE 0 END) / SUM(poids) AS note,
              SUM(poids * resultat_brut) / SUM(poids)                                         AS note_brute
       FROM points
+      WHERE inclus_note = 1
       GROUP BY donnee_id) n
   ON n.donnee_id = d.donnee_id
 WHERE d.critique = 1
