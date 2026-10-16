@@ -1,0 +1,12 @@
+[project]
+name = "qdd-s2"
+version = "1.0.0"
+description = "Évaluation quantitative de la qualité des données Solvabilité 2 (méthode Motard 2024, corrigée)"
+requires-python = ">=3.10"
+dependencies = ["pandas>=2.0", "numpy", "openpyxl", "duckdb"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
