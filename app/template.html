@@ -191,6 +191,7 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
 .etape .q{font-style:italic;color:var(--muted);margin-bottom:10px}
 .etape .corps{display:grid;gap:10px;max-width:80ch}
 .etape table{font-size:13.5px}
+.etape a,.tablebox a{color:var(--accent)}
 .lbl{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
 .vue{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
 .vue .bloc{flex:1 1 150px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--sunk);display:grid;gap:4px;align-content:start}
@@ -233,9 +234,23 @@ dl.glossaire dd{margin:0;color:var(--ink)}
 
 <!-- COMPRENDRE -->
 <section class="panel" id="p-comprendre" data-panel="comprendre">
-  <div class="intro"><span class="eyebrow">À lire en premier · 25 minutes · aucun prérequis</span><h2>Comprendre la méthode pas à pas</h2>
+  <div class="intro"><span class="eyebrow">À lire en premier · aucun prérequis</span><h2>Comprendre la méthode pas à pas</h2>
   <p class="muted">Ce parcours suppose que tu n'as pas lu le mémoire. Il suit un seul petit exemple chiffré, du résultat d'un contrôle jusqu'à la note globale et à la tolérance. Tous les chiffres ont été recalculés par le moteur du projet. Les fiches, QCM et le simulateur viennent ensuite.</p></div>
 
+
+  <div class="card pad" style="display:grid;gap:12px;border-left:4px solid var(--accent)"><span class="lbl">Par où commencer · priorité poste</span>
+    <h3>L'ordre de lecture pour un analyste qualité des données / Solvabilité 2</h3>
+    <p class="muted" style="max-width:80ch">Ton offre parle d'abord de dictionnaire, de lignage, de contrôles, de fiabilité des QRT, d'anomalies et d'audits. Dans le mémoire, ces sujets sont aux pages 24 à 38, qui reprennent la notice ACPR. La méthode de notation (pages 48 à 94) viendra plus tard, comme une proposition.</p>
+    <div class="tablebox"><table><thead><tr><th>Ordre</th><th>À lire</th><th>Pourquoi</th><th>Quand</th></tr></thead><tbody>
+      <tr><td class="num">1</td><td><a href="#" data-go="fiches:perimetre">Périmètre</a>, <a href="#" data-go="fiches:criteres">critères</a>, <a href="#" data-go="fiches:outils">outils ACPR</a>, <a href="#" data-go="fiches:acteurs">acteurs</a>, <a href="#" data-go="fiches:forma">documents</a> (fiches)</td><td>Le vocabulaire et les exigences que l'auditeur aura en main</td><td>Avant novembre</td></tr>
+      <tr><td class="num">2</td><td>Pages 24 à 38 du mémoire, en entier, ou mieux encore la <a href="https://acpr.banque-france.fr/fr/publications-et-statistiques/publications/exigences-en-matiere-de-qualite-des-donnees-pour-les-organismes-et-groupes-dassurance-soumis-la" target="_blank" rel="noopener">notice ACPR</a> elle-même</td><td>Le texte de référence de ton poste ; c'est la seule partie qui mérite une lecture intégrale</td><td>Avant novembre</td></tr>
+      <tr><td class="num">3</td><td><a href="#" data-go="fiches:lignage">Dictionnaire et lignage</a>, <a href="#" data-go="fiches:qrt">contrôles QRT</a>, <a href="#" data-go="fiches:anomalies">registre des anomalies</a> (fiches)</td><td>Ce que l'offre te demande de piloter au quotidien</td><td>Avant novembre</td></tr>
+      <tr><td class="num">4</td><td>Ci-dessous, étapes <a href="#e1" data-go="comprendre:e1">1</a>, <a href="#e2" data-go="comprendre:e2">2</a> et <a href="#e7" data-go="comprendre:e7">7</a></td><td>Transformer un contrôle en pourcentage, traiter les retards, savoir quel contrôle pose problème</td><td>Premier mois</td></tr>
+      <tr><td class="num">5</td><td>Étapes <a href="#e3" data-go="comprendre:e3">3</a> à <a href="#e6" data-go="comprendre:e6">6</a> et <a href="#e8" data-go="comprendre:e8">8</a> (note par donnée, sensibilité, note globale, tolérance, variation)</td><td>La méthode du mémoire, à proposer seulement une fois le dispositif de base solide</td><td>Après la phase d'observation</td></tr>
+      <tr><td class="num">6</td><td>Fiches <a href="#" data-go="fiches:etat">état des lieux</a> et <a href="#" data-go="fiches:mission">mission</a>, puis les QCM et le vrai/faux</td><td>Contexte et vérification</td><td>Quand tu veux</td></tr>
+    </tbody></table></div>
+    <p class="muted" style="font-size:13.5px">Volontairement laissé de côté : le détail article par article (crédibilité, hypothèses réalistes, techniques actuarielles), les démonstrations mathématiques et les spécificités du modèle interne. Ils ne te serviront pas au quotidien.</p>
+  </div>
   <div class="card pad" style="display:grid;gap:12px"><span class="lbl">La méthode en une image</span>
     <div class="vue">
       <div class="bloc"><b>1 · Contrôle</b><span>Un test sur une donnée donne un résultat entre 0 et 100 %.</span></div><div class="fl">→</div>
@@ -825,6 +840,16 @@ function renderRegistre(c){
     <td><span class="pill ${r.gravite==="Haute"?"rouge":"orange"}">${esc(r.gravite)}</span></td><td>${esc(r.proprietaire)}</td>
     <td class="num" style="white-space:nowrap">${esc(r.echeance)}</td><td><span class="pill ${cls(r.statut)}">${esc(r.statut)}</span></td><td style="font-size:13px">${esc(r.constat)}</td></tr>`).join("");
 }
+
+/* ---------- Liens internes (onglet:ancre) ---------- */
+document.addEventListener("click", e=>{
+  const a = e.target.closest("[data-go]"); if(!a) return;
+  e.preventDefault();
+  const [tab, id] = a.dataset.go.split(":");
+  show(tab);
+  const cible = document.getElementById(tab==="fiches" ? "f-"+id : id);
+  if(cible) setTimeout(()=>cible.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}), 30);
+});
 
 /* ---------- Démarrage ---------- */
 renderFiches(); quiz("qcm"); quiz("vf"); renderRappro(); renderDeg();
