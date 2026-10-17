@@ -19,14 +19,14 @@ Lignage (14 flux)        ─┼─> Référentiel des contrôles (20 contrôles 
                           │        ├─> Registre des anomalies (cycle de vie entre campagnes)
                           │        └─> Note QDD (méthode du mémoire) : criticité, tolérance, analyse de variation
                           └─> Journal d'exécution (paramètres, version, empreintes, volumétries)
-Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en étoile) · application Streamlit
+Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en étoile) · application Streamlit (dont un onglet « Guide terre à terre » qui explique le dispositif sans jargon)
 ```
 
 ## Deux versions, une même logique
 | | Rôle | Vérification |
 |---|---|---|
 | **SAS / PROC SQL** (`sas/`) | Version **production** | Vérification statique (`scripts/lint_sas.py`) ; comparaison automatique de 43 valeurs à la référence Python (`sas/98_verifier.sas`) |
-| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 32 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
+| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 34 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
 | JavaScript (`app/moteur.js`) | Calculs de l'atelier HTML | Parité avec le Python testée sur toutes les valeurs |
 | Excel (rapport) | Restitution | Les 11 indicateurs calculés par formules sont égaux à ceux du moteur |
 
@@ -37,7 +37,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py     # SI fictif (DuckDB)
 python -m qdd_s2                          # campagnes N-1 et N -> output/
-python -m pytest -q                       # 32 tests
+python -m pytest -q                       # 34 tests
 python scripts/lint_sas.py                # vérification statique du SAS
 streamlit run streamlit_app.py            # application
 ```

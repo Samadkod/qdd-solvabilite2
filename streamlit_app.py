@@ -1,6 +1,7 @@
 """Atelier QDD Solvabilité 2 — application Streamlit.
 
 Onglets :
+  0. Guide terre à terre : le dispositif expliqué sans jargon, chiffres de la campagne en direct
   1. Atelier : fiches, QCM, vrai/faux, simulateur, avis critique, plan 90 jours (HTML autonome)
   2. Campagne live : le moteur Python tourne en direct sur le SI fictif, paramètres modifiables
   3. Code SAS / SQL : la version production (PROC SQL) et la bibliothèque de contrôles
@@ -18,6 +19,7 @@ import streamlit as st
 from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.rapport_excel import ecrire_rapport
+from guide_terrain import afficher_guide
 from scripts.generer_donnees_btp import generer
 
 RACINE = Path(__file__).parent
@@ -67,7 +69,8 @@ st.title("Atelier QDD Solvabilité 2")
 st.caption("Méthode du mémoire de C. Motard (ISFA / Grant Thornton, 2024), corrigée et industrialisée — "
            "données **fictives** d'un assureur dommages BTP.")
 
-t1, t2, t4, t3 = st.tabs(["📚 Atelier (révision)", "⚙️ Campagne live", "🗂️ Gouvernance", "🧾 Code SAS / SQL"])
+t0, t1, t2, t4, t3 = st.tabs(["🧭 Guide terre à terre", "📚 Atelier (révision)", "⚙️ Campagne live",
+                               "🗂️ Gouvernance", "🧾 Code SAS / SQL"])
 
 # ---------------------------------------------------------------- Atelier
 with t1:
@@ -212,6 +215,10 @@ with t4:
                                "etats_qrt", "frequence_maj", "critique"]], hide_index=True, width="stretch")
     st.subheader("Journal d'exécution (piste d'audit)")
     st.json(c["journal"], expanded=False)
+
+# ---------------------------------------------------------------- Guide (après Campagne live : utilise la campagne choisie)
+with t0:
+    afficher_guide(c, var)
 
 with t3:
     st.markdown("**La version production est en SAS / PROC SQL.** Le Python sert de référence testée ; "
