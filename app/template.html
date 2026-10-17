@@ -180,6 +180,28 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
 .phase .eyebrow{color:var(--accent)}
 .script{font-size:14.5px;display:grid;gap:8px;max-width:76ch}
 .script p b{font-family:var(--mono);font-size:12px;color:var(--accent);margin-right:6px}
+
+/* Comprendre */
+.parcours{display:grid;gap:16px}
+.etape{display:grid;grid-template-columns:52px 1fr;gap:16px;padding:20px 22px;scroll-margin-top:70px}
+.etape>*{min-width:0}
+.etape .rang{font:600 28px/1 var(--display);color:var(--accent);padding-top:2px}
+.etape .formula{white-space:pre}
+.etape h3{margin-bottom:4px}
+.etape .q{font-style:italic;color:var(--muted);margin-bottom:10px}
+.etape .corps{display:grid;gap:10px;max-width:80ch}
+.etape table{font-size:13.5px}
+.lbl{font:600 11.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.vue{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.vue .bloc{flex:1 1 150px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--sunk);display:grid;gap:4px;align-content:start}
+.vue .bloc b{font:600 13px var(--mono);color:var(--accent)}
+.vue .bloc span{font-size:13.5px}
+.vue .fl{align-self:center;color:var(--muted);font-family:var(--mono)}
+@media (max-width:700px){.etape{grid-template-columns:1fr}.vue .fl{display:none}}
+dl.glossaire{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:8px 16px;margin:0;font-size:14px}
+dl.glossaire dt{font-weight:600}
+dl.glossaire dd{margin:0;color:var(--ink)}
+@media (max-width:600px){dl.glossaire{grid-template-columns:1fr}dl.glossaire dd{margin-bottom:8px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -196,6 +218,7 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
 
 <nav class="tabs" aria-label="Sections">
   <div class="wrap" role="tablist">
+    <button role="tab" data-tab="comprendre">Comprendre</button>
     <button role="tab" data-tab="fiches">Fiches</button>
     <button role="tab" data-tab="qcm">QCM</button>
     <button role="tab" data-tab="vf">Vrai / Faux</button>
@@ -208,8 +231,152 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
 
 <main><div class="wrap">
 
+<!-- COMPRENDRE -->
+<section class="panel" id="p-comprendre" data-panel="comprendre">
+  <div class="intro"><span class="eyebrow">À lire en premier · 25 minutes · aucun prérequis</span><h2>Comprendre la méthode pas à pas</h2>
+  <p class="muted">Ce parcours suppose que tu n'as pas lu le mémoire. Il suit un seul petit exemple chiffré, du résultat d'un contrôle jusqu'à la note globale et à la tolérance. Tous les chiffres ont été recalculés par le moteur du projet. Les fiches, QCM et le simulateur viennent ensuite.</p></div>
+
+  <div class="card pad" style="display:grid;gap:12px"><span class="lbl">La méthode en une image</span>
+    <div class="vue">
+      <div class="bloc"><b>1 · Contrôle</b><span>Un test sur une donnée donne un résultat entre 0 et 100 %.</span></div><div class="fl">→</div>
+      <div class="bloc"><b>2 · Donnée</b><span>On fait la moyenne des contrôles de cette donnée : c'est sa note.</span></div><div class="fl">→</div>
+      <div class="bloc"><b>3 · Note globale</b><span>Moyenne des notes des données importantes, pondérée par leur poids dans le SCR.</span></div><div class="fl">→</div>
+      <div class="bloc"><b>4 · Tolérance</b><span>Chaque note est comparée à un minimum déduit de l'erreur de SCR qu'on accepte.</span></div>
+    </div>
+    <p style="max-width:80ch">L'ACPR demande trois choses (notice QDD, fin 2023) : savoir <b>quelles données comptent</b> (criticité), <b>résumer les résultats des contrôles</b> (agrégation) et dire <b>à partir de quand la qualité est insuffisante</b> (tolérance). Le mémoire répond aux trois avec une seule idée : mesurer l'importance d'une donnée par l'effet de ses erreurs sur le SCR.</p>
+  </div>
+
+  <div class="card pad" style="display:grid;gap:10px"><span class="lbl">L'exemple qui sert tout du long</span>
+    <p>Un assureur a un SCR de <b>100 M€</b>. On suit quatre données : les <b>provisions sinistres</b>, les <b>primes acquises</b>, le <b>taux de cession</b> en réassurance et le <b>code postal</b> des assurés. Les provisions sont contrôlées par trois contrôles, les trois autres données par un contrôle chacune.</p>
+  </div>
+
+  <div class="parcours">
+    <article class="card etape" id="e1"><div class="rang">1</div><div class="corps">
+      <div><h3>Le résultat d'un contrôle</h3><p class="q">Comment transformer un contrôle en un chiffre ?</p></div>
+      <p><b>L'idée.</b> Un contrôle mesure un défaut. Son résultat vaut 100 % moins ce défaut. On distingue deux familles de contrôles.</p>
+      <p><b>Rapprochement</b> : on compare la même donnée dans deux systèmes. Par exemple, les primes valent 1 000 000 € dans l'outil de gestion et 990 000 € en comptabilité.</p>
+      <div class="formula">écart = |1 000 000 / 990 000 − 1| = 1,01 %   (par prudence, on prend le plus grand des deux sens)
+résultat = 100 % − 1,01 % = 98,99 %</div>
+      <p><b>Cohérence</b> : on cherche des valeurs impossibles. Par exemple, 50 sinistres sur 10 000 ont une provision négative.</p>
+      <div class="formula">ratio d'anomalies = 50 / 10 000 = 0,5 %   →   résultat = 99,5 %</div>
+      <div class="note ret"><b>À retenir</b><span>Chaque contrôle doit produire un pourcentage, et la formule de calcul ne doit pas changer d'une campagne à l'autre, sinon les résultats ne sont plus comparables.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e2"><div class="rang">2</div><div class="corps">
+      <div><h3>Le contrôle qui n'a pas été fait</h3><p class="q">Que faire d'un contrôle en retard ?</p></div>
+      <p><b>L'idée.</b> On reprend son dernier résultat connu et on le <b>dégrade</b> selon le nombre d'échéances manquées (l'« antériorité »). Ne pas faire un contrôle coûte donc des points, ce qui incite à le faire.</p>
+      <div class="formula">contrôle trimestriel, dernier résultat 99 %, deux trimestres manqués, coefficient 5 % par échéance
+résultat retenu = 99 % × (1 − 5 % × 2) = 89,1 %</div>
+      <div class="note ret"><b>À retenir</b><span>Antériorité = nombre de dates où le contrôle aurait dû être fait et ne l'a pas été. Coefficient de dégradation = pénalité par échéance manquée (un paramètre à fixer).</span></div>
+    </div></article>
+
+    <article class="card etape" id="e3"><div class="rang">3</div><div class="corps">
+      <div><h3>La note d'une donnée</h3><p class="q">Une donnée a plusieurs contrôles : comment les résumer ?</p></div>
+      <p><b>L'idée.</b> On fait la moyenne des résultats de ses contrôles, en pondérant éventuellement les contrôles les plus importants.</p>
+      <div class="tablebox"><table><thead><tr><th>Contrôle sur les provisions</th><th class="r">Résultat</th><th class="r">Poids</th></tr></thead><tbody>
+        <tr><td>Gestion vs comptabilité</td><td class="r num">99 %</td><td class="r num">1</td></tr>
+        <tr><td>Gestion vs entrepôt vs actuariat</td><td class="r num">96 %</td><td class="r num">2</td></tr>
+        <tr><td>Provisions négatives</td><td class="r num">100 %</td><td class="r num">1</td></tr></tbody></table></div>
+      <div class="formula">note provisions = (99 × 1 + 96 × 2 + 100 × 1) / (1 + 2 + 1) = 97,75 %</div>
+      <p>Les autres données ont un seul contrôle : primes 99,5 %, taux de cession 98 %, code postal 90 %.</p>
+      <div class="note ret"><b>À retenir</b><span>On agrège d'abord par donnée. Sinon, une donnée surveillée par dix contrôles pèserait dix fois plus qu'une donnée surveillée par un seul.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e4"><div class="rang">4</div><div class="corps">
+      <div><h3>La sensibilité : l'importance d'une donnée</h3><p class="q">Toutes les données se valent-elles ?</p></div>
+      <p><b>L'idée.</b> Non. Une donnée est importante si une erreur sur elle fait bouger le SCR. Pour le mesurer, l'actuariat relance le calcul du SCR en gonflant volontairement la donnée de 10 % : c'est un « choc ».</p>
+      <div class="tablebox"><table><thead><tr><th>Donnée (+10 %)</th><th class="r">SCR après choc</th><th class="r">Variation du SCR</th><th class="r">Sensibilité</th></tr></thead><tbody>
+        <tr><td>Provisions sinistres</td><td class="r num">106 M€</td><td class="r num">6 %</td><td class="r num">6 % / 10 % = <b>60 %</b></td></tr>
+        <tr><td>Primes acquises</td><td class="r num">102 M€</td><td class="r num">2 %</td><td class="r num"><b>20 %</b></td></tr>
+        <tr><td>Taux de cession</td><td class="r num">99,4 M€</td><td class="r num">0,6 %</td><td class="r num"><b>6 %</b></td></tr>
+        <tr><td>Code postal</td><td class="r num">100,05 M€</td><td class="r num">0,05 %</td><td class="r num"><b>0,5 %</b></td></tr></tbody></table></div>
+      <div class="formula">sensibilité = (variation relative du SCR) / (choc appliqué à la donnée)
+lecture : une sensibilité de 60 % signifie que +1 % d'erreur sur les provisions donne +0,6 % de SCR</div>
+      <p><b>Criticité.</b> On fixe un seuil, par exemple 1 %. Au-dessus, la donnée est <b>critique</b> et entre dans la note. En dessous, elle est ignorée. Ici, le code postal (0,5 %) n'est pas critique : sa note de 90 % ne compte pas.</p>
+      <div class="note pie"><b>Piège</b><span>Le taux de cession fait baisser le SCR (99,4) : on prend la variation en valeur absolue. Et la méthode suppose que le SCR réagit proportionnellement au choc ; le prototype vérifie cette hypothèse avec plusieurs chocs.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e5"><div class="rang">5</div><div class="corps">
+      <div><h3>La note QDD agrégée</h3><p class="q">Comment obtenir un seul chiffre pour toute l'entreprise ?</p></div>
+      <p><b>L'idée.</b> On fait la moyenne des notes des données critiques, pondérée par leur sensibilité. Une donnée qui pèse lourd dans le SCR pèse lourd dans la note.</p>
+      <div class="tablebox"><table><thead><tr><th>Donnée critique</th><th class="r">Note</th><th class="r">Sensibilité</th><th class="r">Poids = s / 86 %</th></tr></thead><tbody>
+        <tr><td>Provisions</td><td class="r num">97,75 %</td><td class="r num">60 %</td><td class="r num">69,8 %</td></tr>
+        <tr><td>Primes</td><td class="r num">99,50 %</td><td class="r num">20 %</td><td class="r num">23,3 %</td></tr>
+        <tr><td>Taux de cession</td><td class="r num">98,00 %</td><td class="r num">6 %</td><td class="r num">7,0 %</td></tr></tbody></table></div>
+      <div class="formula">note agrégée = (60 × 97,75 + 20 × 99,5 + 6 × 98) / (60 + 20 + 6) = 98,17 %
+(une moyenne simple aurait donné 98,42 % : elle sous-estime le problème des provisions)</div>
+      <div class="note ret"><b>À retenir</b><span>La note agrégée n'a de sens que dans l'entreprise qui la calcule : elle dépend de ses contrôles et de ses paramètres. On la suit dans le temps, on ne la compare pas à celle d'un concurrent.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e6"><div class="rang">6</div><div class="corps">
+      <div><h3>La tolérance : à partir de quand c'est grave</h3><p class="q">98,17 %, c'est bien ou pas ?</p></div>
+      <p><b>L'idée.</b> On décide combien d'erreur de SCR on accepte à cause d'<b>une</b> donnée : c'est le <b>ΔSCR max</b>, par exemple 0,5 %. On en déduit la note minimum de chaque donnée.</p>
+      <div class="formula">erreur de SCR due à une donnée ≈ (100 % − note) × sensibilité
+provisions : (100 % − 97,75 %) × 60 % = 1,35 % de SCR   > 0,5 %  →  hors tolérance
+primes     : (100 % − 99,5 %)  × 20 % = 0,10 %          < 0,5 %  →  ok
+note minimum d'une donnée = 100 % − ΔSCR max / sensibilité</div>
+      <div class="tablebox"><table><thead><tr><th>Donnée</th><th class="r">Note</th><th class="r">Note minimum</th><th>Verdict</th></tr></thead><tbody>
+        <tr><td>Provisions</td><td class="r num">97,75 %</td><td class="r num">100 − 0,5 / 60 = 99,17 %</td><td><span class="pill orange">sous le minimum</span></td></tr>
+        <tr><td>Primes</td><td class="r num">99,50 %</td><td class="r num">100 − 0,5 / 20 = 97,50 %</td><td><span class="pill vert">ok</span></td></tr>
+        <tr><td>Taux de cession</td><td class="r num">98,00 %</td><td class="r num">100 − 0,5 / 6 = 91,67 %</td><td><span class="pill vert">ok</span></td></tr></tbody></table></div>
+      <p><b>Au global</b>, la note minimum agrégée vaut 100 % − ΔSCR max / sensibilité moyenne = 100 % − 0,5 / 28,67 = <b>98,26 %</b>. Avec 98,17 %, l'entreprise est juste en dessous : la <b>tolérance globale est dépassée</b>, à cause des provisions.</p>
+      <div class="note pie"><b>Piège</b><span>Plus une donnée est sensible, plus son minimum est exigeant (99,17 % pour les provisions, 91,67 % pour le taux de cession). Et ΔSCR max doit rester inférieur au seuil de criticité (0,5 % < 1 %), sinon des données critiques auraient un minimum négatif.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e7"><div class="rang">7</div><div class="corps">
+      <div><h3>Le seuil d'acceptation d'un contrôle</h3><p class="q">Comment savoir quel contrôle pose problème ?</p></div>
+      <p><b>L'idée.</b> Chaque contrôle d'une donnée doit atteindre la note minimum de cette donnée. Pour les provisions, le seuil est donc 99,17 %.</p>
+      <div class="formula">gestion vs comptabilité        99 %   < 99,17 %  →  orange (moins de 2 points sous le seuil)
+gestion vs entrepôt vs actuariat 96 %  < 99,17 %  →  rouge  : c'est lui qu'il faut traiter
+provisions négatives          100 %  ≥ 99,17 %  →  vert</div>
+      <div class="note ret"><b>À retenir</b><span>La note dit « il y a un problème » ; le seuil par contrôle dit « où ». C'est ce qui alimente le registre des anomalies et le plan d'action.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e8"><div class="rang">8</div><div class="corps">
+      <div><h3>Expliquer pourquoi la note a bougé</h3><p class="q">Le trimestre dernier on était à 99,22 %. Pourquoi 98,17 % aujourd'hui ?</p></div>
+      <p><b>L'idée.</b> On repart de la note précédente et on change les éléments un par un, dans un ordre fixé : résultats des contrôles, retards, paramètres, sensibilités, données ajoutées ou retirées. L'écart de note à chaque étape est l'impact de cet élément. On présente le tout en cascade.</p>
+      <div class="formula">trimestre précédent : le contrôle « gestion vs entrepôt » était à 99 %  →  note 99,22 %
+seul changement : il tombe à 96 %                                     →  note 98,17 %
+impact « qualité mesurée par les contrôles » = −1,05 point</div>
+      <div class="note ret"><b>À retenir</b><span>En comité, la question n'est jamais « quelle est la note ? » mais « pourquoi a-t-elle bougé ? ». La cascade y répond.</span></div>
+    </div></article>
+
+    <article class="card etape" id="e9"><div class="rang">9</div><div class="corps">
+      <div><h3>Ce que le prototype ajoute au mémoire</h3><p class="q">Qu'est-ce qui manque à la note seule pour un vrai dispositif ?</p></div>
+      <ul class="list">
+        <li><b>La couverture</b> : la note ne mesure que ce qui est contrôlé. Le lignage montre les étapes de la chaîne qu'aucun contrôle ne surveille.</li>
+        <li><b>Les contrôles de restitution QRT</b> : un état réglementaire doit être égal à sa source. Tolérance quasi nulle, et ces contrôles sont suivis à part pour ne pas « diluer » la note.</li>
+        <li><b>Le registre des anomalies</b> : chaque contrôle rouge devient une action, avec un propriétaire et une échéance.</li>
+        <li><b>Le journal d'exécution</b> : qui a lancé quoi, avec quels paramètres. C'est ce que demandent les auditeurs.</li></ul>
+      <p>Dans l'onglet <b>Campagne BTP</b>, tu retrouves exactement ces étapes sur 50 points de contrôle. Dans le <b>Simulateur</b>, le bouton « Exemple pas à pas » recharge l'exemple de cette page : change un chiffre et observe ce qui bouge.</p>
+    </div></article>
+  </div>
+
+  <div class="grid2">
+    <div class="card pad" style="display:grid;gap:12px"><span class="lbl">Glossaire</span>
+      <dl class="glossaire">
+        <dt>Fonds propres</dt><dd>Patrimoine de l'assureur : actifs moins dettes envers les assurés.</dd>
+        <dt>Best estimate (BE)</dt><dd>Ce qu'on s'attend à payer en moyenne pour les contrats existants, actualisé.</dd>
+        <dt>SCR</dt><dd>Capital nécessaire pour survivre à une très mauvaise année (1 sur 200). Ratio de solvabilité = fonds propres / SCR.</dd>
+        <dt>QRT</dt><dd>États chiffrés remis à l'ACPR (bilan S.02.01, actifs S.06.02, provisions S.17.01, triangles S.19.01…).</dd>
+        <dt>Contrôle de niveau 1</dt><dd>Contrôle opérationnel sur la donnée. Le niveau 2 vérifie que le niveau 1 fonctionne.</dd>
+        <dt>Point de contrôle</dt><dd>Morceau d'un contrôle qui porte sur une seule donnée (ou une seule maille, par exemple un segment).</dd>
+        <dt>Sensibilité</dt><dd>Variation relative du SCR divisée par le choc appliqué à la donnée.</dd>
+        <dt>Donnée critique</dt><dd>Donnée dont la sensibilité dépasse le seuil de significativité, ou désignée à dire d'expert.</dd>
+        <dt>ΔSCR max</dt><dd>Erreur de SCR acceptée à cause d'une seule donnée. Il fixe toutes les notes minimum.</dd>
+        <dt>Antériorité</dt><dd>Nombre d'échéances manquées par un contrôle depuis sa dernière réalisation.</dd>
+        <dt>Lignage</dt><dd>Chemin d'une donnée de système en système, avec les traitements subis.</dd>
+      </dl></div>
+    <div class="card pad" style="display:grid;gap:10px"><span class="lbl">Prendre du recul</span><h3>Ce mémoire et ton poste</h3>
+      <p>Le mémoire a été écrit dans un cabinet de conseil, pour un groupe qui utilise un modèle interne et dispose d'une équipe QDD. Ton employeur compte un peu plus de 270 collaborateurs (d'après l'offre). Solvabilité 2 applique un principe de proportionnalité : les exigences s'adaptent à la taille et à la complexité de l'organisme. La méthode complète (sensibilités pour chaque donnée, tolérance calculée, analyse de variation) est lourde, et le mémoire le dit lui-même.</p>
+      <p><b>Ce qui te sera utile tout de suite :</b> la grille de lecture réglementaire, et l'idée de hiérarchiser les données par leur effet sur le SCR et de transformer chaque contrôle en pourcentage. Ce sont des réflexes qui se transposent partout.</p>
+      <p><b>Ce qui sera à adapter :</b> la criticité sera probablement d'abord fixée à dire d'expert avec l'actuariat ; la note agrégée viendra seulement si le dispositif de base (dictionnaire, lignage, contrôles, anomalies) est solide.</p>
+      <p>En résumé, c'est un vrai plus pour comprendre et proposer, à condition de le présenter comme une option proportionnée et non comme une méthode à appliquer telle quelle.</p></div>
+  </div>
+</section>
+
 <!-- FICHES -->
-<section class="panel" id="p-fiches" data-panel="fiches">
+<section class="panel" id="p-fiches" data-panel="fiches" hidden>
   <div class="intro"><span class="eyebrow">17 fiches · mémoire + offre</span><h2>Fiches de révision</h2>
   <p class="muted">Chaque fiche reprend une section du mémoire : l'essentiel, la formule, ce qu'il faut retenir et le piège à éviter. Coche « Révisée » pour suivre ta progression (enregistrée dans ce navigateur).</p></div>
   <div class="fiches"><nav class="toc" id="toc"></nav><div id="fiches" style="display:grid;gap:14px"></div></div>
@@ -235,7 +402,7 @@ svg .s1{stroke:var(--accent);fill:none;stroke-width:2} svg .s2{stroke:var(--gold
   <p class="muted">Modifie les sensibilités, les notes et les paramètres : criticité, notes minimum et note agrégée se recalculent. Le graphique reprend la lecture du mémoire : zone grise = non critique, zone rouge = hors tolérance, croix = note agrégée.</p></div>
   <div class="sim">
     <div class="card params">
-      <div class="row"><button class="btn" id="preset-memoire">Exemple du mémoire</button><button class="btn" id="preset-btp">Cas BTP (N)</button></div>
+      <div class="row"><button class="btn" id="preset-pas">Exemple pas à pas</button><button class="btn" id="preset-memoire">Exemple du mémoire</button><button class="btn" id="preset-btp">Cas BTP (N)</button></div>
       <label class="field">Seuil de significativité (%)<input id="s-seuil" type="number" step="0.1" min="0.1"></label>
       <div class="field">Approche de tolérance<div class="seg" id="s-mode"><button data-v="donnee">ΔSCR par donnée</button><button data-v="globale">Tolérance globale</button></div></div>
       <label class="field" id="f-dscr">ΔSCR max par donnée (%)<input id="s-dscr" type="number" step="0.05" min="0"></label>
@@ -395,7 +562,7 @@ const pill = s => `<span class="pill ${s||"na"}">${s||"n.c."}</span>`;
 /* ---------- Onglets ---------- */
 const tabs = [...document.querySelectorAll("[data-tab]")];
 function show(t){
-  if(!document.querySelector(`[data-panel="${t}"]`)) t="fiches";
+  if(!document.querySelector(`[data-panel="${t}"]`)) t="comprendre";
   tabs.forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===t));
   document.querySelectorAll("[data-panel]").forEach(p=>p.hidden = p.dataset.panel!==t);
   store.set("qdd-tab", t);
@@ -476,6 +643,7 @@ function quiz(kind){
 
 /* ---------- Simulateur ---------- */
 const PRESETS = {
+  pas: {seuil:1, mode:"donnee", dscr:0.5, tol:5, rows:[["Provisions sinistres",60,97.75],["Primes acquises",20,99.5],["Taux de cession",6,98],["Code postal",0.5,90]]},
   memoire: {seuil:1, mode:"donnee", dscr:0.5, tol:5, rows:[["Primes acquises",14.23,99.90],["Provisions math.",5.74,74.71],["Sexe (H/F)",2.67,81.72],["Taux de cession",0.52,68.96]]},
 };
 function presetBTP(){
@@ -483,7 +651,7 @@ function presetBTP(){
   const rows = c.donnees.filter(d=>d.sensibilite>0).map(d=>[d.libelle, +(d.sensibilite*100).toFixed(2), +(d.note*100).toFixed(2)]);
   return {seuil:1, mode:"donnee", dscr:0.5, tol:5, rows};
 }
-let sim = JSON.parse(JSON.stringify(PRESETS.memoire));
+let sim = JSON.parse(JSON.stringify(PRESETS.pas));
 function simEval(){
   const p = {seuil:sim.seuil/100, mode:sim.mode, dscr:sim.dscr/100, tol:sim.tol/100, coef:0, degradation:"simple", marge:0.02};
   const don = sim.rows.map((r,k)=>({donnee_id:"d"+k, libelle:r[0], sensibilite:r[1]/100, critique_expert:null}));
@@ -547,6 +715,7 @@ $("#s-rows").addEventListener("click", e=>{ const b=e.target.closest("[data-del]
 $("#s-add").addEventListener("click", ()=>{ sim.rows.push(["Nouvelle donnée", 2, 95]); renderSim(); });
 $("#s-mode").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; sim.mode=b.dataset.v; renderSim(); });
 ["seuil","dscr","tol"].forEach(k=>$("#s-"+k).addEventListener("change", e=>{ sim[k]=parseFloat(e.target.value)||0; renderSim(); }));
+$("#preset-pas").addEventListener("click", ()=>{ sim = JSON.parse(JSON.stringify(PRESETS.pas)); renderSim(); });
 $("#preset-memoire").addEventListener("click", ()=>{ sim = JSON.parse(JSON.stringify(PRESETS.memoire)); renderSim(); });
 $("#preset-btp").addEventListener("click", ()=>{ sim = presetBTP(); renderSim(); });
 
@@ -660,6 +829,6 @@ function renderRegistre(c){
 /* ---------- Démarrage ---------- */
 renderFiches(); quiz("qcm"); quiz("vf"); renderRappro(); renderDeg();
 const h = (location.hash||"").replace("#","");
-show(document.querySelector(`[data-panel="${h}"]`) ? h : store.get("qdd-tab","fiches"));
+show(document.querySelector(`[data-panel="${h}"]`) ? h : store.get("qdd-tab","comprendre"));
 })();
 </script>
