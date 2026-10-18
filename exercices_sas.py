@@ -122,10 +122,11 @@ EXERCICES = [
          indice="`lengthn(strip(isin))` : `LENGTHN` renvoie 0 pour une valeur vide, alors que `LENGTH` renvoie 1.",
          attendu=f"select coalesce(length(trim(isin)), 0) as longueur, count(*) as nb_placements "
                  f"from placements_depositaire where arrete = DATE '{ARRETE}' group by 1 order by 1",
-         remarque="Les codes fictifs font 13 caractères au lieu de 12 : appliquée telle quelle, la règle signalerait "
-                  "presque tous les placements. Défaut du générateur de données fictives, signalé et non corrigé "
-                  "(le contrôle C08 n'est pas réalisé dans les campagnes de démonstration). Leçon : profiler les "
-                  "données avant de fixer une règle."),
+         remarque="Les codes à 12 caractères sont bien formés (2 lettres pays, 9 caractères, 1 clé de contrôle). "
+                  "Les autres sont des valeurs manquantes ou fantaisistes (vide, « N/A », « FR12 ») : ce sont elles "
+                  "que le contrôle C08 doit signaler. Leçon : profiler les données avant de fixer une règle. "
+                  "Pour aller plus loin, la 12e position est une clé de contrôle (algorithme de Luhn) : "
+                  "on peut aussi la vérifier."),
     dict(id="E11", niveau=4, duree=30, titre="Première macro : un contrôle, plusieurs tables",
          apprend="%MACRO / %MEND, paramètres, SELECT … INTO :, %PUT.",
          enonce="Écrivez une macro `%ctrl_doublons(table=, cle=, arrete=)` qui compte les valeurs en double de "

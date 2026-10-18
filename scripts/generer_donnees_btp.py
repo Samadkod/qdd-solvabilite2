@@ -45,6 +45,16 @@ INJ = {
 ARRETES = {"2026-06-30": 0, "2026-09-30": 1}
 
 
+def _cle_isin(corps: str) -> str:
+    """Clé de contrôle ISIN (ISO 6166) : lettres converties (A=10 … Z=35), puis algorithme de Luhn."""
+    chiffres = "".join(str(int(c, 36)) for c in corps)
+    total = 0
+    for i, ch in enumerate(reversed(chiffres)):  # on double le dernier chiffre, puis un sur deux
+        d = int(ch) * (2 if i % 2 == 0 else 1)
+        total += d // 10 + d % 10
+    return str((10 - total % 10) % 10)
+
+
 def _taux(cle, seg, i):
     v = INJ[cle]
     return v[seg][i] if isinstance(v, dict) else v[i]
@@ -129,7 +139,12 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
         # Placements (look-through simplifié) : actions et obligations
         k = 420
         classe = np.where(np.arange(k) < 60, "ACTIONS", "OBLIGATIONS")
-        isin = [f"FR{rng.integers(10**9, 10**10)}{rng.integers(0, 10)}" for _ in range(k)]
+        isin = []
+        for _ in range(k):
+            n = rng.integers(10**9, 10**10)
+            rng.integers(0, 10)  # tirage conservé : ne pas décaler la suite aléatoire des autres données
+            corps = f"FR{str(n)[1:]}"  # 2 lettres pays + 9 caractères
+            isin.append(corps + _cle_isin(corps))  # 12 caractères, clé ISO 6166 valide
         miss = rng.random(k) < _taux("isin_manquant", "", i)
         isin = np.where(miss, rng.choice(["", "N/A", "FR12"], k), isin)
         cic = np.where(classe == "ACTIONS", "FR31", "FR12")

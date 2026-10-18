@@ -25,7 +25,7 @@ def test_resultats_attendus():
     assert r["E08"]["nb_absents"].iloc[0] == 54
     # un code activité vide est hors nomenclature (comportement SAS)
     assert dict(zip(r["E09"]["code_activite"], r["E09"]["nb_contrats"])) == {"BTP": 33, "9999Z": 32, "(vide)": 24}
-    assert dict(zip(r["E10"]["longueur"], r["E10"]["nb_placements"])) == {0: 8, 3: 3, 4: 3, 13: 406}
+    assert dict(zip(r["E10"]["longueur"], r["E10"]["nb_placements"])) == {0: 8, 3: 3, 4: 3, 12: 406}
     assert r["E11"]["nb_doublons"].tolist() == [6, 0, 0]
     # la macro de E12 retrouve exactement les écarts de E05
     e5 = r["E05"].set_index("segment")["ecart_relatif"]
@@ -38,3 +38,16 @@ def test_formatage_francais():
     import pandas as pd
     f = ex._formater(pd.DataFrame({"montant": [1234567.891], "ecart_relatif": [-0.0038369]}))
     assert f.iloc[0].tolist() == ["1 234 567,89", "-0,38 %"]
+
+
+def test_isin_fictifs_valides():
+    """ISIN fictifs : 12 caractères et clé de contrôle ISO 6166 juste (sauf valeurs manquantes voulues)."""
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from generer_donnees_btp import _cle_isin
+    for reel in ["US0378331005", "FR0000120271", "FR0000131104", "DE0007164600", "GB0002634946"]:
+        assert _cle_isin(reel[:11]) == reel[11]
+    import pandas as pd
+    p = pd.read_csv(ex.DEMO / "placements_depositaire.csv", sep=";", dtype=str, keep_default_na=False)
+    bons = p[p["isin"].str.len() == 12]["isin"]
+    assert len(bons) == 821 and all(_cle_isin(i[:11]) == i[11] for i in bons)
+    assert set(p.loc[p["isin"].str.len() != 12, "isin"]) == {"", "N/A", "FR12"}
