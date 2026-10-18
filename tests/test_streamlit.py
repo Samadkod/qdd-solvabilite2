@@ -16,8 +16,13 @@ def app():
 
 def test_application_demarre_sans_erreur(app):
     assert not app.exception
-    assert [t.label for t in app.tabs] == ["🧭 Guide terre à terre", "📚 Atelier (révision)", "⚙️ Campagne live",
-                                          "🗂️ Gouvernance", "🧾 Code SAS / SQL"]
+    onglets = [t.label for t in app.tabs]
+    principaux = ["🧭 Guide terre à terre", "📚 Atelier (révision)", "⚙️ Campagne live", "🗂️ Gouvernance",
+                  "🧾 Code SAS / SQL"]
+    assert [o for o in onglets if o in principaux] == principaux
+    for sous in ("L'essentiel", "Les chiffres", "Le poste", "L'assurance en clair", "Se former", "Calendrier",
+                 "Glossaire"):
+        assert sous in onglets
 
 
 def test_guide_cite_les_valeurs_de_reference(app):
@@ -32,3 +37,9 @@ def test_guide_cite_les_valeurs_de_reference(app):
     assert "Contrôles en cause : « Survenance avant date d'effet »" in texte
     for flux in ("F04", "F05", "F06", "F09", "F13"):
         assert f"**{flux}**" in texte
+
+
+def test_calendrier_suit_la_date_de_prise_de_poste(app):
+    texte = " ".join(i.value for i in app.tabs[0].info)
+    # clôture annuelle 31/12/2026 : QRT trimestriels à 5 semaines, annuels à 14 semaines
+    assert "**31/12/2026**" in texte and "**04/02/2027**" in texte and "**08/04/2027**" in texte
