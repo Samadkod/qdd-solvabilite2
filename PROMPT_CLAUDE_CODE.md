@@ -7,7 +7,7 @@ Tu reprends le projet qdd-s2 situé dans ce dossier. Commence par lire CLAUDE.md
 1. **Vérifier l'état.**
    - Installe les dépendances (`pip install -r requirements.txt`).
    - Lance `python scripts/generer_donnees_btp.py`, `python -m qdd_s2`, `python -m pytest -q` et `python scripts/lint_sas.py`.
-   - Confirme que les 39 tests passent et que les valeurs de la campagne N sont celles de CLAUDE.md. Si quelque chose diffère, arrête-toi et explique-moi pourquoi avant de corriger.
+   - Confirme que les 45 tests passent et que les valeurs de la campagne N sont celles de CLAUDE.md. Si quelque chose diffère, arrête-toi et explique-moi pourquoi avant de corriger.
 
 2. **Publier sur GitHub.** Mon compte est `Samadkod`.
    - Vérifie que `gh auth status` est connecté. Sinon, guide-moi pour `gh auth login`.

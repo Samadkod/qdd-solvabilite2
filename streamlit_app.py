@@ -21,6 +21,8 @@ from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.rapport_excel import ecrire_rapport
 from exercices_sas import afficher_exercices
+from explications import (AIDE_COMPTEURS as AIDE, ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES,
+                          lire_axe, lire_variation)
 from guide_terrain import afficher_guide
 from style_app import appliquer_style, bandeau
 from scripts.generer_donnees_btp import generer
@@ -57,7 +59,8 @@ def campagnes(seuil, dscr, coef, degradation, ecart, montant):
                     "controles": ev.controles,
                     "axes": {a: ev.par_axe(a).reset_index() for a in ("maille", "etape", "criteres", "responsable")},
                     "sens": c.sensibilites.reset_index(), "gouv": c.gouvernance,
-                    "couverture": c.couverture, "registre": c.registre, "journal": c.journal})
+                    "couverture": c.couverture, "registre": c.registre, "journal": c.journal,
+                    "params": ev.params})
     return out, var, xlsx
 
 
@@ -116,23 +119,27 @@ with t2:
     st.markdown("##### La note")
     m = st.columns(4)
     m[0].metric("Note QDD agrégée", pct(I["note"]),
-                None if prev is None else f"{(I['note'] - prev['ind']['note']) * 100:+.2f} pt".replace(".", ","))
-    m[1].metric("Objectif (note min)", pct(I["note_min"]))
-    m[2].metric("Écart à l'objectif", pct(I["ecart_objectif"]))
-    m[3].metric("Données hors tolérance", f"{I['nb_donnees_hors_tolerance']} / {I['nb_donnees_critiques']}")
+                None if prev is None else f"{(I['note'] - prev['ind']['note']) * 100:+.2f} pt".replace(".", ","),
+                help=AIDE["note"])
+    m[1].metric("Objectif (note min)", pct(I["note_min"]), help=AIDE["objectif"])
+    m[2].metric("Écart à l'objectif", pct(I["ecart_objectif"]), help=AIDE["ecart"])
+    m[3].metric("Données hors tolérance", f"{I['nb_donnees_hors_tolerance']} / {I['nb_donnees_critiques']}",
+                help=AIDE["hors_tol"])
     st.markdown("##### Les contrôles")
     m = st.columns(4)
-    m[0].metric("Contrôles à jour", pct(I["taux_validation"], 0))
-    m[1].metric("Contrôles conformes", pct(I["taux_conformite_controles"], 0))
-    m[2].metric("Restitutions QRT conformes", pct(I["taux_conformite_restitutions"], 0))
+    m[0].metric("Contrôles à jour", pct(I["taux_validation"], 0), help=AIDE["a_jour"])
+    m[1].metric("Contrôles conformes", pct(I["taux_conformite_controles"], 0), help=AIDE["conformes"])
+    m[2].metric("Restitutions QRT conformes", pct(I["taux_conformite_restitutions"], 0), help=AIDE["qrt"])
     m[3].metric("Zones de risque couvertes", pct(g["taux_couverture_zones_risque"], 0),
-                help="Flux sans contrôle : " + ", ".join(g["flux_non_couverts"]))
+                help=AIDE["zones"] + " Flux sans contrôle : " + ", ".join(g["flux_non_couverts"]) + ".")
     st.markdown("##### Les anomalies")
     m = st.columns(4)
-    m[0].metric("Anomalies ouvertes", g["nb_anomalies_ouvertes"])
-    m[1].metric("dont gravité haute", g["nb_anomalies_haute"])
-    m[2].metric("dont échéance dépassée", g["nb_anomalies_en_retard"])
-    m[3].metric("Anomalies clôturées", g["nb_anomalies_cloturees"])
+    m[0].metric("Anomalies ouvertes", g["nb_anomalies_ouvertes"], help=AIDE["ouvertes"])
+    m[1].metric("dont gravité haute", g["nb_anomalies_haute"], help=AIDE["haute"])
+    m[2].metric("dont échéance dépassée", g["nb_anomalies_en_retard"], help=AIDE["retard"])
+    m[3].metric("Anomalies clôturées", g["nb_anomalies_cloturees"], help=AIDE["cloturees"])
+    st.caption("Survolez le **?** d'un compteur pour savoir ce qu'il mesure. Le calcul pas à pas est dans "
+               "*Guide terre à terre → D'où sortent les chiffres*.")
 
     st.subheader("Données")
     d = c["donnees"][["libelle", "donnee_id", "proprietaire", "sensibilite", "critique", "note", "note_min",
@@ -146,42 +153,58 @@ with t2:
                        "sensibilite": "Sensibilité SCR", "critique": "Critique", "note": "Note QDD",
                        "note_min": "Note min", "statut": "Statut", "criteres_couverts": "E/X/P",
                        "nb_controles": "Contrôles"})
+    st.caption(LEGENDE_DONNEES)
 
-    g1, g2 = st.columns(2)
-    with g1:
-        st.subheader("Pourquoi la note a bougé (N-1 → N)")
-        v = var[(var["impact"].abs() > 1e-9) | var["impact"].isna()].copy()
-        v["debut"] = (v["note"] - v["impact"].fillna(0)).where(v["impact"].notna(), v["note"].min() - 0.005)
-        v["sens"] = v["impact"].apply(lambda x: "Total" if pd.isna(x) else ("Hausse" if x >= 0 else "Baisse"))
-        v["ordre"] = range(len(v))
-        v["libelle"] = v["etape"].str.replace(" (antériorité intacte)", "", regex=False)
-        v["texte"] = v.apply(lambda r: pct(r.note) if pd.isna(r.impact) else f"{r.impact * 100:+.2f} pt", axis=1)
-        base = alt.Chart(v).encode(y=alt.Y("libelle:N", sort=alt.SortField("ordre"), title=None))
-        bars = base.mark_bar().encode(
-            x=alt.X("debut:Q", title="Note QDD agrégée", axis=alt.Axis(format="%"), scale=alt.Scale(zero=False)),
-            x2="note:Q",
-            color=alt.Color("sens:N", scale=alt.Scale(domain=["Total", "Hausse", "Baisse"],
-                                                      range=["#0E5A69", "#22744A", "#AD3030"]), legend=None))
-        st.altair_chart(bars + base.mark_text(align="left", dx=4).encode(
-            x="note:Q", text="texte:N"), width="stretch")
-        st.caption("Substitutions successives (mémoire, tableau 20) aux paramètres choisis.")
-    with g2:
-        st.subheader("Par axe d'analyse")
-        axe = st.selectbox("Axe", ["maille", "etape", "criteres", "responsable"],
-                           format_func={"maille": "Segment / classe", "etape": "Étape de la chaîne",
-                                        "criteres": "Critère S2", "responsable": "Responsable"}.get)
-        a = c["axes"][axe].rename(columns={axe: "modalite"}).dropna(subset=["note"])
-        a["statut"] = a.apply(lambda r: "vert" if r.note >= r.note_min else
-                              ("orange" if r.note >= r.note_min - 0.02 else "rouge"), axis=1)
-        bar = alt.Chart(a).mark_bar().encode(
-            y=alt.Y("modalite:N", sort="x", title=None),
-            x=alt.X("note:Q", title="Note", axis=alt.Axis(format="%"), scale=alt.Scale(zero=False)),
-            color=alt.Color("statut:N", scale=alt.Scale(domain=["vert", "orange", "rouge"],
-                                                        range=["#22744A", "#C98A10", "#AD3030"]), legend=None),
-            tooltip=[alt.Tooltip("note:Q", format=".2%"), alt.Tooltip("note_min:Q", format=".2%")])
-        tick = alt.Chart(a).mark_tick(color="black", thickness=2, size=22).encode(y="modalite:N", x="note_min:Q")
-        st.altair_chart(bar + tick, width="stretch")
-        st.caption("Barre = note ; trait noir = note minimum.")
+    st.subheader("Pourquoi la note a bougé depuis la campagne précédente")
+    debut, fin = var["note"].iloc[0], var["note"].iloc[-1]
+    st.markdown(f"**{pct(debut)}** (N-1) → **{pct(fin)}** (N) : **{(fin - debut) * 100:+.2f} point**".replace(".", ","))
+    v = var[var["impact"].notna() & (var["impact"].abs() > 1e-6)].copy()
+    v["cause"] = v["etape"].map(ETAPES_COURTES).fillna(v["etape"])
+    v["points"] = v["impact"] * 100
+    v["sens"] = v["points"].map(lambda x: "Hausse" if x >= 0 else "Baisse")
+    v["texte"] = v["points"].map(lambda x: f"{x:+.2f} pt".replace(".", ","))
+    base = alt.Chart(v).encode(y=alt.Y("cause:N", sort=v.reindex(v["points"].abs().sort_values(ascending=False).index)["cause"].tolist(), title=None,
+                                       axis=alt.Axis(labelLimit=320, labelFontSize=13, labelOverlap=False),
+                                       scale=alt.Scale(paddingInner=0.35)))
+    barres = base.mark_bar(cornerRadius=4).encode(
+        x=alt.X("points:Q", title="Effet sur la note (points)", axis=alt.Axis(format="+.1f", grid=True)),
+        color=alt.Color("sens:N", scale=alt.Scale(domain=["Hausse", "Baisse"], range=["#22744A", "#AD3030"]),
+                        legend=None),
+        tooltip=[alt.Tooltip("cause:N", title="Cause"), alt.Tooltip("texte:N", title="Effet")])
+    etiquettes = base.mark_text(align="right", dx=-6, fontSize=13, color="#15202A").encode(
+        x="points:Q", text="texte:N")
+    zero = alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(color="#566370").encode(x="x:Q")
+    st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(44)), width="stretch")
+    st.info(lire_variation(var), icon="📖")
+
+    st.subheader("Où sont les problèmes ? Écart au minimum, par groupe")
+    axe = st.selectbox("Regrouper par", ["maille", "etape", "criteres", "responsable"],
+                       format_func={"maille": "Segment / classe d'actif", "etape": "Étape de la chaîne",
+                                    "criteres": "Critère de qualité", "responsable": "Responsable"}.get)
+    a = c["axes"][axe].rename(columns={axe: "modalite"}).dropna(subset=["note"])
+    a["groupe"] = a["modalite"].map(lambda x: MODALITES.get(x, x))
+    a["points"] = a["ecart_objectif"] * 100
+    a["statut"] = a.apply(lambda r: "Au-dessus du minimum" if r.note >= r.note_min else
+                          ("Juste en dessous" if r.note >= r.note_min - 0.02 else "Nettement en dessous"), axis=1)
+    a["texte"] = a["points"].map(lambda x: f"{x:+.2f} pt".replace(".", ","))
+    a["note_txt"], a["min_txt"] = a["note"].map(pct), a["note_min"].map(pct)
+    base = alt.Chart(a).encode(y=alt.Y("groupe:N", sort=a.sort_values("points")["groupe"].tolist(), title=None,
+                                       axis=alt.Axis(labelLimit=320, labelFontSize=13, labelOverlap=False),
+                                       scale=alt.Scale(paddingInner=0.35)))
+    barres = base.mark_bar(cornerRadius=4).encode(
+        x=alt.X("points:Q", title="Note − note minimum (points)", axis=alt.Axis(format="+.1f")),
+        color=alt.Color("statut:N", scale=alt.Scale(domain=["Au-dessus du minimum", "Juste en dessous",
+                                                            "Nettement en dessous"],
+                                                    range=["#22744A", "#C98A10", "#AD3030"]),
+                        legend=alt.Legend(title=None, orient="top")),
+        tooltip=[alt.Tooltip("groupe:N", title="Groupe"), alt.Tooltip("note_txt:N", title="Note"),
+                 alt.Tooltip("min_txt:N", title="Minimum"), alt.Tooltip("texte:N", title="Écart")])
+    etiquettes = (base.transform_filter("datum.points >= 0").mark_text(align="left", dx=6, fontSize=12, color="#15202A")
+                  .encode(x="points:Q", text="texte:N")
+                  + base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=12, color="#15202A")
+                  .encode(x="points:Q", text="texte:N"))
+    st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(40)), width="stretch")
+    st.info(lire_axe(a, axe), icon="📖")
 
     st.subheader("Points de contrôle")
     f = st.pills("Filtre", ["rouge", "orange", "vert", "en retard"], selection_mode="multi")
@@ -196,12 +219,19 @@ with t2:
     st.dataframe(ctrl[cols].style.format({"resultat_brut": pct, "resultat": pct, "seuil": pct})
                  .map(lambda v: COULEUR.get(v, ""), subset=["statut"]),
                  hide_index=True, width="stretch")
+    st.caption(LEGENDE_CONTROLES)
 
     with st.expander("Sensibilités du SCR et test de linéarité"):
         s = c["sens"]
         st.dataframe(s.style.format({col: pct for col in s.columns if col.startswith("s") or col == "non_linearite"}),
                      hide_index=True, width="stretch")
-        st.caption(f"SCR (formule standard simplifiée, non réglementaire) : {c['scr']:,.1f} M€".replace(",", " "))
+        st.caption(
+            f"SCR (formule standard simplifiée, non réglementaire) : {c['scr']:.1f} M€. ".replace(".", ",", 1)
+            + "**Lire le tableau.** *valeur* : le montant de la donnée (M€, ou taux pour la cession). *sensibilite* : "
+            "on augmente la donnée de 15 % et on mesure de combien le SCR bouge (en %), puis on divise par 15 %. "
+            "Les colonnes *s_choc_…* refont le calcul avec d'autres chocs (−15 %, +5 %, +30 %) : si elles restent "
+            "proches, la sensibilité est fiable (*lineaire* = vrai). Au-delà de 10 % d'écart (*non_linearite*), "
+            "il faut la manier avec prudence.")
 
     st.download_button("⬇️ Rapport Excel de la campagne N", xlsx, file_name="rapport_qdd.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

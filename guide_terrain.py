@@ -14,20 +14,10 @@ import datetime as dt
 import pandas as pd
 import streamlit as st
 
+from explications import ETAPES_EN_CLAIR, afficher_d_ou_sortent
+
 DATE_PRISE_DE_POSTE = dt.date(2026, 11, 6)  # valeur par défaut, modifiable dans l'onglet
 
-# libellés des étapes de la variation (moteur) -> explication en clair
-ETAPES_EN_CLAIR = {
-    "Suppression de contrôles": "des contrôles ont été retirés du dispositif",
-    "Sortie de données critiques": "des données ne sont plus jugées critiques",
-    "QDD mesurée par les contrôles (antériorité intacte)": "les contrôles ont trouvé davantage d'erreurs dans les données",
-    "Antériorité des contrôles": "des contrôles n'ont pas été refaits à temps (pénalité de retard)",
-    "Coefficient de dégradation": "la pénalité de retard a été modifiée",
-    "Pondération des contrôles": "le poids relatif des contrôles a changé",
-    "Ajout de contrôles": "de nouveaux contrôles ont été ajoutés",
-    "Sensibilités des données critiques": "le poids des données dans le SCR a changé",
-    "Entrée de données critiques": "de nouvelles données sont devenues critiques",
-}
 
 # missions de l'offre (reformulées) -> en clair, où les voir dans l'application, premier geste
 MISSIONS = [
@@ -176,21 +166,23 @@ def afficher_guide(c: dict, var: pd.DataFrame | None) -> None:
         "poste et comment s'y préparer. Il est écrit pour quelqu'un qui vient de la **data** plutôt que de "
         "l'actuariat. Les chiffres sont recalculés en direct : ils changent si vous modifiez les paramètres "
         "dans l'onglet *Campagne live*.")
-    s = st.tabs(["L'essentiel", "Les chiffres", "Le poste", "L'assurance en clair", "Se former",
-                 "Calendrier", "Glossaire"])
+    s = st.tabs(["L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
+                 "Se former", "Calendrier", "Glossaire"])
     with s[0]:
         _essentiel(c)
     with s[1]:
-        _chiffres(c, var)
+        afficher_d_ou_sortent(c)
     with s[2]:
-        _poste()
+        _chiffres(c, var)
     with s[3]:
-        _assurance(c)
+        _poste()
     with s[4]:
-        _se_former()
+        _assurance(c)
     with s[5]:
-        _calendrier()
+        _se_former()
     with s[6]:
+        _calendrier()
+    with s[7]:
         _glossaire()
 
 

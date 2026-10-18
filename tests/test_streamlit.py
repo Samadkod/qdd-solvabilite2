@@ -20,7 +20,7 @@ def test_application_demarre_sans_erreur(app):
     principaux = ["🧭 Guide terre à terre", "🧪 SAS pratique", "📚 Atelier (révision)", "⚙️ Campagne live",
                   "🗂️ Gouvernance", "🧾 Code SAS / SQL"]
     assert [o for o in onglets if o in principaux] == principaux
-    for sous in ("L'essentiel", "Les chiffres", "Le poste", "L'assurance en clair", "Se former", "Calendrier",
+    for sous in ("L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair", "Se former", "Calendrier",
                  "Glossaire"):
         assert sous in onglets
 
