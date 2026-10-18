@@ -2,6 +2,7 @@
 
 Onglets :
   0. Guide terre à terre : le dispositif expliqué sans jargon, chiffres de la campagne en direct
+  0 bis. SAS pratique : exercices progressifs corrigés, résultats attendus recalculés sur les CSV de démo
   1. Atelier : fiches, QCM, vrai/faux, simulateur, avis critique, plan 90 jours (HTML autonome)
   2. Campagne live : le moteur Python tourne en direct sur le SI fictif, paramètres modifiables
   3. Code SAS / SQL : la version production (PROC SQL) et la bibliothèque de contrôles
@@ -19,7 +20,9 @@ import streamlit as st
 from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.rapport_excel import ecrire_rapport
+from exercices_sas import afficher_exercices
 from guide_terrain import afficher_guide
+from style_app import appliquer_style, bandeau
 from scripts.generer_donnees_btp import generer
 
 RACINE = Path(__file__).parent
@@ -65,12 +68,15 @@ def pct(x, d=2):
 COULEUR = {"vert": "background-color:#DCF1E4;color:#22744A", "orange": "background-color:#FBEBCB;color:#9C6400",
            "rouge": "background-color:#F8DEDE;color:#AD3030;font-weight:600"}
 
-st.title("Atelier QDD Solvabilité 2")
-st.caption("Méthode du mémoire de C. Motard (ISFA / Grant Thornton, 2024), corrigée et industrialisée — "
-           "données **fictives** d'un assureur dommages BTP.")
+appliquer_style()
+bandeau()
 
-t0, t1, t2, t4, t3 = st.tabs(["🧭 Guide terre à terre", "📚 Atelier (révision)", "⚙️ Campagne live",
-                               "🗂️ Gouvernance", "🧾 Code SAS / SQL"])
+t0, t5, t1, t2, t4, t3 = st.tabs(["🧭 Guide terre à terre", "🧪 SAS pratique", "📚 Atelier (révision)",
+                                   "⚙️ Campagne live", "🗂️ Gouvernance", "🧾 Code SAS / SQL"])
+
+# ---------------------------------------------------------------- SAS pratique
+with t5:
+    afficher_exercices()
 
 # ---------------------------------------------------------------- Atelier
 with t1:
@@ -84,6 +90,8 @@ with t1:
 with t2:
     with st.sidebar:
         st.header("Paramètres de la méthode")
+        st.caption("Ils s'appliquent au *Guide* et à la *Campagne live*. Les valeurs par défaut redonnent "
+                   "les chiffres de référence.")
         seuil = st.number_input("Seuil de significativité (%)", 0.1, 20.0, 1.0, 0.1) / 100
         dscr = st.number_input("ΔSCR max par donnée (%)", 0.0, 20.0, 0.5, 0.05) / 100
         coef = st.number_input("Coefficient de dégradation (%)", 0.0, 100.0, 5.0, 1.0) / 100
@@ -104,23 +112,27 @@ with t2:
     c, prev = camps[k], camps[k - 1] if k > 0 else None
     I = c["ind"]
 
-    m = st.columns(6)
+    g = c["gouv"]
+    st.markdown("##### La note")
+    m = st.columns(4)
     m[0].metric("Note QDD agrégée", pct(I["note"]),
-                None if prev is None else f"{(I['note'] - prev['ind']['note']) * 100:+.2f} pt")
+                None if prev is None else f"{(I['note'] - prev['ind']['note']) * 100:+.2f} pt".replace(".", ","))
     m[1].metric("Objectif (note min)", pct(I["note_min"]))
     m[2].metric("Écart à l'objectif", pct(I["ecart_objectif"]))
     m[3].metric("Données hors tolérance", f"{I['nb_donnees_hors_tolerance']} / {I['nb_donnees_critiques']}")
-    m[4].metric("Contrôles à jour", pct(I["taux_validation"], 0))
-    m[5].metric("Contrôles conformes", pct(I["taux_conformite_controles"], 0))
-    g = c["gouv"]
-    m2 = st.columns(6)
-    m2[0].metric("Restitutions QRT conformes", pct(I["taux_conformite_restitutions"], 0))
-    m2[1].metric("Zones de risque couvertes", pct(g["taux_couverture_zones_risque"], 0),
-                 help="Flux sans contrôle : " + ", ".join(g["flux_non_couverts"]))
-    m2[2].metric("Anomalies ouvertes", g["nb_anomalies_ouvertes"])
-    m2[3].metric("dont gravité haute", g["nb_anomalies_haute"])
-    m2[4].metric("dont échéance dépassée", g["nb_anomalies_en_retard"])
-    m2[5].metric("Anomalies clôturées", g["nb_anomalies_cloturees"])
+    st.markdown("##### Les contrôles")
+    m = st.columns(4)
+    m[0].metric("Contrôles à jour", pct(I["taux_validation"], 0))
+    m[1].metric("Contrôles conformes", pct(I["taux_conformite_controles"], 0))
+    m[2].metric("Restitutions QRT conformes", pct(I["taux_conformite_restitutions"], 0))
+    m[3].metric("Zones de risque couvertes", pct(g["taux_couverture_zones_risque"], 0),
+                help="Flux sans contrôle : " + ", ".join(g["flux_non_couverts"]))
+    st.markdown("##### Les anomalies")
+    m = st.columns(4)
+    m[0].metric("Anomalies ouvertes", g["nb_anomalies_ouvertes"])
+    m[1].metric("dont gravité haute", g["nb_anomalies_haute"])
+    m[2].metric("dont échéance dépassée", g["nb_anomalies_en_retard"])
+    m[3].metric("Anomalies clôturées", g["nb_anomalies_cloturees"])
 
     st.subheader("Données")
     d = c["donnees"][["libelle", "donnee_id", "proprietaire", "sensibilite", "critique", "note", "note_min",

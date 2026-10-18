@@ -1,3 +1,22 @@
+# Thème aligné sur l'atelier HTML (app/template.html) : mêmes couleurs, mêmes polices.
 [theme]
-primaryColor = "#0E5A69"
 base = "light"
+primaryColor = "#0E5A69"
+backgroundColor = "#EEF1F3"
+secondaryBackgroundColor = "#F6F8F9"
+textColor = "#15202A"
+linkColor = "#0E5A69"
+font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+headingFont = "Spectral:https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&display=swap"
+codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+headingFontWeights = [600, 600, 600, 600, 600, 600]
+baseRadius = "0.7rem"
+borderColor = "#D3DAE0"
+dataframeBorderColor = "#E3E7EB"
+showWidgetBorder = true
+chartCategoricalColors = ["#0E5A69", "#8E6210", "#22744A", "#AD3030", "#5B7FA6", "#9C6400", "#566370"]
+
+[theme.sidebar]
+backgroundColor = "#E2EAEC"
+secondaryBackgroundColor = "#FFFFFF"
+borderColor = "#C9D3D8"

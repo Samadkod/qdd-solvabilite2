@@ -17,8 +17,8 @@ def app():
 def test_application_demarre_sans_erreur(app):
     assert not app.exception
     onglets = [t.label for t in app.tabs]
-    principaux = ["🧭 Guide terre à terre", "📚 Atelier (révision)", "⚙️ Campagne live", "🗂️ Gouvernance",
-                  "🧾 Code SAS / SQL"]
+    principaux = ["🧭 Guide terre à terre", "🧪 SAS pratique", "📚 Atelier (révision)", "⚙️ Campagne live",
+                  "🗂️ Gouvernance", "🧾 Code SAS / SQL"]
     assert [o for o in onglets if o in principaux] == principaux
     for sous in ("L'essentiel", "Les chiffres", "Le poste", "L'assurance en clair", "Se former", "Calendrier",
                  "Glossaire"):
