@@ -12,6 +12,7 @@
 %include "&RACINE./sas/05_rapport.sas";
 %include "&RACINE./sas/06_gouvernance.sas";
 %include "&RACINE./sas/07_export_qlik.sas";
+%include "&RACINE./sas/08_chargement.sas";
 
 /* Démo : on repart d'un registre et d'un journal vides */
 proc datasets lib=QDD nolist; delete registre_anomalies journal_executions; quit;
@@ -29,6 +30,7 @@ proc datasets lib=QDD nolist; delete registre_anomalies journal_executions; quit
 %qdd_journal(camp=N, arrete=30SEP2026);
 
 %qdd_variation(prec=N1, cour=N);
+%qdd_volumetrie(prec=30JUN2026, cour=30SEP2026);   /* contrôles de chargement (niveau 0), hors note */
 %qdd_rapport(camp=N, prec=N1);
 %qdd_export_qlik(camps=N1 N, derniere=N);
 

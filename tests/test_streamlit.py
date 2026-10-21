@@ -7,7 +7,9 @@ pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest
 
 APP = Path(__file__).resolve().parents[1] / "streamlit_app.py"
-PAGES = ["synthese", "donnees", "controles", "anomalies", "lignes", "regles", "lignage", "comprendre", "guide", "sas", "atelier", "code"]
+ATELIER = ["synthese", "donnees", "controles", "anomalies", "lignes", "regles", "lignage", "chargement", "feuille"]
+DOCUMENTATION = ["comprendre", "guide", "sas", "atelier", "code"]
+PAGES = ATELIER + DOCUMENTATION
 
 
 def ouvrir(page: str) -> AppTest:
@@ -25,10 +27,21 @@ def guide():
 def test_chaque_page_demarre_sans_erreur(page):
     at = ouvrir(page)
     assert not at.exception, page
-    # le menu propose toutes les pages, la page ouverte est mise en avant
+    # le menu propose les pages de l'espace courant (atelier ou documentation), la page ouverte est mise en avant
     menu = {b.key: b for b in at.sidebar.button}
-    assert all(f"menu_{p}" in menu for p in PAGES)
+    espace, autre = (DOCUMENTATION, ATELIER) if page in DOCUMENTATION else (ATELIER, DOCUMENTATION)
+    assert all(f"menu_{p}" in menu for p in espace) and not any(f"menu_{p}" in menu for p in autre)
     assert menu[f"menu_{page}"].proto.type == "primary"
+    assert ("menu_retour" in menu) == (page in DOCUMENTATION)
+    assert ("menu_documentation" in menu) == (page in ATELIER)
+
+
+def test_bouton_documentation_puis_retour():
+    at = ouvrir("synthese")
+    at.sidebar.button(key="menu_documentation").click().run()
+    assert at.session_state["page"] == "guide" and not at.exception
+    at.sidebar.button(key="menu_retour").click().run()
+    assert at.session_state["page"] == "synthese" and not at.exception
 
 
 def test_menu_change_de_page():

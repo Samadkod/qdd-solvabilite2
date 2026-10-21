@@ -105,11 +105,13 @@ def comptes_agreges(base: Path | str, arrete: str) -> pd.DataFrame:
 def regroupements(df: pd.DataFrame) -> pd.DataFrame:
     """Une ligne par message : combien de lignes, d'objets, de mailles et quel montant (comme un Pareto)."""
     if df.empty:
-        return pd.DataFrame(columns=["Contrôle", "Message", "Lignes en anomalie", "Objets", "Mailles", "Montant (€)"])
+        return pd.DataFrame(columns=["Contrôle", "Message", "Lignes en anomalie", "Part", "Objets", "Mailles",
+                                     "Montant (€)"])
     g = df.groupby(["controle", "message"], as_index=False).agg(
         lignes=("poids", "sum"), objets=("objet", "nunique"), mailles=("maille", lambda s: ", ".join(sorted(set(s)))),
         montant=("montant", "sum"))
     g = g.sort_values("lignes", ascending=False)
+    g.insert(3, "Part", 100 * g["lignes"] / g["lignes"].sum())  # en % du total des lignes affichées
     return g.rename(columns={"controle": "Contrôle", "message": "Message", "lignes": "Lignes en anomalie",
                              "objets": "Objets", "mailles": "Mailles", "montant": "Montant (€)"})
 
@@ -182,7 +184,9 @@ def afficher_lignes(c: dict, base: Path) -> None:
         with groupes:
             st.caption("Une ligne par message, du plus fréquent au plus rare : par où commencer les corrections.")
             st.dataframe(regroupements(vue), hide_index=True, width="stretch",
-                         column_config={"Montant (€)": st.column_config.NumberColumn(format="%.2f")})
+                         column_config={"Montant (€)": st.column_config.NumberColumn(format="%.2f"),
+                                        "Part": st.column_config.ProgressColumn(format="%.1f %%", min_value=0,
+                                                                                max_value=100)})
     st.caption("Les contrôles de rapprochement (R) et de restitution QRT (Q) comparent des totaux entre outils : ils "
                "n'ont pas de ligne individuelle. Leur détail est dans la page Contrôles.")
 

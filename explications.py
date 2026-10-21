@@ -169,7 +169,7 @@ def lire_axe(a: pd.DataFrame, axe: str) -> str:
 
 AIDE_COMPTEURS = {
     "note": "Moyenne des notes des données critiques, chacune pesant selon son importance dans le SCR. "
-            "Le calcul détaillé est dans le Guide, sous-onglet « D'où sortent les chiffres ».",
+            "Le calcul détaillé est dans Documentation → « D'où sortent les chiffres ».",
     "objectif": "Note minimum exigée pour l'ensemble. Plus les données pèsent lourd dans le SCR, plus "
                 "l'objectif est haut.",
     "ecart": "Note globale moins objectif. Positif : objectif atteint.",

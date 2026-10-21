@@ -23,31 +23,31 @@ DATE_PRISE_DE_POSTE = dt.date(2026, 11, 6)  # valeur par défaut, modifiable dan
 MISSIONS = [
     ("Qualité & gouvernance", "Piloter le dispositif QDD et coordonner la résolution des anomalies",
      "Savoir à tout moment quelles données sont fiables, et faire corriger les autres par les bons services",
-     "Campagne live (note, statuts) · Gouvernance (registre)",
+     "Synthèse · Anomalies (registre) · Lignes en anomalie",
      "Tenir un registre où chaque anomalie a un propriétaire et une échéance"),
     ("Qualité & gouvernance", "Produire et maintenir dictionnaire, cartographie et lignage des flux, contrôles, reporting qualité",
      "Les « cartes d'identité » des données, le plan des tuyaux entre les outils, la liste des vérifications",
-     "Gouvernance (dictionnaire, lignage) · dossier referentiels/",
+     "Lignage & dictionnaire · Règles de contrôle · dossier referentiels/",
      "Partir de l'existant et le mettre au format des référentiels du projet"),
     ("Qualité & gouvernance", "Concevoir, développer et automatiser les traitements de fiabilisation (SAS avancé, SQL)",
      "Écrire des programmes qui vérifient les données tout seuls, à chaque arrêté",
-     "Code SAS / SQL (02_controles.sas, sql/controles/)",
+     "Documentation → Code SAS / SQL (02_controles.sas, sql/controles/)",
      "Automatiser un premier contrôle aujourd'hui fait à la main"),
     ("Qualité & gouvernance", "Sensibiliser les métiers et accompagner leurs contributions",
      "Expliquer aux gestionnaires, comptables, actuaires pourquoi leurs données comptent et quoi corriger",
-     "Ce guide · Atelier (fiches)",
+     "Documentation → ce guide, D'où sortent les chiffres, Atelier (fiches)",
      "Préparer une présentation de 15 minutes « la QDD en clair »"),
     ("Qualité & gouvernance", "Tenir le corpus documentaire et contribuer aux audits (ACPR, commissaires aux comptes)",
      "Pouvoir prouver, documents à l'appui, comment chaque chiffre a été obtenu et contrôlé",
-     "Gouvernance (journal d'exécution) · rapport Excel",
+     "Chargement & exécution (journal) · rapport Excel",
      "Lister les documents existants et leur date de dernière mise à jour"),
     ("Qualité & gouvernance", "Intégrer la QDD dans les projets de transformation et les groupes de travail IT",
      "Quand un outil change, vérifier que les données restent justes avant, pendant et après",
-     "Gouvernance (lignage : quels flux un projet touche)",
+     "Lignage & dictionnaire (quels flux un projet touche)",
      "Demander la liste des projets IT en cours qui touchent des données critiques"),
     ("Optimisation & automatisation", "Analyser les processus et proposer des améliorations",
      "Repérer ce qui est lent, manuel ou fragile, et proposer mieux",
-     "Gouvernance (étapes à risque non couvertes)",
+     "Synthèse (étapes sans contrôle) · Chargement & exécution (durées)",
      "Chronométrer une clôture : où part le temps ?"),
     ("Optimisation & automatisation", "Déployer les bonnes pratiques de développement et de documentation",
      "Code lisible, commenté, versionné, testé, rejouable par un collègue",
@@ -55,11 +55,11 @@ MISSIONS = [
      "Proposer une convention simple : nommage, en-tête de programme, journal"),
     ("Optimisation & automatisation", "Appui expert SAS, SQL, Qlik Sense",
      "Être la personne qu'on vient voir quand un programme ou un tableau de bord coince",
-     "Code SAS / SQL · app/chargement_qdd.qvs",
+     "Documentation → Code SAS / SQL · app/chargement_qdd.qvs",
      "Se former à Qlik Sense en s'appuyant sur Power BI (sous-onglet « Se former »)"),
     ("Travaux actuariels", "Provisions techniques, Solvabilité 2, ORSA, tarification, sinistralité grave, réassurance, sensibilités",
      "Fournir aux actuaires des données fiables et participer à leurs analyses",
-     "Campagne live (sensibilités du SCR) · sous-onglet « L'assurance en clair »",
+     "Note & données (sensibilités du SCR) · sous-onglet « L'assurance en clair »",
      "Assister à une revue de provisions et noter quelles données y entrent"),
 ]
 
@@ -159,13 +159,13 @@ def _j(d: dt.date) -> str:
 
 
 def afficher_guide(c: dict, var: pd.DataFrame | None) -> None:
-    """c : campagne sélectionnée dans « Campagne live » ; var : variation N-1 -> N (ou None)."""
+    """c : campagne affichée (choisie dans le menu) ; var : variation N-1 -> N (ou None)."""
     st.markdown(
         "Ce guide explique **sans jargon** ce que fait l'application, ce que disent les chiffres "
         f"de la campagne **{c['campagne']}** (arrêté du {pd.Timestamp(c['date']):%d/%m/%Y}), ce qu'attend le "
         "poste et comment s'y préparer. Il est écrit pour quelqu'un qui vient de la **data** plutôt que de "
         "l'actuariat. Les chiffres sont recalculés en direct : ils changent si vous modifiez les paramètres "
-        "dans l'onglet *Campagne live*.")
+        "dans le menu (*Paramètres de la méthode*).")
     s = st.tabs(["L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
                  "Se former", "Calendrier", "Glossaire"])
     with s[0]:
@@ -217,7 +217,7 @@ def _essentiel(c: dict) -> None:
     st.header("Une campagne, étape par étape")
     st.markdown(
         "Une **campagne**, c'est le contrôle complet à une date d'arrêté (fin de trimestre). "
-        "Voici ce qui se passe, et le programme SAS qui le fait (onglet *Code SAS / SQL*) :\n\n"
+        "Voici ce qui se passe, et le programme SAS qui le fait (*Documentation → Code SAS / SQL*) :\n\n"
         "| # | Ce qu'on fait | En clair | Programme |\n"
         "|---|---|---|---|\n"
         "| 1 | Paramétrer et se connecter | Date d'arrêté, seuils, accès aux bases (ODBC en production) | `00_config.sas` |\n"
@@ -230,16 +230,18 @@ def _essentiel(c: dict) -> None:
     st.caption("Les étapes 1 à 6 sont faites pour tourner sans intervention, à chaque arrêté : c'est là que se "
                "joue l'automatisation. L'étape 7 reste humaine : c'est là que se joue le rôle de pilote.")
 
-    st.header("Lire l'onglet « Campagne live » en 1 minute")
+    st.header("Lire la Synthèse en 1 minute")
     st.markdown(
-        "1. **Regardez la note globale et l'objectif** (premier compteur). Au-dessus de l'objectif : bien, "
-        "mais ce n'est pas suffisant.\n"
-        "2. **Regardez « Données hors tolérance »**. Tout ce qui n'est pas 0 doit être expliqué.\n"
-        "3. **Dans le tableau « Données »**, repérez les lignes rouges et orange, en commençant par celles "
-        "qui ont la plus forte sensibilité.\n"
-        "4. **Dans « Points de contrôle »**, filtrez sur « rouge » puis « en retard » pour voir les contrôles en cause.\n"
-        "5. **Dans *Gouvernance***, vérifiez que chaque anomalie a un propriétaire et une échéance.\n"
-        "6. **Téléchargez le rapport Excel** pour le partager ou le présenter.")
+        "1. **Bloc « le chargement et l'exploitation » d'abord** : si une table est en alerte de volume ou un contrôle "
+        "en échec technique, les résultats sont à prendre avec prudence tant que ce n'est pas expliqué.\n"
+        "2. **La note et l'objectif** : au-dessus de l'objectif, c'est bien, mais ce n'est pas suffisant.\n"
+        "3. **« Données critiques hors tolérance »** : tout ce qui n'est pas 0 doit être expliqué ; ↗ ouvre la liste.\n"
+        "4. **Sous chaque chiffre, l'évolution depuis N-1** : en rouge si ça se dégrade, en vert si ça s'améliore.\n"
+        "5. **« Contrôles en rouge » et « en retard »** : ↗ ouvre la liste, ou le panneau Actions mène à la page "
+        "Contrôles déjà filtrée.\n"
+        "6. **Les anomalies** : chaque anomalie a-t-elle un propriétaire et une échéance ? Le Top 5 des messages dit "
+        "par où commencer.\n"
+        "7. **Exportez** le registre ou le rapport Excel pour le partager ou le présenter.")
 
 
 # ====================================================================== Les chiffres
@@ -475,7 +477,7 @@ def _se_former() -> None:
     st.header("SQL : ce que vous savez déjà sert directement")
     st.markdown(
         "Les 20 contrôles du projet sont écrits en SQL standard, sans fonctions exotiques "
-        "(dossier `sql/controles/`, onglet *Code SAS / SQL*). Ils tournent tels quels dans PROC SQL. "
+        "(dossier `sql/controles/`, *Documentation → Code SAS / SQL*). Ils tournent tels quels dans PROC SQL. "
         "Un bon exercice : les lire dans l'ordre C01 → R06 → Q04 et, pour chacun, dire en une phrase "
         "quelle erreur il attrape.")
 
@@ -497,7 +499,7 @@ def _calendrier() -> None:
     etapes = [
         (f"Avant le premier jour (du {_j(j(-19))} au {_j(j(-1))})", True, [
             "Semaine 1 — **Comprendre le métier** : les sous-onglets « L'essentiel » et « L'assurance en clair », "
-            "le parcours « Comprendre la méthode pas à pas » de l'onglet *Atelier*, puis les QCM.",
+            "le parcours « Comprendre la méthode pas à pas » de l'*Atelier (révision)*, puis les QCM.",
             "Semaine 2 — **SAS** : créer le compte SAS OnDemand, lancer `sas/99_executer.sas`, lire le journal, "
             "refaire les exemples du sous-onglet « Se former », puis écrire une macro de contrôle à soi.",
             "Semaine 3 — **Qlik Sense** à partir de Power BI (tableau d'équivalences), et relecture du glossaire "

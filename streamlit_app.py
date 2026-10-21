@@ -26,8 +26,10 @@ from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MO
                           lire_axe, lire_variation)
 from guide_terrain import afficher_guide
 from style_app import appliquer_style, bandeau, entete_page
-from lignes_anomalie import afficher_lignes, afficher_regles, lignes as lignes_en_anomalie
-from synthese import afficher_synthese
+from chargement import SEUIL_VARIATION, execution as executer_controles, volumetrie
+from feuille_de_route import afficher_feuille_de_route
+from lignes_anomalie import afficher_lignes, afficher_regles, lignes as lignes_en_anomalie, referentiel
+from synthese import afficher_synthese, tuiles
 from scripts.generer_donnees_btp import generer
 
 RACINE = Path(__file__).parent
@@ -67,6 +69,16 @@ def campagnes(seuil, dscr, coef, degradation, ecart, montant):
     return out, var, xlsx
 
 
+@st.cache_data(show_spinner=False)
+def lignes_cache(base: str, arrete: str) -> pd.DataFrame:
+    return lignes_en_anomalie(base, arrete)
+
+
+@st.cache_data(show_spinner=False)
+def execution_cache(base: str, arrete: str) -> pd.DataFrame:
+    return executer_controles(base, arrete, referentiel())
+
+
 def pct(x, d=2):
     return "—" if x is None or pd.isna(x) else f"{x * 100:.{d}f} %".replace(".", ",")
 
@@ -86,12 +98,18 @@ PAGES = {
                "Le catalogue des 20 contrôles : famille, message, responsable, état dans la campagne."),
     "lignage": ("Pilotage QDD", "Lignage & dictionnaire", "🗂️",
                 "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
+    "chargement": ("Exploitation", "Chargement & exécution", "⚙️",
+                   "Les données sont-elles bien arrivées, et chaque contrôle a-t-il pu tourner ?"),
+    "feuille": ("Évolutions", "Feuille de route", "🗺️",
+                "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", "🔎", "Le calcul pas à pas, sur les vrais chiffres."),
     "guide": ("Comprendre", "Guide terre à terre", "🧭", "Le métier, les chiffres et le poste, sans jargon."),
     "sas": ("Se former", "SAS pratique", "🧪", "13 exercices progressifs, corrigés, avec le résultat attendu."),
     "atelier": ("Se former", "Atelier (révision)", "📚", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
     "code": ("Technique", "Code SAS / SQL", "💻", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
 }
+
+DOC = {"Comprendre", "Se former", "Technique"}  # rubriques rangées sous le bouton « Documentation »
 
 if "page" not in st.session_state:
     demandee = st.query_params.get("page", "synthese")
@@ -115,13 +133,25 @@ appliquer_style()
 with st.sidebar:
     st.markdown('<div class="qdd-marque">🛡️ Atelier QDD<span>Solvabilité 2 · données fictives</span></div>',
                 unsafe_allow_html=True)
+    en_doc = PAGES[st.session_state["page"]][0] in DOC
+    if en_doc:
+        st.markdown('<div class="qdd-espace">📖 Documentation</div>', unsafe_allow_html=True)
+        st.button("←  Retour à l'atelier QDD", key="menu_retour", on_click=_choisir, args=("synthese",),
+                  width="stretch", type="secondary")
     rubrique = None
     for cle, (rub, titre, icone, _) in PAGES.items():
+        if (rub in DOC) != en_doc:
+            continue
         if rub != rubrique:
             st.markdown(f'<div class="qdd-rubrique">{rub}</div>', unsafe_allow_html=True)
             rubrique = rub
         st.button(f"{icone}  {titre}", key=f"menu_{cle}", on_click=_choisir, args=(cle,), width="stretch",
                   type="primary" if st.session_state["page"] == cle else "tertiary")
+    if not en_doc:
+        st.divider()
+        st.button("📖  Documentation", key="menu_documentation", on_click=_choisir, args=("guide",), width="stretch",
+                  type="secondary", help="Comprendre (guide, explication des chiffres), se former (SAS, atelier) et "
+                                         "code technique.")
     st.divider()
     with st.expander("⚙️ Paramètres de la méthode"):
         st.caption("Les valeurs par défaut redonnent les chiffres de référence.")
@@ -158,6 +188,50 @@ else:
 
 
 # ================================================================ pages
+def _contexte(camp: dict, precedente: dict | None):
+    base = str(base_fictive())
+    return (lignes_cache(base, camp["date"]), volumetrie(camp, precedente), execution_cache(base, camp["date"]))
+
+
+def page_synthese() -> None:
+    lig, vol, exe = _contexte(c, prev)
+    precedentes = None
+    if prev is not None:
+        avant = camps[k - 2] if k >= 2 else None
+        precedentes = tuiles(prev, avant, *_contexte(prev, avant))
+    afficher_synthese(c, prev, xlsx, aller, lig, vol, exe, precedentes)
+
+
+def page_chargement() -> None:
+    _, vol, exe = _contexte(c, prev)
+    st.subheader("Volumétrie des tables sources")
+    st.markdown(
+        f"Avant de lire un résultat, on vérifie que les données sont **arrivées entières**. Une table vide est "
+        f"**bloquante**. Une table dont le nombre de lignes varie de plus de **{SEUIL_VARIATION * 100:.0f} %** depuis le "
+        "trimestre précédent est **à expliquer** avant toute conclusion. Pour les petites tables (moins de 50 lignes, "
+        "une par segment ou par poste), tout changement du nombre de lignes est à expliquer.")
+    couleur = {"Bloquant": "background-color:#F8DEDE;color:#AD3030;font-weight:600",
+               "À expliquer": "background-color:#FBEBCB;color:#9C6400", "Normal": "background-color:#DCF1E4;color:#22744A"}
+    st.dataframe(vol.style.format({"Variation": lambda v: "—" if pd.isna(v) else f"{v:+.1%}".replace(".", ",")})
+                 .map(lambda v: couleur.get(v, ""), subset=["Statut"]), hide_index=True, width="stretch")
+    with st.expander("Pourquoi un seuil de 10 % ?"):
+        st.markdown(
+            "- **Ce qui est normal** : sur le SI fictif, d'un trimestre à l'autre, les tables bougent d'au plus "
+            "**+1,2 %** (portefeuille stable : affaires nouvelles moins résiliations).\n"
+            "- **Ce qu'on veut attraper** : un chargement partiel ou doublé — un segment manquant, un mois oublié, un "
+            "filtre en trop. Ces incidents font bouger les volumes de bien plus de 10 %.\n"
+            "- **Le compromis** : 10 %, c'est plus de huit fois la variation normale, donc **pas de fausse alerte**, "
+            "tout en restant assez bas pour voir un vrai incident.\n"
+            "- **En entreprise** : recalibrer sur l'historique réel (la plus forte variation observée sur 8 trimestres, "
+            "plus une marge), le justifier dans la politique QDD, et prévoir un seuil propre aux tables saisonnières.")
+    st.subheader("Exécution des contrôles")
+    st.caption("Chaque requête de contrôle est rejouée sur les données de l'arrêté. Un contrôle en échec technique ne "
+               "dit rien de la qualité : ce n'est ni une anomalie, ni un résultat conforme.")
+    st.dataframe(exe, hide_index=True, width="stretch")
+    st.subheader("Journal d'exécution (piste d'audit)")
+    st.json(c["journal"], expanded=False)
+
+
 def page_donnees() -> None:
     st.subheader("Les données et leur note")
     d = c["donnees"][["libelle", "donnee_id", "proprietaire", "sensibilite", "critique", "note", "note_min",
@@ -310,8 +384,9 @@ def page_code() -> None:
 
 
 {
-    "synthese": lambda: afficher_synthese(c, prev, xlsx, aller,
-                                          st.cache_data(show_spinner=False)(lignes_en_anomalie)(str(base_fictive()), c["date"])),
+    "synthese": page_synthese,
+    "chargement": page_chargement,
+    "feuille": afficher_feuille_de_route,
     "lignes": lambda: afficher_lignes(c, base_fictive()),
     "regles": lambda: afficher_regles(c, base_fictive()),
     "donnees": page_donnees,

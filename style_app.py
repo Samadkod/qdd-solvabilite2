@@ -79,6 +79,9 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button p{font-size:.93
 [data-testid="stMain"] [data-testid="stDownloadButton"] button > div,
 [data-testid="stMain"] [data-testid="stButton"] button > div{justify-content:flex-start;}
 
+.qdd-espace{font-family:Spectral,serif; font-size:1.15rem; font-weight:600; color:var(--qdd-encre); margin:.2rem 0 .5rem .2rem;}
+.qdd-tuile-delta{font-size:.82rem; font-weight:600; margin-top:-.1rem;}
+
 /* en-têtes de page */
 .qdd-surtitre{font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.8;
   margin-bottom:.25rem;}

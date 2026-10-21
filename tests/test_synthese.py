@@ -51,3 +51,20 @@ def test_chaque_liste_correspond_a_sa_tuile(t):
 def test_bloc_exploitation(t):
     assert t["non_executes"].valeur == "4 sur 20" and t["non_executes"].ton == "orange"
     assert set(t["non_executes"].liste["Contrôle"]) == {"C07", "C08", "R04", "R05"}
+
+
+def test_evolutions_coloree_selon_le_sens():
+    from synthese import Tuile, evolutions
+    cour = [Tuile("ouvertes", "b", "t", "14", "orange", "", mesure=14, mieux="bas"),
+            Tuile("cloturees", "b", "t", "2", "vert", "", mesure=2, mieux="haut"),
+            Tuile("note", "b", "t", "", "vert", "", mesure=0.9745, mieux="haut", unite="point"),
+            Tuile("lues", "b", "t", "", "gris", "", mesure=100)]
+    prec = [Tuile("ouvertes", "b", "t", "11", "orange", "", mesure=11, mieux="bas"),
+            Tuile("cloturees", "b", "t", "0", "gris", "", mesure=0, mieux="haut"),
+            Tuile("note", "b", "t", "", "vert", "", mesure=0.9876, mieux="haut", unite="point"),
+            Tuile("lues", "b", "t", "", "gris", "", mesure=100)]
+    t = {x.cle: x for x in evolutions(cour, prec, "N-1")}
+    assert t["ouvertes"].delta == "▲ +3 depuis N-1" and t["ouvertes"].delta_ton == "rouge"  # plus d'anomalies : rouge
+    assert t["cloturees"].delta_ton == "vert"
+    assert t["note"].delta == "▼ -1,31 pt depuis N-1" and t["note"].delta_ton == "rouge"
+    assert t["lues"].delta == "= stable depuis N-1" and t["lues"].delta_ton == "gris"
