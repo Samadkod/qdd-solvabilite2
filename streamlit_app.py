@@ -20,6 +20,7 @@ import streamlit as st
 
 from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
+from qdd_s2.gouvernance import cycle_de_vie
 from qdd_s2.rapport_excel import ecrire_rapport
 from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
@@ -336,6 +337,13 @@ def page_controles() -> None:
 
 def page_anomalies() -> None:
     reg = c["registre"]
+    st.markdown("#### Cycle de vie du registre")
+    cycle = cycle_de_vie(reg, [(x["campagne"], x["date"]) for x in camps[:k + 1]])
+    st.dataframe(cycle, hide_index=True, width="content")
+    st.caption("Une anomalie naît quand un contrôle passe sous son seuil ; elle devient « Récurrente » si elle est "
+               "encore là à la campagne suivante ; elle est clôturée quand le contrôle est refait et revient au vert. "
+               "Les clôtures datent de leur campagne : filtrez sur « Clôturée » pour les voir.")
+    st.markdown("#### Registre")
     f1, f2 = st.columns(2)
     statuts = f1.multiselect("Statut", ["Ouverte", "Récurrente", "Clôturée"], default=["Ouverte", "Récurrente"])
     gravites = f2.multiselect("Gravité", sorted(reg["gravite"].dropna().unique()), placeholder="Toutes")

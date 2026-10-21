@@ -1,4 +1,4 @@
-"""Régénère sas/donnees_demo/valeurs_attendues.csv : les 43 valeurs que sas/98_verifier.sas compare à l'exécution SAS.
+"""Régénère sas/donnees_demo/valeurs_attendues.csv : les 59 valeurs que sas/98_verifier.sas compare à l'exécution SAS.
 
 À lancer après toute modification d'un calcul ou des données fictives (invariant de parité Python ↔ SAS) :
     python scripts/generer_donnees_btp.py && python scripts/valeurs_attendues.py
@@ -18,7 +18,7 @@ INDICATEURS = ["note", "note_min", "note_avant_degradation", "ecart_objectif", "
                "taux_conformite_restitutions"]
 GOUVERNANCE = ["taux_couverture_zones_risque", "nb_zones_non_couvertes", "nb_anomalies_ouvertes",
                "nb_anomalies_haute", "nb_anomalies_recurrentes", "nb_anomalies_en_retard", "nb_anomalies_cloturees"]
-NOMS_SAS = {"N-1": "N1", "N": "N"}
+NOMS_SAS = {"N-2": "N2", "N-1": "N1", "N": "N"}
 
 
 def lignes(base: Path) -> list[str]:

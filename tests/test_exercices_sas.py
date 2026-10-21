@@ -16,7 +16,7 @@ def test_un_corrige_par_exercice():
 
 def test_resultats_attendus():
     r = ex.resultats_attendus()
-    assert r["E01"]["nb_lignes"].tolist() == [6106, 6178]
+    assert r["E01"]["nb_lignes"].tolist() == [6031, 6106, 6178]
     assert r["E02"]["nb_contrats"].iloc[0] == 3241
     assert r["E03"]["nb_sinistres"].tolist() == [19, 4567, 371]
     assert r["E06"]["contrat_id"].tolist() == ["AU000277", "AU001019", "DO000609", "RC001015", "RC001317",
@@ -31,7 +31,7 @@ def test_resultats_attendus():
     e5 = r["E05"].set_index("segment")["ecart_relatif"]
     e12 = r["E12"].set_index("segment")["ecart_relatif"]
     assert (e5.sort_index() - e12.sort_index()).abs().max() < 1e-12
-    assert r["E13"]["nb_anomalies"].tolist() == [6, 13, 16, 6, 12, 54]
+    assert r["E13"]["nb_anomalies"].tolist() == [5, 25, 13, 6, 13, 16, 6, 12, 54]
 
 
 def test_formatage_francais():
@@ -49,5 +49,5 @@ def test_isin_fictifs_valides():
     import pandas as pd
     p = pd.read_csv(ex.DEMO / "placements_depositaire.csv", sep=";", dtype=str, keep_default_na=False)
     bons = p[p["isin"].str.len() == 12]["isin"]
-    assert len(bons) == 821 and all(_cle_isin(i[:11]) == i[11] for i in bons)
+    assert len(bons) == 1235 and all(_cle_isin(i[:11]) == i[11] for i in bons)
     assert set(p.loc[p["isin"].str.len() != 12, "isin"]) == {"", "N/A", "FR12"}

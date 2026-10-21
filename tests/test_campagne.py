@@ -18,7 +18,7 @@ def campagnes(tmp_path_factory):
 
 def test_deux_campagnes_et_variation(campagnes):
     camps, var = campagnes
-    assert [c.campagne for c in camps] == ["N-1", "N"]
+    assert [c.campagne for c in camps] == ["N-2", "N-1", "N"]
     # la décomposition explique exactement la variation de la note
     assert var["impact"].sum() == pytest.approx(var["note"].iloc[-1] - var["note"].iloc[0], abs=1e-12)
     assert var["note"].iloc[-1] == pytest.approx(camps[-1].evaluation.indicateurs["note"], abs=1e-12)
@@ -29,7 +29,7 @@ def test_incident_entrepot_detecte(campagnes):
     camps, _ = campagnes
     d = camps[-1].evaluation.donnees
     assert d.loc["provisions_sinistres_RC_DECENNALE", "statut"] == "rouge"
-    assert camps[0].evaluation.donnees.loc["provisions_sinistres_RC_DECENNALE", "statut"] != "rouge"
+    assert camps[-2].evaluation.donnees.loc["provisions_sinistres_RC_DECENNALE", "statut"] != "rouge"
 
 
 def test_controles_non_realises_degrades(campagnes):
@@ -86,3 +86,21 @@ def test_parite_javascript(campagnes, tmp_path):
     exporter_json(camps, var, f)
     r = subprocess.run(["node", str(RACINE / "tests" / "parite_js.mjs"), str(f)], capture_output=True, text=True)
     assert r.returncode == 0, r.stdout[-2000:]
+
+
+def test_cycle_de_vie_du_registre(campagnes):
+    """Mars 2026 (N-2) ouvre des anomalies que N-1 clôture : C06 (saisie des dates), R04 RC décennale
+    (coupure comptable), Q04 RC décennale (extraction provisoire de S.05.01)."""
+    from qdd_s2.gouvernance import cycle_de_vie
+    camps, _ = campagnes
+    reg = camps[-1].registre
+    clos = reg[reg["statut"] == "Clôturée"].set_index("objet")
+    assert sorted(clos.index) == ["C06|TOUS", "Q04|RC_DECENNALE", "R04|RC_DECENNALE"]
+    assert set(clos["date_cloture"]) == {"2026-06-30"} and set(clos["campagne_detection"]) == {"N-2"}
+    # R04 RC décennale : clôturée en N-1, puis non réalisé en N -> nouvelle anomalie d'un autre type
+    r04 = reg[reg["objet"] == "R04|RC_DECENNALE"].set_index("type")
+    assert r04.loc["Qualité de donnée", "statut"] == "Clôturée"
+    assert r04.loc["Contrôle non réalisé", "statut"] == "Ouverte"
+    cycle = cycle_de_vie(reg, [(c.campagne, c.date_arrete) for c in camps])
+    assert cycle["Détectées"].tolist() == [13, 1, 3] and cycle["Clôturées"].tolist() == [0, 3, 0]
+    assert cycle["Ouvertes en fin de campagne"].tolist() == [c.gouvernance["nb_anomalies_ouvertes"] for c in camps]

@@ -37,8 +37,14 @@ def test_aucune_fausse_alerte_sur_le_si_fictif():
         pytest.skip("base fictive absente")
     from qdd_s2.campagne import Config, lancer_campagnes
     camps, _ = lancer_campagnes(Config(base=BASE))
-    v = ch.volumetrie({"journal": camps[1].journal}, {"journal": camps[0].journal})
+    v = ch.volumetrie({"journal": camps[-1].journal}, {"journal": camps[-2].journal})  # N-1 -> N
     assert len(v) == 17 and (v["Statut"] == "Normal").all()
+    # N-2 -> N-1 : une seule alerte, justifiée. Le triangle S.19.01 de mars compte 12 années de survenance
+    # par segment au lieu de 11 : l'année 2015 n'y existe que par 3 sinistres survenus avant l'effet du
+    # contrat (anomalies C07). La règle signale bien une petite table modifiée, à expliquer.
+    v = ch.volumetrie({"journal": camps[-2].journal}, {"journal": camps[-3].journal})
+    alertes = v[v["Statut"] != "Normal"]
+    assert alertes["Table"].tolist() == ["qrt_s1901_diagonale"] and alertes["Statut"].tolist() == ["À expliquer"]
     exe = ch.execution(BASE, "2026-09-30", referentiel())
     assert len(exe) == 20 and (exe["Statut"] == "Exécuté").all()
 

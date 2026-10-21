@@ -38,12 +38,16 @@
   proc sql noprint;
     select controle_id, famille into :cid1-, :fam1- from QDD.referentiel_controles;
     %let n = &sqlobs;
-    delete from QDD.hist_resultats where date_realisation = "&arrete"d;  /* relance idempotente */
   quit;
   %do i = 1 %to &n;
     %let id  = &&cid&i;
     %let fam = &&fam&i;
     %if %sysfunc(indexw(%str( &non_realises), &id)) = 0 %then %do;
+      /* relance idempotente : on n'efface que les résultats de CE contrôle à cette date
+         (un résultat saisi à la main pour un contrôle non réalisé est conservé) */
+      proc sql noprint;
+        delete from QDD.hist_resultats where date_realisation = "&arrete"d and scan(point_id, 1, '|') = "&id";
+      quit;
       %&id(&arrete);
       %if &fam = rapprochement %then %mesure_rapprochement(&id);
       %else %mesure_coherence(&id);

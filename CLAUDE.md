@@ -13,7 +13,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Couche | Chemin | Statut |
 |---|---|---|
 | Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution) | Écrite, vérifiée statiquement, **jamais exécutée** (pas de SAS dans l'environnement d'origine) |
-| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 84 tests verts |
+| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 85 tests verts |
 | Contrôles | `sql/controles/*.sql` (20, ANSI, sans CTE) + macros SAS équivalentes dans `sas/02_controles.sas` | Testés sur DuckDB |
 | Référentiels | `referentiels/` : dictionnaire, référentiel des contrôles, lignage (flux + chemins), plan de campagne, historique | Source de vérité |
 | Atelier HTML | `app/template.html` + `app/moteur.js` + `app/contenu.js` → `scripts/construire_appli.py` | Parité JS = Python testée |
@@ -21,14 +21,14 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Exercices SAS | Corrigés dans `sas/10_exercices_corriges.sas` (source unique, non appelé par `99_executer.sas`) ; énoncés et résultats attendus (DuckDB sur `sas/donnees_demo`) dans `exercices_sas.py` | Lint SAS OK, résultats attendus testés (`tests/test_exercices_sas.py`) ; **jamais exécutés dans SAS** |
 | Contrôles de chargement (niveau 0) | `chargement.py` + `sas/08_chargement.sas` (%qdd_volumetrie) : table vide = Bloquant ; variation > 10 % (ou petite table < 50 lignes modifiée) = À expliquer ; rejeu des requêtes de contrôle (échec technique, durée). Hors note | Règle testée (`tests/test_chargement.py`), aucune fausse alerte sur le SI fictif ; SAS jamais exécuté |
 | Lignes en anomalie | `sql/lignes/C01…C10` (une ligne par objet fautif) + `lignes_anomalie.py` (lignes, regroupements, catalogue des règles) | Par contrôle et par maille, nombre de lignes = nombre d'anomalies du contrôle agrégé, sur N-1 et N (`tests/test_lignes_anomalie.py`) ; pas d'équivalent SAS |
-| Données fictives | `scripts/generer_donnees_btp.py` → `data/btp_fictif.duckdb` ; CSV pour SAS dans `sas/donnees_demo/` | Déterministes |
+| Données fictives | `scripts/generer_donnees_btp.py` → `data/btp_fictif.duckdb` (3 arrêtés : 31/03, 30/06, 30/09/2026) ; CSV pour SAS dans `sas/donnees_demo/` | Déterministes ; un flux aléatoire par arrêté |
 
 ## Commandes
 ```bash
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py      # base fictive
-python -m qdd_s2                           # campagnes N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
-python -m pytest -q                        # 84 tests, tous doivent passer
+python -m qdd_s2                           # campagnes N-2, N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
+python -m pytest -q                        # 85 tests, tous doivent passer
 python scripts/lint_sas.py                 # vérification statique du SAS (doit afficher « Lint SAS OK »)
 python scripts/construire_appli.py         # régénère l'atelier HTML (après python -m qdd_s2)
 streamlit run streamlit_app.py
@@ -49,7 +49,7 @@ Recalcul des formules Excel : `tests/test_excel_recalcul.py` recalcule le rappor
 - Python ↔ JavaScript : `tests/parite_js.mjs` (lancé par pytest si Node est présent).
 - Python ↔ SQL : `sql/agregation_note_qdd.sql` (test `test_parite_sql_python`).
 - Python ↔ Excel : formules des onglets « Contrôles », « Données critiques », « Synthèse ».
-- Python ↔ SAS : régénérer `sas/donnees_demo/valeurs_attendues.csv` (43 valeurs, `python scripts/valeurs_attendues.py`) si un calcul ou une donnée change. `sas/98_verifier.sas` les compare à l'exécution SAS.
+- Python ↔ SAS : régénérer `sas/donnees_demo/valeurs_attendues.csv` (59 valeurs, `python scripts/valeurs_attendues.py`) si un calcul ou une donnée change. `sas/98_verifier.sas` les compare à l'exécution SAS.
 - Les tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire doivent rester reproduits (`tests/test_memoire.py`).
 
 ## Valeurs de référence (campagne N, 30/09/2026)
@@ -60,9 +60,11 @@ Recalcul des formules Excel : `tests/test_excel_recalcul.py` recalcule le rappor
 | Restitutions QRT conformes | 10 sur 11 |
 | Zones de risque couvertes | 25 sur 33 |
 | Anomalies ouvertes | 14, dont 4 de gravité haute |
+| Anomalies clôturées (registre) | 3, clôturées en N-1 : C06, R04 RC décennale, Q04 RC décennale |
 
 Si l'une de ces valeurs change, c'est une **régression**, sauf si le changement est voulu et documenté dans le commit.
 Historique : 97,45 % → 97,49 % (octobre 2026) après correction, validée par le propriétaire, des dates de sinistres fictives (survenance entre l'effet du contrat et l'arrêté, déclaration jamais après l'arrêté) ; seuls note, note avant dégradation, écart à l'objectif et étapes de variation ont bougé (17 valeurs attendues SAS sur 43).
+Ajout (octobre 2026, validé par le propriétaire) d'une campagne N-2 au 31/03/2026 pour montrer le cycle de vie complet du registre : nouvel arrêté généré avec son propre flux aléatoire (indice 2), données N-1 et N identiques au bit près ; note, objectif et compteurs de N inchangés ; seuls changent les identifiants d'anomalies, les dates de détection et 4 valeurs attendues (N-1 : récurrentes 0 → 10, en retard 0 → 10, clôturées 0 → 3 ; N : clôturées 0 → 3).
 
 ## Ce qui n'est PAS vérifié
 - Exécution SAS : à faire sur SAS OnDemand ou en entreprise avec `99_executer.sas`, puis lire le log et `WORK.VERIFICATION`.

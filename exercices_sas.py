@@ -157,8 +157,8 @@ EXERCICES = [
          apprend="Macro de campagne, DATETIME(), OUTPUT multiple, PROC APPEND, PROC EXPORT.",
          enonce="Écrivez `%lancer_controles(arrete=)` qui exécute les contrôles C03, C04 et C01 des exercices "
                 "précédents et ajoute une ligne par contrôle dans `work.journal_exercices` (date et heure "
-                "d'exécution, arrêté, contrôle, nombre d'anomalies). Lancez-la pour le 30/06/2026 et le "
-                "30/09/2026, puis exportez le journal en CSV dans `&SORTIE`.",
+                "d'exécution, arrêté, contrôle, nombre d'anomalies). Lancez-la pour les trois arrêtés "
+                "(31/03, 30/06 et 30/09/2026), puis exportez le journal en CSV dans `&SORTIE`.",
          indice="Dans une étape DATA, chaque `output;` écrit une ligne : trois `output;` = trois lignes. "
                 "`proc datasets … nowarn; delete …;` vide le journal au début sans avertissement.",
          attendu="select strftime(a, '%d/%m/%Y') as arrete, controle, nb_anomalies from ("

@@ -47,7 +47,9 @@ def _liste_anomalies(reg: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame({
         "Anomalie": reg["anomalie_id"], "Type": reg["type"], "Libellé": reg["libelle"], "Gravité": reg["gravite"],
         "Propriétaire": reg["proprietaire"], "Échéance": pd.to_datetime(reg["echeance"]).dt.strftime("%d/%m/%Y"),
-        "Statut": reg["statut"], "Action attendue": reg["action_attendue"]})
+        "Statut": reg["statut"], "Détectée le": pd.to_datetime(reg["date_detection"]).dt.strftime("%d/%m/%Y"),
+        "Clôturée le": pd.to_datetime(reg["date_cloture"]).dt.strftime("%d/%m/%Y").fillna(""),
+        "Action attendue": reg["action_attendue"]})
 
 
 def _compte(cle, bloc, titre, sel_liste, n, total, ton_si, aide, mieux="bas") -> Tuile:

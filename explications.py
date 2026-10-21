@@ -183,7 +183,8 @@ AIDE_COMPTEURS = {
     "ouvertes": "Problèmes détectés et pas encore réglés.",
     "haute": "Parmi les anomalies ouvertes, les plus graves.",
     "retard": "Anomalies dont la date limite de correction est dépassée.",
-    "cloturees": "Anomalies réglées : contrôle refait à temps et revenu au vert.",
+    "cloturees": "Anomalies réglées depuis la première campagne du registre : contrôle refait et revenu au vert "
+                 "(la date de clôture figure dans le registre).",
 }
 
 LEGENDE_DONNEES = (

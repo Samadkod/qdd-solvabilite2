@@ -1,7 +1,7 @@
 /* =====================================================================
    98 — VÉRIFICATION AUTOMATIQUE : SAS vs moteur Python de référence
-   À lancer après 99_executer.sas. Compare 43 valeurs (indicateurs des
-   2 campagnes, gouvernance, 11 étapes de la variation) à donnees_demo/
+   À lancer après 99_executer.sas. Compare 59 valeurs (indicateurs des
+   3 campagnes, gouvernance, 11 étapes de la variation) à donnees_demo/
    valeurs_attendues.csv, produit par le moteur Python testé.
    Résultat : table WORK.VERIFICATION + message dans le log.
    ===================================================================== */
@@ -19,6 +19,7 @@ run;
   proc append base=work._obtenu data=work._l force; run;
 %mend;
 proc datasets lib=work nolist; delete _obtenu; quit;
+%_long(N2);
 %_long(N1);
 %_long(N);
 data work._v; length campagne $10 indicateur $40; set QDD.variation;

@@ -212,6 +212,7 @@ run;
 %mend lancer_controles;
 
 proc datasets lib=work nolist nowarn; delete journal_exercices; quit;   /* NOWARN : pas d'avertissement au premier lancement */
+%lancer_controles(arrete=31MAR2026);
 %lancer_controles(arrete=30JUN2026);
 %lancer_controles(arrete=&ARRETE);
 

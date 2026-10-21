@@ -3,7 +3,7 @@
 Aucune donnée réelle : montants, volumes et anomalies sont simulés (graine fixe)
 pour illustrer la chaîne gestion -> entrepôt -> comptabilité -> actuariat.
 
-Deux arrêtés : 30/06/2026 (campagne N-1) et 30/09/2026 (campagne N).
+Trois arrêtés : 31/03/2026 (campagne N-2), 30/06/2026 (N-1) et 30/09/2026 (N).
 Anomalies injectées différemment selon l'arrêté pour rendre l'analyse de
 variation parlante (ex. incident de migration entrepôt sur les DO en N).
 
@@ -27,22 +27,26 @@ ACTIVITES = ["4120A", "4120B", "4211Z", "4221Z", "4299Z", "4311Z", "4312A", "432
              "4322A", "4322B", "4329A", "4331Z", "4332A", "4333Z", "4334Z", "4339Z",
              "4391A", "4391B", "4399A", "4399C"]  # codes NAF du BTP (nomenclature de référence)
 
-# Taux d'anomalies par arrêté : (N-1, N)
+# Taux d'anomalies par arrêté : (N-1, N, N-2). L'ordre suit l'indice de l'arrêté dans ARRETES.
 INJ = {
-    "dwh_contrat_manquant": {"RC_DECENNALE": (.002, .002), "DOMMAGES_OUVRAGE": (.004, .035), "AUTO_FLOTTE": (.001, .001)},
-    "dwh_prime_alteree": (.010, .012),
-    "prime_negative": (.003, .002),
-    "doublon_contrat": (.001, .001),
-    "activite_hors_nomenclature": (.020, .015),
-    "sinistre_orphelin": (.004, .003),
-    "provision_negative": (.002, .001),
-    "survenance_apres_declaration": (.006, .004),
-    "survenance_avant_effet": (.010, .009),
-    "dwh_provision_alteree": {"RC_DECENNALE": (.010, .060), "DOMMAGES_OUVRAGE": (.008, .008), "AUTO_FLOTTE": (.005, .004)},
-    "isin_manquant": (.010, .030),
-    "cic_incoherent": (.010, .010),
+    "dwh_contrat_manquant": {"RC_DECENNALE": (.002, .002, .002), "DOMMAGES_OUVRAGE": (.004, .035, .004), "AUTO_FLOTTE": (.001, .001, .001)},
+    "dwh_prime_alteree": (.010, .012, .010),
+    "prime_negative": (.003, .002, .003),
+    "doublon_contrat": (.001, .001, .001),
+    "activite_hors_nomenclature": (.020, .015, .022),
+    "sinistre_orphelin": (.004, .003, .004),
+    "provision_negative": (.002, .001, .002),
+    "survenance_apres_declaration": (.006, .004, .050),  # N-2 : défaut de saisie corrigé avant N-1
+    "survenance_avant_effet": (.010, .009, .010),
+    "dwh_provision_alteree": {"RC_DECENNALE": (.010, .060, .010), "DOMMAGES_OUVRAGE": (.008, .008, .008), "AUTO_FLOTTE": (.005, .004, .005)},
+    "isin_manquant": (.010, .030, .010),
+    "cic_incoherent": (.010, .010, .010),
 }
-ARRETES = {"2026-06-30": 0, "2026-09-30": 1}
+# Arrêté -> indice. L'indice fixe la graine (graine + indice) et la colonne de INJ : chaque arrêté a son
+# propre flux aléatoire. N-2 (mars 2026) a été ajouté après coup avec l'indice 2, en dernier, pour que
+# les données de N-1 et N restent identiques au bit près.
+ARRETES = {"2026-06-30": 0, "2026-09-30": 1, "2026-03-31": 2}
+RANG = {"2026-03-31": -1, "2026-06-30": 0, "2026-09-30": 1}  # position chronologique (croissance du portefeuille)
 
 
 def _cle_isin(corps: str) -> str:
@@ -70,7 +74,7 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
                               "modele_parametres", "placements_depositaire", "placements_compta"]}
     for arrete, i in ARRETES.items():
         rng = np.random.default_rng(graine + i)
-        croissance = 1 + 0.012 * i
+        croissance = 1 + 0.012 * RANG[arrete]
         for seg, (nc, pm, ns, provm) in SEGMENTS.items():
             n = int(nc * croissance)
             cid = [f"{seg[:2]}{k:06d}" for k in range(n)]
@@ -142,7 +146,8 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
                 "reglements_total": [round(ds["reglements_cumules"].sum(), 2)]}))
             tables["compta_reglements"].append(pd.DataFrame({
                 "arrete": [arrete], "segment": [seg],
-                "reglements": [round(gs["reglements_cumules"].sum() * rng.normal(1, 0.006), 2)]}))
+                "reglements": [round(gs["reglements_cumules"].sum() * rng.normal(1, 0.006)
+                                     * (0.97 if (i == 2 and seg == "RC_DECENNALE") else 1.0), 2)]}))  # N-2 : coupure comptable
             tx = {"RC_DECENNALE": .25, "DOMMAGES_OUVRAGE": .15, "AUTO_FLOTTE": .10}[seg]
             tables["reassurance_traites"].append(pd.DataFrame({"arrete": [arrete], "segment": [seg], "taux_cession": [tx]}))
             tables["modele_parametres"].append(pd.DataFrame({"arrete": [arrete], "segment": [seg],
@@ -163,7 +168,7 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
         bad = rng.random(k) < _taux("cic_incoherent", "", i)
         cic = np.where(bad, np.where(classe == "ACTIONS", "FR12", "FR31"), cic)
         vm = np.where(classe == "ACTIONS", rng.lognormal(np.log(6.5e5), .5, k), rng.lognormal(np.log(9.0e5), .4, k)).round(2)
-        vm = vm * (1 + 0.01 * i)
+        vm = vm * (1 + 0.01 * RANG[arrete])
         aid = [f"A{j:05d}" for j in range(k)]
         tables["placements_depositaire"].append(pd.DataFrame({"arrete": arrete, "actif_id": aid, "classe": classe,
                                                                "isin": isin, "cic": cic, "valeur_marche": vm}))
@@ -191,9 +196,11 @@ def _generer_qrt(tables: dict, graine: int) -> dict:
     pas la taxonomie EIOPA). Générés après le SI, avec un RNG distinct : les tables
     existantes et leurs résultats ne changent pas.
 
-    Les états sont exacts par construction, sauf UNE anomalie injectée en N : le BE
-    dommages-ouvrage de S.17.01 provient d'une version antérieure du calcul (écart d'environ
-    -3 % avec l'outil de provisionnement).
+    Les états sont exacts par construction, sauf deux anomalies injectées :
+      - en N, le BE dommages-ouvrage de S.17.01 provient d'une version antérieure du calcul
+        (écart d'environ -3 % avec l'outil de provisionnement) ;
+      - en N-2, les primes RC décennale de S.05.01 proviennent d'une extraction provisoire
+        (+1,5 % par rapport à la comptabilité), corrigée dès N-1.
     """
     cat = {k: pd.concat(v, ignore_index=True) for k, v in tables.items()}
     out = {k: [] for k in ["actuariat_be", "qrt_s0501", "qrt_s1701", "qrt_s1901_diagonale",
@@ -209,7 +216,7 @@ def _generer_qrt(tables: dict, graine: int) -> dict:
             be_qrt = be * (0.97 if (i == 1 and seg == "DOMMAGES_OUVRAGE") else 1.0)
             out["qrt_s1701"].append({"arrete": arrete, "segment": seg, "be_sinistres_brut": round(be_qrt, 2)})
             out["qrt_s0501"].append({"arrete": arrete, "segment": seg,
-                                     "primes_acquises_brutes": round(cp[seg], 2)})
+                                     "primes_acquises_brutes": round(cp[seg] * (1.015 if (i == 2 and seg == "RC_DECENNALE") else 1.0), 2)})
             # dernière diagonale du triangle de paiements cumulés, construite depuis l'entrepôt
             g = gs[gs.segment == seg].assign(annee_survenance=lambda x: pd.to_datetime(x.date_survenance).dt.year)
             g = g.merge(ds[["sinistre_id", "reglements_cumules"]].rename(columns={"reglements_cumules": "r_dwh"}),

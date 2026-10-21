@@ -771,7 +771,7 @@ function renderCampagne(keep){
   const ev = Q.evaluer(c.donnees, c.controles, cp); lastEv = ev;
   const I = ev.indicateurs;
   const prev = ci>0 ? Q.evaluer(DATA.campagnes[ci-1].donnees, DATA.campagnes[ci-1].controles, cp).indicateurs : null;
-  const delta = (k)=> prev ? `${I[k]-prev[k]>=0?"+":"−"}${(Math.abs(I[k]-prev[k])*100).toFixed(2).replace(".",",")} pt vs N-1` : "Première campagne";
+  const delta = (k)=> prev ? `${I[k]-prev[k]>=0?"+":"−"}${(Math.abs(I[k]-prev[k])*100).toFixed(2).replace(".",",")} pt vs ${DATA.campagnes[ci-1].campagne}` : "Première campagne";
   const tiles = [
     ["Note QDD agrégée", pct(I.note), delta("note"), false],
     ["Objectif (note min)", pct(I.note_min), `ΔSCR max ${pct(cp.dscr)} · S̄ ${pct(ev.S,1)}`, false],

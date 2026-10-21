@@ -304,7 +304,7 @@ def _chiffres(c: dict, var: pd.DataFrame | None) -> None:
     st.markdown(
         f"**{g['nb_anomalies_ouvertes']} anomalie(s) ouverte(s)**, dont **{g['nb_anomalies_haute']} grave(s)** "
         f"et **{g['nb_anomalies_en_retard']} dont l'échéance est dépassée**. "
-        f"Anomalies réglées depuis la campagne précédente : {g['nb_anomalies_cloturees']}.")
+        f"Anomalies réglées depuis l'ouverture du registre : {g['nb_anomalies_cloturees']}.")
     hautes = ouv[ouv["gravite"] == "Haute"]
     if not hautes.empty:
         st.markdown("Les plus graves, et qui doit agir :")

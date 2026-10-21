@@ -157,6 +157,25 @@ def maj_registre(registre: pd.DataFrame | None, campagne: str, date_arrete: str,
     return reg[COLONNES_REGISTRE].reset_index(drop=True)
 
 
+def cycle_de_vie(reg: pd.DataFrame, campagnes: list[tuple[str, str]]) -> pd.DataFrame:
+    """Une ligne par campagne : anomalies détectées, clôturées et restées ouvertes à son arrêté.
+
+    reg : registre tel qu'il est après la dernière campagne de la liste.
+    campagnes : [(nom, date_arrete), ...] dans l'ordre chronologique.
+    « Ouvertes en fin de campagne » est égal à nb_anomalies_ouvertes de chaque campagne.
+    """
+    det = pd.to_datetime(reg["date_detection"])
+    clo = pd.to_datetime(reg["date_cloture"])
+    lignes = []
+    for nom, date in campagnes:
+        d = pd.Timestamp(date)
+        lignes.append({"Campagne": nom, "Arrêté": d.strftime("%d/%m/%Y"),
+                       "Détectées": int((det == d).sum()),
+                       "Clôturées": int((clo == d).sum()),
+                       "Ouvertes en fin de campagne": int(((det <= d) & ~(clo <= d)).sum())})
+    return pd.DataFrame(lignes)
+
+
 def indicateurs_anomalies(reg: pd.DataFrame, date_arrete: str) -> dict:
     o = reg[reg["statut"].isin(["Ouverte", "Récurrente"])]
     d = pd.Timestamp(date_arrete)

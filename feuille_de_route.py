@@ -17,8 +17,9 @@ ELEMENTS = [
     dict(id="E5", statut="Plus tard", titre="Historique et tendances sur plusieurs trimestres",
          pourquoi="Montrer en comité l'évolution de la note, des contrôles conformes, des anomalies ouvertes et "
                   "clôturées, avec un tableau « détail par campagne » et la variation d'une campagne à l'autre.",
-         prerequis="Au moins 6 à 8 campagnes : générer des trimestres fictifs supplémentaires (modifie les données, "
-                   "décision du propriétaire) ; en entreprise, historiser les résultats à chaque campagne.",
+         prerequis="Au moins 6 à 8 campagnes (3 aujourd'hui) : générer des trimestres fictifs supplémentaires, sur "
+                   "le modèle de N-2 (un flux aléatoire par arrêté, données existantes inchangées) ; en entreprise, "
+                   "historiser les résultats à chaque campagne.",
          effort="Moyen"),
     dict(id="E6", statut="Plus tard", titre="Durées d'exécution des contrôles",
          pourquoi="Mission optimisation : repérer les traitements les plus longs, suivre leur durée dans le temps, "
@@ -32,15 +33,11 @@ ELEMENTS = [
                   "sensibilités mesurées (17,27 %), ce qui en fait la 3e donnée la plus lourde de la note.",
          prerequis="Choix de méthode à documenter dans la politique QDD, ou à remplacer par une mesure (par exemple "
                    "l'effet d'un décalage d'année de survenance sur le Best Estimate).", effort="Moyen"),
-    dict(id="E8", statut="Plus tard", titre="Montrer une anomalie qui se clôture",
-         pourquoi="Avec deux campagnes, aucune anomalie n'est encore clôturée : le cycle de vie complet du registre "
-                   "(ouverte, récurrente, clôturée) n'est pas visible.",
-         prerequis="Une troisième campagne fictive où un propriétaire corrige ses données (lié à E5).", effort="Moyen"),
     # ---------------------------------------------------------------- à vérifier
     dict(id="V1", statut="À vérifier", titre="Exécuter la chaîne SAS complète",
          pourquoi="Le SAS est écrit et vérifié statiquement, jamais exécuté.",
          prerequis="SAS OnDemand for Academics : lancer sas/99_executer.sas, lire le journal et WORK.VERIFICATION "
-                   "(43 valeurs comparées à la référence Python).",
+                   "(59 valeurs comparées à la référence Python).",
          effort="Moyen"),
     dict(id="V2", statut="À vérifier", titre="Exécuter les corrigés des exercices SAS",
          pourquoi="Les 13 corrigés passent le contrôle statique mais n'ont jamais tourné.",
@@ -74,6 +71,13 @@ ELEMENTS = [
                   "signalés par C07, 46 %) et laissait des déclarations après l'arrêté (182).",
          prerequis="Décision du propriétaire (octobre 2026). Après correction : 60 lignes C07 (1,2 %), aucune "
                    "déclaration après l'arrêté ; note N 97,45 % → 97,49 %, tous les compteurs inchangés.", effort="—"),
+    dict(id="F9", statut="Fait", titre="Cycle de vie complet du registre (campagne N-2)",
+         pourquoi="Avec deux campagnes, aucune anomalie n'était clôturée. La campagne fictive du 31/03/2026 ouvre "
+                  "13 anomalies ; N-1 en clôture 3 (dates de survenance C06, règlements R04 RC décennale, primes "
+                  "S.05.01 Q04 RC décennale). R04 RC décennale montre tout le parcours : ouverte, clôturée, puis "
+                  "rouverte en N sous le type « Contrôle non réalisé ».",
+         prerequis="Décision du propriétaire (octobre 2026). Données N-1 et N identiques au bit près ; note et "
+                   "compteurs de N inchangés.", effort="—"),
     dict(id="F5", statut="Fait", titre="ISIN fictifs à 12 caractères avec clé de contrôle valide",
          pourquoi="Le générateur produisait des codes à 13 caractères.", prerequis="—", effort="—"),
 ]

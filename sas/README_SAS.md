@@ -12,7 +12,7 @@ Même logique, mêmes noms, mêmes résultats attendus que la référence Python
 | `05_rapport.sas` | `%qdd_rapport` : classeur Excel (synthèse, variation, données, contrôles, axes, sensibilités, lignage, registre, dictionnaire, journal) |
 | `06_gouvernance.sas` | `%qdd_couverture`, `%qdd_registre` (cycle de vie des anomalies), `%qdd_journal` (piste d'audit) |
 | `07_export_qlik.sas` | `%qdd_export_qlik` : modèle en étoile CSV pour Qlik Sense (script `app/chargement_qdd.qvs`) |
-| `98_verifier.sas` | Compare 43 valeurs à `donnees_demo/valeurs_attendues.csv` (référence Python) |
+| `98_verifier.sas` | Compare 59 valeurs à `donnees_demo/valeurs_attendues.csv` (référence Python) |
 | `99_executer.sas` | Exécute tout, puis lance la vérification |
 
 ## Tester avant la prise de poste

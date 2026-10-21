@@ -23,7 +23,7 @@ def t():
                      "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"}),
                      "controles": ev.controles, "couverture": c.couverture, "registre": c.registre,
                      "journal": c.journal})
-    return {x.cle: x for x in tuiles(vues[-1], vues[0])}
+    return {x.cle: x for x in tuiles(vues[-1], vues[-2])}
 
 
 def test_valeurs_de_reference(t):
@@ -33,7 +33,7 @@ def test_valeurs_de_reference(t):
     assert t["hors_tol"].valeur == "2 sur 8"
     assert t["qrt_ko"].valeur == "1 sur 11"
     assert t["zones"].valeur == "8 sur 33"
-    assert (t["ouvertes"].valeur, t["haute"].valeur, t["retard"].valeur, t["cloturees"].valeur) == ("14", "4", "11", "0")
+    assert (t["ouvertes"].valeur, t["haute"].valeur, t["retard"].valeur, t["cloturees"].valeur) == ("14", "4", "11", "3")
     assert t["recurrentes"].valeur == "11"
     assert (t["ctrl_notes"].valeur, t["ctrl_retard"].valeur, t["ctrl_rouges"].valeur, t["ctrl_oranges"].valeur) == \
         ("28", "6", "4", "2")
