@@ -49,25 +49,25 @@ Recalcul et contrôle des formules Excel, si LibreOffice est disponible : ouvrir
 - Python ↔ JavaScript : `tests/parite_js.mjs` (lancé par pytest si Node est présent).
 - Python ↔ SQL : `sql/agregation_note_qdd.sql` (test `test_parite_sql_python`).
 - Python ↔ Excel : formules des onglets « Contrôles », « Données critiques », « Synthèse ».
-- Python ↔ SAS : régénérer `sas/donnees_demo/valeurs_attendues.csv` (43 valeurs) si un calcul ou une donnée change. `sas/98_verifier.sas` les compare à l'exécution SAS.
+- Python ↔ SAS : régénérer `sas/donnees_demo/valeurs_attendues.csv` (43 valeurs, `python scripts/valeurs_attendues.py`) si un calcul ou une donnée change. `sas/98_verifier.sas` les compare à l'exécution SAS.
 - Les tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire doivent rester reproduits (`tests/test_memoire.py`).
 
 ## Valeurs de référence (campagne N, 30/09/2026)
 | Indicateur | Valeur |
 |---|---|
-| Note QDD / objectif | 97,45 % / 97,10 % |
+| Note QDD / objectif | 97,49 % / 97,10 % |
 | Données critiques hors tolérance | 2 sur 8 |
 | Restitutions QRT conformes | 10 sur 11 |
 | Zones de risque couvertes | 25 sur 33 |
 | Anomalies ouvertes | 14, dont 4 de gravité haute |
 
 Si l'une de ces valeurs change, c'est une **régression**, sauf si le changement est voulu et documenté dans le commit.
+Historique : 97,45 % → 97,49 % (octobre 2026) après correction, validée par le propriétaire, des dates de sinistres fictives (survenance entre l'effet du contrat et l'arrêté, déclaration jamais après l'arrêté) ; seuls note, note avant dégradation, écart à l'objectif et étapes de variation ont bougé (17 valeurs attendues SAS sur 43).
 
 ## Ce qui n'est PAS vérifié
 - Exécution SAS : à faire sur SAS OnDemand ou en entreprise avec `99_executer.sas`, puis lire le log et `WORK.VERIFICATION`.
 - Script Qlik `app/chargement_qdd.qvs` et gabarit ODBC : jamais exécutés.
 - SCR : formule standard simplifiée, non réglementaire. Corrélations entre segments illustratives.
-- Données fictives, défaut connu : la date de survenance des sinistres est tirée sans tenir compte de la date d'effet du contrat (`generer_donnees_btp.py`), d'où ~46 % de lignes C07 (2 282 au 30/09/2026) au lieu de ~1 % visé. Sans effet sur les valeurs de référence (C07 non réalisé dans les campagnes de démo). Corriger le générateur modifie les sinistres (triangles, C06…) : décision du propriétaire.
 
 ## Conventions
 - Commits en français, au présent, avec un corps qui explique le pourquoi.

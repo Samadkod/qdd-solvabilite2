@@ -41,12 +41,7 @@ MESSAGES = {
     "Q04": "Les primes déclarées en S.05.01 doivent être celles de la comptabilité.",
 }
 # défauts connus des données fictives (pas du contrôle) : affichés tels quels avec un avertissement
-DEFAUTS_CONNUS = {
-    "C07": "Défaut connu des données fictives : le générateur tire la date de survenance des sinistres sans tenir "
-           "compte de la date d'effet du contrat, d'où environ un sinistre sur deux signalé. Le contrôle est juste ; "
-           "il n'est pas exécuté dans les campagnes de démonstration (il reprend son résultat de décembre 2025), "
-           "la note n'est donc pas touchée. Correction du générateur en attente de décision.",
-}
+DEFAUTS_CONNUS: dict[str, str] = {}  # vide depuis la correction des dates de sinistres (C07)
 FAMILLES = {"coherence": "Cohérence", "rapprochement": "Rapprochement", "restitution": "Restitution QRT"}
 FREQUENCES = {"T": "Trimestrielle", "S": "Semestrielle", "A": "Annuelle"}
 CRITERES = {"E": "Exhaustivité", "X": "Exactitude", "P": "Pertinence"}

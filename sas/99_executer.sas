@@ -38,8 +38,8 @@ proc datasets lib=QDD nolist; delete registre_anomalies journal_executions; quit
 %include "&RACINE./sas/98_verifier.sas";
 
 /* Repères (moteur Python, mêmes données) :
-   N-1 : note 98,76 % | objectif 97,10 %
-   N   : note 97,45 % | objectif 97,10 % | 2 données hors tolérance (provisions RC décennale rouge,
+   N-1 : note 98,79 % | objectif 97,10 %
+   N   : note 97,49 % | objectif 97,10 % | 2 données hors tolérance (provisions RC décennale rouge,
          date de survenance orange) | restitutions QRT conformes 10/11 (Q02 dommages-ouvrage en écart)
          | couverture des zones de risque 25/33 | 14 anomalies ouvertes dont 4 hautes
-   Variation : -0,72 pt QDD mesurée, -0,59 pt antériorité, -0,01 pt sensibilités */
+   Variation : -0,70 pt QDD mesurée, -0,59 pt antériorité, -0,01 pt sensibilités */

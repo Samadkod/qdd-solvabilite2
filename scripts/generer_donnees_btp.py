@@ -103,12 +103,24 @@ def generer(chemin: str | Path = "data/btp_fictif.duckdb", graine: int = 2026) -
             contrat = rng.choice(cid, m)
             orph = rng.random(m) < _taux("sinistre_orphelin", seg, i)
             contrat = np.where(orph, "INCONNU", contrat)
-            surv = pd.Timestamp("2016-06-01") + pd.to_timedelta(rng.integers(0, 3700, m), "D")
-            decl = surv + pd.to_timedelta(rng.integers(5, 400, m), "D")
-            inv = rng.random(m) < _taux("survenance_apres_declaration", seg, i)
-            surv = np.where(inv, decl + pd.to_timedelta(30, "D"), surv)
+            # Dates des sinistres (mêmes tirages aléatoires, dans le même ordre, que la version initiale : les autres
+            # données ne bougent pas). Règles de réalisme :
+            #   - survenance entre la date d'effet du contrat (ou le 01/06/2016 pour un contrat inconnu) et l'arrêté
+            #     moins 30 jours ; déclaration 5 à 400 jours plus tard, jamais après l'arrêté ;
+            #   - anomalies voulues seulement : ~0,5 % de déclarations enregistrées avant la survenance (C06),
+            #     ~1 % de survenances avant l'effet du contrat (C07, ci-dessous).
+            A = pd.Timestamp(arrete)
+            tirage = rng.integers(0, 3700, m)
             eff = gc.drop_duplicates("contrat_id").set_index("contrat_id")["date_effet"]
             eff_s = pd.Series(contrat).map(eff)
+            debut = pd.to_datetime(eff_s).fillna(pd.Timestamp("2016-06-01"))
+            fenetre = ((A - pd.Timedelta(days=30)) - debut).dt.days.clip(lower=1)
+            surv = pd.DatetimeIndex(debut + pd.to_timedelta(tirage % fenetre.values, "D"))
+            delai = pd.to_timedelta(rng.integers(5, 400, m), "D")
+            decl = pd.DatetimeIndex(np.minimum((surv + delai).values, A.to_datetime64()))
+            inv = rng.random(m) < _taux("survenance_apres_declaration", seg, i)
+            decl = pd.DatetimeIndex(np.where(inv, (surv - pd.Timedelta(days=30)).values, decl.values))
+            surv = surv.values
             avant = (rng.random(m) < _taux("survenance_avant_effet", seg, i)) & eff_s.notna().values
             surv = np.where(avant, (eff_s - pd.to_timedelta(60, "D")).values, surv)
             prov = rng.lognormal(np.log(provm), 1.0, m).round(2)

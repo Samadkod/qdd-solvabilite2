@@ -27,9 +27,9 @@ def t():
 
 
 def test_valeurs_de_reference(t):
-    assert t["note"].valeur == "97,45 %" and t["note"].ton == "vert"
+    assert t["note"].valeur == "97,49 %" and t["note"].ton == "vert"
     assert t["objectif"].valeur == "97,10 %"
-    assert t["variation"].valeur == "-1,31 pt" and t["variation"].ton == "rouge"
+    assert t["variation"].valeur == "-1,29 pt" and t["variation"].ton == "rouge"
     assert t["hors_tol"].valeur == "2 sur 8"
     assert t["qrt_ko"].valeur == "1 sur 11"
     assert t["zones"].valeur == "8 sur 33"

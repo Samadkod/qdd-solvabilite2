@@ -68,7 +68,7 @@ def test_sous_onglets_du_guide(guide):
 def test_guide_cite_les_valeurs_de_reference(guide):
     texte = " ".join(m.value for m in guide.markdown)
     # valeurs de référence de la campagne N (CLAUDE.md), reprises en direct du moteur
-    assert "La note globale est de 97,45 % pour un objectif de 97,10 %" in texte
+    assert "La note globale est de 97,49 % pour un objectif de 97,10 %" in texte
     assert "2 donnée(s) critique(s) sur 8" in " ".join(w.value for w in guide.warning)
     assert "10 vérification(s) conforme(s) sur 11" in texte
     assert "14 anomalie(s) ouverte(s)" in texte and "4 grave(s)" in texte

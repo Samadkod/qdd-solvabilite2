@@ -18,7 +18,7 @@ def test_resultats_attendus():
     r = ex.resultats_attendus()
     assert r["E01"]["nb_lignes"].tolist() == [6106, 6178]
     assert r["E02"]["nb_contrats"].iloc[0] == 3241
-    assert r["E03"]["nb_sinistres"].tolist() == [42, 4471, 444]
+    assert r["E03"]["nb_sinistres"].tolist() == [19, 4567, 371]
     assert r["E06"]["contrat_id"].tolist() == ["AU000277", "AU001019", "DO000609", "RC001015", "RC001317",
                                                "RC002279"]
     assert r["E07"]["nb_orphelins"].iloc[0] == 12

@@ -7,13 +7,6 @@ from __future__ import annotations
 import pandas as pd
 
 ELEMENTS = [
-    # ---------------------------------------------------------------- décisions
-    dict(id="D1", statut="En attente de décision", titre="Corriger la date de survenance dans les données fictives (C07)",
-         pourquoi="Le générateur tire la survenance sans tenir compte de la date d'effet du contrat : 2 282 sinistres "
-                  "(46 %) sont signalés par C07 au lieu d'environ 1 % visé.",
-         prerequis="Accord du propriétaire : la correction modifie les sinistres (triangles S.19.01, C06…) et peut "
-                   "changer des valeurs de référence. Chaque chiffre qui change sera montré avant de pousser.",
-         effort="Faible"),
     # ---------------------------------------------------------------- prévu plus tard
     dict(id="E4", statut="Plus tard", titre="Suivi de campagne étape par étape",
          pourquoi="Piloter une clôture : extraction, contrôles, calcul, validation, publication, avec pour chaque étape "
@@ -61,6 +54,11 @@ ELEMENTS = [
     dict(id="F4", statut="Fait", titre="Lignes en anomalie et catalogue des règles",
          pourquoi="Montrer quelles lignes sont fausses, avec un message en clair, et décrire chaque règle.",
          prerequis="—", effort="—"),
+    dict(id="F6", statut="Fait", titre="Dates de sinistres fictives réalistes (C07)",
+         pourquoi="Le générateur tirait la survenance sans tenir compte de la date d'effet du contrat (2 282 sinistres "
+                  "signalés par C07, 46 %) et laissait des déclarations après l'arrêté (182).",
+         prerequis="Décision du propriétaire (octobre 2026). Après correction : 60 lignes C07 (1,2 %), aucune "
+                   "déclaration après l'arrêté ; note N 97,45 % → 97,49 %, tous les compteurs inchangés.", effort="—"),
     dict(id="F5", statut="Fait", titre="ISIN fictifs à 12 caractères avec clé de contrôle valide",
          pourquoi="Le générateur produisait des codes à 13 caractères.", prerequis="—", effort="—"),
 ]
@@ -82,6 +80,8 @@ def afficher_feuille_de_route() -> None:
         col.metric(f"{ICONES[s]} {s}", int((df["statut"] == s).sum()))
     for s in ORDRE:
         st.markdown(f"#### {ICONES[s]} {s}")
+        if not any(x["statut"] == s for x in ELEMENTS):
+            st.caption("Aucun élément.")
         for e in [x for x in ELEMENTS if x["statut"] == s]:
             with st.container(border=True):
                 st.markdown(f"**{e['id']} · {e['titre']}**" + (f"  ·  effort : {e['effort']}" if e["effort"] != "—" else ""))

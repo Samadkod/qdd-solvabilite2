@@ -16,7 +16,7 @@ Tu reprends le projet qdd-s2 situé dans ce dossier. Commence par lire CLAUDE.md
    - Donne-moi l'URL du dépôt.
 
 3. **Préparer le déploiement Streamlit Community Cloud.**
-   - Vérifie que `streamlit_app.py` démarre en local (`streamlit run streamlit_app.py`) et que l'onglet « Campagne live » affiche une note de 97,45 %.
+   - Vérifie que `streamlit_app.py` démarre en local (`streamlit run streamlit_app.py`) et que l'onglet « Campagne live » affiche une note de 97,49 %.
    - Le déploiement final se fait sur share.streamlit.io : *Create app* → dépôt `Samadkod/qdd-solvabilite2`, branche `main`, fichier `streamlit_app.py`. Guide-moi pas à pas et ne prétends pas l'avoir fait toi-même.
 
 4. **Vérifier l'intégration continue.** Le workflow `.github/workflows/tests.yml` lance pytest et `scripts/lint_sas.py` à chaque push. Après le push, vérifie avec `gh run list` qu'il passe au vert. Sinon, corrige la cause et explique-la-moi.

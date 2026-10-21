@@ -55,15 +55,15 @@ def test_textes_campagne_n():
     c = _vue(camps[-1])
     ctrl = c["controles"]
     c06 = ctrl[ctrl["controle_id"] == "C06|TOUS"].iloc[0]
-    assert "**42 lignes en erreur sur 4957**" in texte_controle(c06, c["date"]) and "**99,00 %**" in texte_controle(c06, c["date"])
+    assert "**19 lignes en erreur sur 4957**" in texte_controle(c06, c["date"]) and "**99,74 %**" in texte_controle(c06, c["date"])
     c07 = ctrl[ctrl["controle_id"] == "C07|TOUS"].iloc[0]
     assert "n'a pas été refait" in texte_controle(c07, c["date"])
     r04 = ctrl[ctrl["controle_id"] == "R04|RC_DECENNALE"].iloc[0]
     assert texte_controle(r04, c["date"]).startswith("*Mesuré lors de la campagne du 30/06/2026")
     x = decortiquer_donnee(c, "date_survenance")
-    assert round(x["note"], 4) == 0.9635 and x["statut"] == "orange"
+    assert round(x["note"], 4) == 0.9671 and x["statut"] == "orange"
     lv = lire_variation(var)
-    assert "baisse de 1,31 point" in lv and "-0,72 point" in lv and "-0,59 point" in lv
+    assert "baisse de 1,29 point" in lv and "-0,70 point" in lv and "-0,59 point" in lv
     assert "Comment lire ce graphique" in lire_axe(c["axes"]["criteres"].rename(columns={"criteres": "modalite"}),
                                                    "criteres")
 

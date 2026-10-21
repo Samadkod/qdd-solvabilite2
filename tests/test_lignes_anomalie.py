@@ -27,7 +27,7 @@ def test_valeurs_campagne_n():
         pytest.skip("base fictive absente")
     lig = la.lignes(BASE, "2026-09-30")
     n = lig.groupby("controle")["poids"].sum().to_dict()
-    assert (n["C01"], n["C03"], n["C04"], n["C06"], n["C08"], n["C10"]) == (54, 6, 12, 42, 14, 89)
+    assert (n["C01"], n["C03"], n["C04"], n["C06"], n["C08"], n["C10"]) == (54, 6, 12, 19, 14, 89)
     g = la.regroupements(lig)
     assert g["Lignes en anomalie"].sum() == lig["poids"].sum()
 

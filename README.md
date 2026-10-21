@@ -45,7 +45,7 @@ streamlit run streamlit_app.py            # application
 ## Résultats de la campagne fictive N (30/09/2026)
 | Indicateur | Valeur |
 |---|---|
-| Note QDD agrégée / objectif | 97,45 % / 97,10 % |
+| Note QDD agrégée / objectif | 97,49 % / 97,10 % |
 | Données critiques hors tolérance | 2 sur 8 (provisions RC décennale rouge, date de survenance orange) |
 | Restitutions QRT conformes | 10 sur 11 (S.17.01 dommages-ouvrage : BE périmé, écart de 3,1 %) |
 | Zones de risque couvertes | 25 sur 33 (flux vers l'outil SCR F04, F09, F13 non contrôlés) |
