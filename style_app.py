@@ -61,8 +61,38 @@ h5{font-family:Spectral,serif; color:var(--qdd-accent); margin-top:.6rem !import
 .qdd-tag.or{background:var(--qdd-or-doux); color:var(--qdd-or);}
 .qdd-tag.gris{background:#E3E7EB; color:var(--qdd-gris);}
 
-/* barre latérale */
+/* barre latérale : menu */
 section[data-testid="stSidebar"] h2{font-family:Spectral,serif;}
+.qdd-marque{font-family:Spectral,serif; font-size:1.35rem; font-weight:600; color:var(--qdd-accent); margin:-.4rem 0 .6rem;}
+.qdd-marque span{display:block; font-family:"IBM Plex Sans",sans-serif; font-size:.78rem; font-weight:500;
+  color:var(--qdd-gris); letter-spacing:.02em;}
+.qdd-rubrique{font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--qdd-gris);
+  margin:1rem 0 .1rem .6rem; line-height:1.4;}
+section[data-testid="stSidebar"] [data-testid="stButton"] button{justify-content:flex-start !important; text-align:left;
+  padding:.35rem .7rem; min-height:2.2rem;}
+section[data-testid="stSidebar"] [data-testid="stButton"] button > div{justify-content:flex-start !important; width:100%;}
+section[data-testid="stSidebar"] [data-testid="stButton"] button p{font-size:.93rem; text-align:left;}
+
+/* panneau Actions : libellés sur plusieurs lignes plutôt que tronqués */
+[data-testid="stMain"] [data-testid="stButton"] button p, [data-testid="stMain"] [data-testid="stDownloadButton"] button p{
+  white-space:normal !important; overflow:visible !important; text-overflow:clip !important; text-align:left;}
+[data-testid="stMain"] [data-testid="stDownloadButton"] button > div,
+[data-testid="stMain"] [data-testid="stButton"] button > div{justify-content:flex-start;}
+
+/* en-têtes de page */
+.qdd-surtitre{font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.8;
+  margin-bottom:.25rem;}
+.qdd-entete{margin:0 0 1.2rem; padding-bottom:.8rem; border-bottom:1px solid var(--qdd-ligne);}
+.qdd-entete .qdd-surtitre{color:var(--qdd-gris);}
+.qdd-entete h1{font-family:Spectral,serif; font-weight:600; font-size:2rem; color:var(--qdd-encre); margin:0; padding:0;}
+.qdd-entete p{color:var(--qdd-gris); margin:.3rem 0 0;}
+
+/* tuiles de la synthèse */
+.qdd-tuile-titre{font-size:.9rem; font-weight:600; color:var(--qdd-gris); line-height:1.25;}
+.qdd-tuile-valeur{font-family:Spectral,serif; font-size:2rem; font-weight:600; line-height:1.1; margin:.1rem 0 .2rem;}
+.qdd-actions-titre{font-family:Spectral,serif; font-size:1.25rem; font-weight:600; color:var(--qdd-encre);
+  padding:.6rem 0 .4rem; border-bottom:1px solid var(--qdd-ligne); margin-bottom:.4rem;}
+h4{font-family:Spectral,serif !important; color:var(--qdd-encre); margin-top:.8rem !important;}
 </style>
 """
 
@@ -71,23 +101,32 @@ def appliquer_style() -> None:
     st.markdown(CSS, unsafe_allow_html=True)
 
 
-def bandeau() -> None:
+def bandeau(campagne: str, date) -> None:
     st.markdown(
-        """
+        f"""
 <div class="qdd-hero">
-  <h1>Atelier QDD Solvabilité 2</h1>
-  <p>Mesurer, expliquer et améliorer la qualité des données qui alimentent le SCR et les états réglementaires,
-  sur un assureur dommages BTP entièrement fictif.</p>
+  <div class="qdd-surtitre">Pilotage QDD · Synthèse</div>
+  <h1>Campagne {campagne} — arrêté du {date:%d/%m/%Y}</h1>
+  <p>Qualité des données qui alimentent le SCR et les états réglementaires d'un assureur dommages BTP fictif.
+  Chaque tuile se lit seule ; ↗ ouvre la liste qui la compose.</p>
   <div class="qdd-badges">
     <span class="qdd-badge">Données 100 % fictives</span>
     <span class="qdd-badge">Méthode C. Motard (ISFA / Grant Thornton, 2024), corrigée</span>
     <span class="qdd-badge">Python · SAS · SQL · Qlik Sense</span>
   </div>
 </div>
-<div class="qdd-pistes">
-  <div class="qdd-piste"><b>🧭 Comprendre</b><span>Guide terre à terre : le métier, les chiffres et le poste, sans jargon.</span></div>
-  <div class="qdd-piste"><b>🧪 Pratiquer</b><span>SAS pratique : 13 exercices progressifs, corrigés, avec le résultat attendu.</span></div>
-  <div class="qdd-piste"><b>⚙️ Analyser</b><span>Campagne live : le calcul tourne en direct, paramètres à gauche.</span></div>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+def entete_page(rubrique: str, titre: str, description: str, contexte: str) -> None:
+    st.markdown(
+        f"""
+<div class="qdd-entete">
+  <div class="qdd-surtitre">{rubrique} · {contexte}</div>
+  <h1>{titre}</h1>
+  <p>{description}</p>
 </div>
 """,
         unsafe_allow_html=True,

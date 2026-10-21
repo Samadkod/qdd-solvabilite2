@@ -1,4 +1,4 @@
-"""Application Streamlit : démarrage sans erreur et guide « terre à terre » alimenté par la campagne N."""
+"""Application Streamlit : chaque page démarre sans erreur, et les pages expliquées citent les valeurs de référence."""
 from pathlib import Path
 
 import pytest
@@ -7,26 +7,52 @@ pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest
 
 APP = Path(__file__).resolve().parents[1] / "streamlit_app.py"
+PAGES = ["synthese", "donnees", "controles", "anomalies", "lignage", "comprendre", "guide", "sas", "atelier", "code"]
+
+
+def ouvrir(page: str) -> AppTest:
+    at = AppTest.from_file(str(APP), default_timeout=300)
+    at.session_state["page"] = page
+    return at.run()
 
 
 @pytest.fixture(scope="module")
-def app():
-    return AppTest.from_file(str(APP), default_timeout=300).run()
+def guide():
+    return ouvrir("guide")
 
 
-def test_application_demarre_sans_erreur(app):
-    assert not app.exception
-    onglets = [t.label for t in app.tabs]
-    principaux = ["🧭 Guide terre à terre", "🧪 SAS pratique", "📚 Atelier (révision)", "⚙️ Campagne live",
-                  "🗂️ Gouvernance", "🧾 Code SAS / SQL"]
-    assert [o for o in onglets if o in principaux] == principaux
-    for sous in ("L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair", "Se former", "Calendrier",
-                 "Glossaire"):
+@pytest.mark.parametrize("page", PAGES)
+def test_chaque_page_demarre_sans_erreur(page):
+    at = ouvrir(page)
+    assert not at.exception, page
+    # le menu propose toutes les pages, la page ouverte est mise en avant
+    menu = {b.key: b for b in at.sidebar.button}
+    assert all(f"menu_{p}" in menu for p in PAGES)
+    assert menu[f"menu_{page}"].proto.type == "primary"
+
+
+def test_menu_change_de_page():
+    at = ouvrir("synthese")
+    at.sidebar.button(key="menu_anomalies").click().run()
+    assert at.session_state["page"] == "anomalies" and not at.exception
+    assert any("anomalie(s) affichée(s)" in c.value for c in at.caption)
+
+
+def test_action_ouvre_les_controles_filtres():
+    at = ouvrir("synthese")
+    next(b for b in at.button if b.key and b.key.startswith("action_controles_Voir les contrôles en rouge")).click().run()
+    assert at.session_state["page"] == "controles" and not at.exception
+    assert any(c.value.startswith("4 point(s) de contrôle affiché(s)") for c in at.caption)
+
+
+def test_sous_onglets_du_guide(guide):
+    onglets = [t.label for t in guide.tabs]
+    for sous in ("L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
+                 "Se former", "Calendrier", "Glossaire"):
         assert sous in onglets
 
 
-def test_guide_cite_les_valeurs_de_reference(app):
-    guide = app.tabs[0]
+def test_guide_cite_les_valeurs_de_reference(guide):
     texte = " ".join(m.value for m in guide.markdown)
     # valeurs de référence de la campagne N (CLAUDE.md), reprises en direct du moteur
     assert "La note globale est de 97,45 % pour un objectif de 97,10 %" in texte
@@ -39,7 +65,7 @@ def test_guide_cite_les_valeurs_de_reference(app):
         assert f"**{flux}**" in texte
 
 
-def test_calendrier_suit_la_date_de_prise_de_poste(app):
-    texte = " ".join(i.value for i in app.tabs[0].info)
+def test_calendrier_suit_la_date_de_prise_de_poste(guide):
+    texte = " ".join(i.value for i in guide.info)
     # clôture annuelle 31/12/2026 : QRT trimestriels à 5 semaines, annuels à 14 semaines
     assert "**31/12/2026**" in texte and "**04/02/2027**" in texte and "**08/04/2027**" in texte

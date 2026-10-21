@@ -1,11 +1,11 @@
 """Atelier QDD Solvabilité 2 — application Streamlit.
 
-Onglets :
-  0. Guide terre à terre : le dispositif expliqué sans jargon, chiffres de la campagne en direct
-  0 bis. SAS pratique : exercices progressifs corrigés, résultats attendus recalculés sur les CSV de démo
-  1. Atelier : fiches, QCM, vrai/faux, simulateur, avis critique, plan 90 jours (HTML autonome)
-  2. Campagne live : le moteur Python tourne en direct sur le SI fictif, paramètres modifiables
-  3. Code SAS / SQL : la version production (PROC SQL) et la bibliothèque de contrôles
+Navigation par menu latéral, en quatre rubriques :
+  Pilotage QDD : Synthèse (tuiles cliquables + actions), Note & données, Contrôles, Anomalies, Lignage & dictionnaire
+  Comprendre   : D'où sortent les chiffres, Guide terre à terre
+  Se former    : SAS pratique, Atelier (révision)
+  Technique    : Code SAS / SQL
+Le moteur Python tourne en direct sur le SI fictif ; la campagne et les paramètres se choisissent dans le menu.
 Données 100 % fictives (assureur dommages BTP simulé).
 """
 from __future__ import annotations
@@ -21,10 +21,11 @@ from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.rapport_excel import ecrire_rapport
 from exercices_sas import afficher_exercices
-from explications import (AIDE_COMPTEURS as AIDE, ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES,
+from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
                           lire_axe, lire_variation)
 from guide_terrain import afficher_guide
-from style_app import appliquer_style, bandeau
+from style_app import appliquer_style, bandeau, entete_page
+from synthese import afficher_synthese
 from scripts.generer_donnees_btp import generer
 
 RACINE = Path(__file__).parent
@@ -71,77 +72,88 @@ def pct(x, d=2):
 COULEUR = {"vert": "background-color:#DCF1E4;color:#22744A", "orange": "background-color:#FBEBCB;color:#9C6400",
            "rouge": "background-color:#F8DEDE;color:#AD3030;font-weight:600"}
 
+# page -> (rubrique, titre, icône, description)
+PAGES = {
+    "synthese": ("Pilotage QDD", "Synthèse", "📊", "Tout l'état de la campagne en un écran. Cliquez sur ↗ pour le détail."),
+    "donnees": ("Pilotage QDD", "Note & données", "🎯", "La note de chaque donnée, pourquoi elle a bougé et où sont les écarts."),
+    "controles": ("Pilotage QDD", "Contrôles", "🔍", "Chaque point de contrôle : résultat, retard, seuil et statut."),
+    "anomalies": ("Pilotage QDD", "Anomalies", "🚩", "Le registre : qui doit corriger quoi, pour quand."),
+    "lignage": ("Pilotage QDD", "Lignage & dictionnaire", "🗂️",
+                "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
+    "comprendre": ("Comprendre", "D'où sortent les chiffres", "🔎", "Le calcul pas à pas, sur les vrais chiffres."),
+    "guide": ("Comprendre", "Guide terre à terre", "🧭", "Le métier, les chiffres et le poste, sans jargon."),
+    "sas": ("Se former", "SAS pratique", "🧪", "13 exercices progressifs, corrigés, avec le résultat attendu."),
+    "atelier": ("Se former", "Atelier (révision)", "📚", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
+    "code": ("Technique", "Code SAS / SQL", "🧾", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
+}
+
+if "page" not in st.session_state:
+    demandee = st.query_params.get("page", "synthese")
+    st.session_state["page"] = demandee if demandee in PAGES else "synthese"
+
+
+def aller(page: str, **etat) -> None:
+    """Change de page (depuis un bouton d'action) en préparant éventuellement des filtres."""
+    st.session_state.update(etat)
+    st.session_state["page"] = page
+    st.rerun()
+
+
+def _choisir(page: str) -> None:
+    st.session_state["page"] = page
+
+
 appliquer_style()
-bandeau()
 
-t0, t5, t1, t2, t4, t3 = st.tabs(["🧭 Guide terre à terre", "🧪 SAS pratique", "📚 Atelier (révision)",
-                                   "⚙️ Campagne live", "🗂️ Gouvernance", "🧾 Code SAS / SQL"])
-
-# ---------------------------------------------------------------- SAS pratique
-with t5:
-    afficher_exercices()
-
-# ---------------------------------------------------------------- Atelier
-with t1:
-    html = (RACINE / "app" / "atelier_qdd_s2.html").read_text(encoding="utf-8")
-    page = ('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
-            '<meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<style>[hidden]{display:none!important}</style></head><body>' + html + "</body></html>")
-    st.iframe(page, height=1500)
-
-# ---------------------------------------------------------------- Campagne live
-with t2:
-    with st.sidebar:
-        st.header("Paramètres de la méthode")
-        st.caption("Ils s'appliquent au *Guide* et à la *Campagne live*. Les valeurs par défaut redonnent "
-                   "les chiffres de référence.")
+# ---------------------------------------------------------------- menu latéral
+with st.sidebar:
+    st.markdown('<div class="qdd-marque">🛡️ Atelier QDD<span>Solvabilité 2 · données fictives</span></div>',
+                unsafe_allow_html=True)
+    rubrique = None
+    for cle, (rub, titre, icone, _) in PAGES.items():
+        if rub != rubrique:
+            st.markdown(f'<div class="qdd-rubrique">{rub}</div>', unsafe_allow_html=True)
+            rubrique = rub
+        st.button(f"{icone}  {titre}", key=f"menu_{cle}", on_click=_choisir, args=(cle,), width="stretch",
+                  type="primary" if st.session_state["page"] == cle else "tertiary")
+    st.divider()
+    with st.expander("⚙️ Paramètres de la méthode"):
+        st.caption("Les valeurs par défaut redonnent les chiffres de référence.")
         seuil = st.number_input("Seuil de significativité (%)", 0.1, 20.0, 1.0, 0.1) / 100
         dscr = st.number_input("ΔSCR max par donnée (%)", 0.0, 20.0, 0.5, 0.05) / 100
         coef = st.number_input("Coefficient de dégradation (%)", 0.0, 100.0, 5.0, 1.0) / 100
-        degradation = st.radio("Dégradation", ["simple", "composee"], format_func={"simple": "Simple", "composee": "Composée"}.get, horizontal=True)
+        degradation = st.radio("Dégradation", ["simple", "composee"],
+                               format_func={"simple": "Simple", "composee": "Composée"}.get, horizontal=True)
         ecart = st.radio("Écart de rapprochement", ["memoire", "symetrique"],
                          format_func={"memoire": "Mémoire (max/min − 1)", "symetrique": "Symétrique borné"}.get)
         montant = st.toggle("Ratio d'anomalies pondéré en montant", value=True)
         st.caption("Contrôle de cohérence (éq. 12) : ΔSCR max doit rester sous le seuil.")
 
-    if dscr >= seuil:
-        st.error(f"Paramètres incohérents : ΔSCR max ({pct(dscr)}) doit être inférieur au seuil de significativité ({pct(seuil)}) — éq. 12.")
-        st.stop()
+page = st.session_state["page"]
+st.query_params["page"] = page
 
-    camps, var, xlsx = campagnes(seuil, dscr, coef, degradation, ecart, montant)
-    noms = [f"{c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}" for c in camps]
-    choix = st.segmented_control("Campagne", noms, default=noms[-1]) or noms[-1]
-    k = noms.index(choix)
-    c, prev = camps[k], camps[k - 1] if k > 0 else None
-    I = c["ind"]
+if dscr >= seuil:
+    st.error(f"Paramètres incohérents : ΔSCR max ({pct(dscr)}) doit être inférieur au seuil de significativité "
+             f"({pct(seuil)}) — éq. 12.")
+    st.stop()
 
-    g = c["gouv"]
-    st.markdown("##### La note")
-    m = st.columns(4)
-    m[0].metric("Note QDD agrégée", pct(I["note"]),
-                None if prev is None else f"{(I['note'] - prev['ind']['note']) * 100:+.2f} pt".replace(".", ","),
-                help=AIDE["note"])
-    m[1].metric("Objectif (note min)", pct(I["note_min"]), help=AIDE["objectif"])
-    m[2].metric("Écart à l'objectif", pct(I["ecart_objectif"]), help=AIDE["ecart"])
-    m[3].metric("Données hors tolérance", f"{I['nb_donnees_hors_tolerance']} / {I['nb_donnees_critiques']}",
-                help=AIDE["hors_tol"])
-    st.markdown("##### Les contrôles")
-    m = st.columns(4)
-    m[0].metric("Contrôles à jour", pct(I["taux_validation"], 0), help=AIDE["a_jour"])
-    m[1].metric("Contrôles conformes", pct(I["taux_conformite_controles"], 0), help=AIDE["conformes"])
-    m[2].metric("Restitutions QRT conformes", pct(I["taux_conformite_restitutions"], 0), help=AIDE["qrt"])
-    m[3].metric("Zones de risque couvertes", pct(g["taux_couverture_zones_risque"], 0),
-                help=AIDE["zones"] + " Flux sans contrôle : " + ", ".join(g["flux_non_couverts"]) + ".")
-    st.markdown("##### Les anomalies")
-    m = st.columns(4)
-    m[0].metric("Anomalies ouvertes", g["nb_anomalies_ouvertes"], help=AIDE["ouvertes"])
-    m[1].metric("dont gravité haute", g["nb_anomalies_haute"], help=AIDE["haute"])
-    m[2].metric("dont échéance dépassée", g["nb_anomalies_en_retard"], help=AIDE["retard"])
-    m[3].metric("Anomalies clôturées", g["nb_anomalies_cloturees"], help=AIDE["cloturees"])
-    st.caption("Survolez le **?** d'un compteur pour savoir ce qu'il mesure. Le calcul pas à pas est dans "
-               "*Guide terre à terre → D'où sortent les chiffres*.")
+camps, var, xlsx = campagnes(seuil, dscr, coef, degradation, ecart, montant)
+noms = [f"{c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}" for c in camps]
+with st.sidebar:
+    choix = st.segmented_control("Campagne affichée", noms, default=noms[-1], key="campagne") or noms[-1]
+k = noms.index(choix)
+c, prev = camps[k], camps[k - 1] if k > 0 else None
 
-    st.subheader("Données")
+rub, titre, icone, description = PAGES[page]
+if page == "synthese":
+    bandeau(c["campagne"], pd.Timestamp(c["date"]))
+else:
+    entete_page(rub, f"{icone} {titre}", description, f"Campagne {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}")
+
+
+# ================================================================ pages
+def page_donnees() -> None:
+    st.subheader("Les données et leur note")
     d = c["donnees"][["libelle", "donnee_id", "proprietaire", "sensibilite", "critique", "note", "note_min",
                       "statut", "criteres_couverts", "nb_controles"]].sort_values(
         ["critique", "sensibilite"], ascending=False)
@@ -163,7 +175,8 @@ with t2:
     v["points"] = v["impact"] * 100
     v["sens"] = v["points"].map(lambda x: "Hausse" if x >= 0 else "Baisse")
     v["texte"] = v["points"].map(lambda x: f"{x:+.2f} pt".replace(".", ","))
-    base = alt.Chart(v).encode(y=alt.Y("cause:N", sort=v.reindex(v["points"].abs().sort_values(ascending=False).index)["cause"].tolist(), title=None,
+    ordre = v.reindex(v["points"].abs().sort_values(ascending=False).index)["cause"].tolist()
+    base = alt.Chart(v).encode(y=alt.Y("cause:N", sort=ordre, title=None,
                                        axis=alt.Axis(labelLimit=320, labelFontSize=13, labelOverlap=False),
                                        scale=alt.Scale(paddingInner=0.35)))
     barres = base.mark_bar(cornerRadius=4).encode(
@@ -206,21 +219,6 @@ with t2:
     st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(40)), width="stretch")
     st.info(lire_axe(a, axe), icon="📖")
 
-    st.subheader("Points de contrôle")
-    f = st.pills("Filtre", ["rouge", "orange", "vert", "en retard"], selection_mode="multi")
-    ctrl = c["controles"]
-    if f:
-        mask = ctrl["statut"].isin([x for x in f if x != "en retard"])
-        if "en retard" in f:
-            mask |= ctrl["anteriorite"] > 0
-        ctrl = ctrl[mask]
-    cols = ["controle_id", "libelle", "donnee_id", "etape", "responsable", "resultat_brut", "anteriorite",
-            "resultat", "seuil", "statut", "detail"]
-    st.dataframe(ctrl[cols].style.format({"resultat_brut": pct, "resultat": pct, "seuil": pct})
-                 .map(lambda v: COULEUR.get(v, ""), subset=["statut"]),
-                 hide_index=True, width="stretch")
-    st.caption(LEGENDE_CONTROLES)
-
     with st.expander("Sensibilités du SCR et test de linéarité"):
         s = c["sens"]
         st.dataframe(s.style.format({col: pct for col in s.columns if col.startswith("s") or col == "non_linearite"}),
@@ -232,19 +230,45 @@ with t2:
             "Les colonnes *s_choc_…* refont le calcul avec d'autres chocs (−15 %, +5 %, +30 %) : si elles restent "
             "proches, la sensibilité est fiable (*lineaire* = vrai). Au-delà de 10 % d'écart (*non_linearite*), "
             "il faut la manier avec prudence.")
-
-    st.download_button("⬇️ Rapport Excel de la campagne N", xlsx, file_name="rapport_qdd.xlsx",
+    st.download_button("⬇️ Rapport Excel de la campagne", xlsx, file_name="rapport_qdd.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-# ---------------------------------------------------------------- Code
-with t4:
-    st.markdown("**Ce que l'offre appelle le dispositif** : dictionnaire, lignage, contrôles, suivi des anomalies, "
-                "piste d'audit. Valeurs de la campagne sélectionnée dans l'onglet *Campagne live*.")
-    st.subheader("Registre des anomalies")
+
+def page_controles() -> None:
+    f = st.pills("Filtrer", ["rouge", "orange", "vert", "en retard"], selection_mode="multi", key="filtre_controles")
+    ctrl = c["controles"]
+    if f:
+        mask = ctrl["statut"].isin([x for x in f if x != "en retard"])
+        if "en retard" in f:
+            mask |= ctrl["anteriorite"] > 0
+        ctrl = ctrl[mask]
+    st.caption(f"{len(ctrl)} point(s) de contrôle affiché(s) sur {len(c['controles'])}.")
+    cols = ["controle_id", "libelle", "donnee_id", "etape", "responsable", "resultat_brut", "anteriorite",
+            "resultat", "seuil", "statut", "detail"]
+    st.dataframe(ctrl[cols].style.format({"resultat_brut": pct, "resultat": pct, "seuil": pct})
+                 .map(lambda v: COULEUR.get(v, ""), subset=["statut"]),
+                 hide_index=True, width="stretch")
+    st.caption(LEGENDE_CONTROLES)
+
+
+def page_anomalies() -> None:
     reg = c["registre"]
-    st.dataframe(reg.style.map(lambda v: {"Récurrente": COULEUR["rouge"], "Ouverte": COULEUR["orange"],
+    f1, f2 = st.columns(2)
+    statuts = f1.multiselect("Statut", ["Ouverte", "Récurrente", "Clôturée"], default=["Ouverte", "Récurrente"])
+    gravites = f2.multiselect("Gravité", sorted(reg["gravite"].dropna().unique()), placeholder="Toutes")
+    vue = reg[reg["statut"].isin(statuts)] if statuts else reg
+    if gravites:
+        vue = vue[vue["gravite"].isin(gravites)]
+    st.caption(f"{len(vue)} anomalie(s) affichée(s) sur {len(reg)}. « Récurrente » : déjà présente à la campagne "
+               "précédente. Une anomalie se clôture quand le contrôle est refait à temps et revient au vert.")
+    st.dataframe(vue.style.map(lambda v: {"Récurrente": COULEUR["rouge"], "Ouverte": COULEUR["orange"],
                                           "Clôturée": COULEUR["vert"]}.get(v, ""), subset=["statut"]),
                  hide_index=True, width="stretch")
+    st.download_button("⬇️ Exporter ces anomalies (CSV)", vue.to_csv(index=False, sep=";").encode("utf-8-sig"),
+                       file_name=f"anomalies_{c['campagne']}.csv", mime="text/csv")
+
+
+def page_lignage() -> None:
     st.subheader("Lignage et couverture des zones de risque")
     cv = c["couverture"]
     seul = st.toggle("Seulement les zones de risque non couvertes (données critiques)", value=True)
@@ -258,11 +282,16 @@ with t4:
     st.subheader("Journal d'exécution (piste d'audit)")
     st.json(c["journal"], expanded=False)
 
-# ---------------------------------------------------------------- Guide (après Campagne live : utilise la campagne choisie)
-with t0:
-    afficher_guide(c, var)
 
-with t3:
+def page_atelier() -> None:
+    html = (RACINE / "app" / "atelier_qdd_s2.html").read_text(encoding="utf-8")
+    page_html = ('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
+                 '<meta name="viewport" content="width=device-width,initial-scale=1">'
+                 '<style>[hidden]{display:none!important}</style></head><body>' + html + "</body></html>")
+    st.iframe(page_html, height=1500)
+
+
+def page_code() -> None:
     st.markdown("**La version production est en SAS / PROC SQL.** Le Python sert de référence testée ; "
                 "le SAS reprend les mêmes formules (voir `sas/README_SAS.md`).")
     sas = sorted((RACINE / "sas").glob("*.sas")) + [RACINE / "app" / "chargement_qdd.qvs"]
@@ -272,3 +301,17 @@ with t3:
     sql = sorted((RACINE / "sql" / "controles").glob("*.sql"))
     q = st.selectbox("Contrôle SQL (ANSI, testé sur DuckDB)", sql, format_func=lambda p: p.stem)
     st.code(q.read_text(encoding="utf-8"), language="sql")
+
+
+{
+    "synthese": lambda: afficher_synthese(c, prev, xlsx, aller),
+    "donnees": page_donnees,
+    "controles": page_controles,
+    "anomalies": page_anomalies,
+    "lignage": page_lignage,
+    "comprendre": lambda: afficher_d_ou_sortent(c),
+    "guide": lambda: afficher_guide(c, var),
+    "sas": afficher_exercices,
+    "atelier": page_atelier,
+    "code": page_code,
+}[page]()
