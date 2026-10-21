@@ -229,9 +229,14 @@ def afficher_d_ou_sortent(c: dict) -> None:
     cs = x["controles"]
 
     st.subheader("Étape 1 — Ce que chaque contrôle a trouvé")
+    if cs["controle"].duplicated().any():
+        st.caption("Un même contrôle peut apparaître plusieurs fois : il est mesuré séparément pour chaque segment "
+                   "(ou classe d'actifs), et chaque mesure compte dans la note de la donnée.")
     for r in cs.itertuples():
         with st.container(border=True):
-            st.markdown(f"**{r.controle_id.split('|')[0]} · {r.libelle}**")
+            maille = r.controle_id.split("|")[1] if "|" in r.controle_id else "TOUS"
+            suffixe = "" if maille == "TOUS" else f" — {MODALITES.get(maille, maille)}"
+            st.markdown(f"**{r.controle_id.split('|')[0]} · {r.libelle}{suffixe}**")
             st.markdown(texte_controle(r, c["date"]))
 
     st.subheader("Étape 2 — La pénalité de retard")
@@ -270,12 +275,14 @@ def afficher_d_ou_sortent(c: dict) -> None:
         poids = (f"- **Le poids de la donnée (sa sensibilité).** On augmente artificiellement la donnée de "
                  f"{p(CHOC, 0)} et on regarde de combien le SCR bouge. Ici, le SCR ({m(x['scr'])}) bouge de "
                  f"{p(s * CHOC)} (≈ {m(x['scr'] * s * CHOC)}). Sensibilité = {p(s * CHOC)} ÷ {p(CHOC, 0)} = "
-                 f"**{p(s, 1)}**.\n")
+                 f"**{p(s, 2)}**.\n")
     st.markdown(
         poids +
         f"- **L'erreur tolérée.** On accepte qu'une donnée fausse le SCR d'au plus **{p(par.delta_scr_max)}**. "
-        f"Pour cette donnée, cela fait une erreur maximale de {p(par.delta_scr_max)} ÷ {p(s, 1)} = "
-        f"{p(par.delta_scr_max / s)}.\n"
+        f"Une sensibilité de {p(s, 2)} veut dire : si la donnée est fausse de 10 %, le SCR est faux de "
+        f"{p(s, 2)} × 10 % = {p(s * 0.10, 3)}. Pour ne pas dépasser {p(par.delta_scr_max)} d'erreur sur le SCR, "
+        f"la donnée peut donc être fausse d'au plus {p(par.delta_scr_max)} ÷ {p(s, 2)} = "
+        f"**{p(par.delta_scr_max / s)}**.\n"
         f"- **Note minimum** = 100 % − {p(par.delta_scr_max / s)} = **{p(x['note_min'])}**.")
     st.caption("Conséquence : une donnée qui pèse lourd doit être presque parfaite ; une donnée qui pèse peu "
                "peut se permettre plus d'erreurs.")
