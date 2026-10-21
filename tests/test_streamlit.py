@@ -7,7 +7,7 @@ pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest
 
 APP = Path(__file__).resolve().parents[1] / "streamlit_app.py"
-PAGES = ["synthese", "donnees", "controles", "anomalies", "lignage", "comprendre", "guide", "sas", "atelier", "code"]
+PAGES = ["synthese", "donnees", "controles", "anomalies", "lignes", "regles", "lignage", "comprendre", "guide", "sas", "atelier", "code"]
 
 
 def ouvrir(page: str) -> AppTest:

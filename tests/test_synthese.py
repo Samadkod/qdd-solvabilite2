@@ -21,7 +21,8 @@ def t():
         ev = c.evaluation
         vues.append({"campagne": c.campagne, "date": c.date_arrete, "ind": ev.indicateurs, "gouv": c.gouvernance,
                      "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"}),
-                     "controles": ev.controles, "couverture": c.couverture, "registre": c.registre})
+                     "controles": ev.controles, "couverture": c.couverture, "registre": c.registre,
+                     "journal": c.journal})
     return {x.cle: x for x in tuiles(vues[-1], vues[0])}
 
 
@@ -40,8 +41,13 @@ def test_valeurs_de_reference(t):
 
 def test_chaque_liste_correspond_a_sa_tuile(t):
     for x in t.values():
-        if x.liste is not None:
+        if x.liste is not None and x.nombre is not None:
             assert len(x.liste) == x.nombre, x.cle
             assert x.valeur.split()[0] == str(x.nombre), x.cle
     assert set(t["hors_tol"].liste["Donnée"]) == {"Provisions sinistres RC décennale", "Date de survenance des sinistres"}
     assert set(t["zones"].liste["Flux"]) == {"F04", "F05", "F06", "F09", "F13"}
+
+
+def test_bloc_exploitation(t):
+    assert t["non_executes"].valeur == "4 sur 20" and t["non_executes"].ton == "orange"
+    assert set(t["non_executes"].liste["Contrôle"]) == {"C07", "C08", "R04", "R05"}

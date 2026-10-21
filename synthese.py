@@ -40,7 +40,7 @@ def _liste_anomalies(reg: pd.DataFrame) -> pd.DataFrame:
         "Statut": reg["statut"], "Action attendue": reg["action_attendue"]})
 
 
-def tuiles(c: dict, prev: dict | None) -> list[Tuile]:
+def tuiles(c: dict, prev: dict | None, df_lignes: pd.DataFrame | None = None) -> list[Tuile]:
     I, g, d, ctrl, reg = c["ind"], c["gouv"], c["donnees"], c["controles"], c["registre"]
     out: list[Tuile] = []
 
@@ -112,11 +112,48 @@ def tuiles(c: dict, prev: dict | None) -> list[Tuile]:
         if cle == "cloturees" and n == 0:
             ton = "gris"
         out.append(Tuile(cle, "Les anomalies", titre, str(n), ton, aide, _liste_anomalies(sel), n))
+
+    # ---------------------------------------------------------------- l'exploitation (dernier passage du traitement)
+    j = c.get("journal")
+    if j:
+        h = pd.Timestamp(j["horodatage"])
+        out.append(Tuile("execution", "L'exploitation", f"Dernière exécution (à {h:%H:%M})", f"{h:%d/%m/%Y}", "gris",
+                         f"Date du dernier calcul de la campagne (version du code {j['version_code']}). "
+                         "Le journal complet est dans « Lignage & dictionnaire »."))
+        from lignes_anomalie import MESSAGES, referentiel
+        ref = referentiel()
+        code = ctrl["controle_id"].str.split("|").str[0]
+        faits = set(code[ctrl["realise_campagne"]])
+        non_faits = ref[~ref["controle_id"].isin(faits)]
+        out.append(Tuile("non_executes", "L'exploitation", "Contrôles non exécutés ce trimestre",
+                         f"{len(non_faits)} sur {len(ref)}", "orange" if len(non_faits) else "vert",
+                         "Ces contrôles n'ont pas tourné à cette campagne : ils reprennent leur dernier résultat connu, "
+                         "avec une pénalité de retard.",
+                         pd.DataFrame({"Contrôle": non_faits["controle_id"],
+                                       "Message": non_faits["controle_id"].map(MESSAGES),
+                                       "Responsable": non_faits["responsable"]}), len(non_faits)))
+        import json
+        vol = json.loads(j["volumetries_sources"]) if isinstance(j["volumetries_sources"], str) else j["volumetries_sources"]
+        out.append(Tuile("volumes", "L'exploitation", "Lignes lues dans les sources",
+                         f"{sum(vol.values()):,}".replace(",", " "), "gris",
+                         "Nombre de lignes lues dans chaque table source à la date d'arrêté.",
+                         pd.DataFrame({"Table": list(vol), "Lignes": list(vol.values())})))
+    if df_lignes is not None:
+        from lignes_anomalie import DEFAUTS_CONNUS, regroupements
+        n = int(df_lignes["poids"].sum())
+        par = df_lignes.groupby("controle")["poids"].sum()
+        connus = " ".join(f"Dont {int(par[k])} pour {k}, défaut connu des données fictives (voir la page)."
+                          for k in DEFAUTS_CONNUS if k in par.index)
+        out.append(Tuile("lignes", "L'exploitation", "Lignes en anomalie (cohérence)", f"{n:,}".replace(",", " "),
+                         "orange" if n else "vert",
+                         "Lignes individuelles en erreur trouvées par les contrôles C01 à C10, sur les données du jour. "
+                         "Le détail ligne à ligne est dans la page « Lignes en anomalie ». " + connus,
+                         regroupements(df_lignes), None))
     return out
 
 
 # ====================================================================== affichage
-def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller) -> None:
+def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes: pd.DataFrame | None = None) -> None:
     """aller(page, **etat) : change de page (fourni par l'application)."""
     import streamlit as st
 
@@ -131,10 +168,11 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller) -> None:
             st.download_button("⬇️ Exporter cette liste (CSV)", t.liste.to_csv(index=False, sep=";").encode("utf-8-sig"),
                                file_name=f"{t.cle}_{c['campagne']}.csv", mime="text/csv")
 
-    ts = tuiles(c, prev)
+    ts = tuiles(c, prev, df_lignes)
     principal, actions = st.columns([3.6, 1.4], gap="large")
     with principal:
-        for bloc, icone in [("La note", "📊"), ("Les contrôles", "🔍"), ("Les anomalies", "🚩")]:
+        for bloc, icone in [("La note", "📊"), ("Les contrôles", "🔍"), ("Les anomalies", "🚩"),
+                            ("L'exploitation", "⚙️")]:
             st.markdown(f"#### {icone} Synthèse — {bloc.lower()}")
             groupe = [t for t in ts if t.bloc == bloc]
             for i in range(0, len(groupe), 3):
@@ -156,6 +194,8 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller) -> None:
             ("Voir les contrôles en rouge", "controles", {"filtre_controles": ["rouge"]}),
             ("Voir les contrôles en retard", "controles", {"filtre_controles": ["en retard"]}),
             ("Voir les anomalies ouvertes", "anomalies", {}),
+            ("Voir les lignes en anomalie", "lignes", {}),
+            ("Voir les règles de contrôle", "regles", {}),
             ("Voir les étapes sans contrôle", "lignage", {}),
             ("Comprendre d'où sortent les chiffres", "comprendre", {}),
         ]:

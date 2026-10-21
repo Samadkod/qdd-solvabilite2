@@ -13,12 +13,13 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Couche | Chemin | Statut |
 |---|---|---|
 | Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution) | Écrite, vérifiée statiquement, **jamais exécutée** (pas de SAS dans l'environnement d'origine) |
-| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 59 tests verts |
+| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 66 tests verts |
 | Contrôles | `sql/controles/*.sql` (20, ANSI, sans CTE) + macros SAS équivalentes dans `sas/02_controles.sas` | Testés sur DuckDB |
 | Référentiels | `referentiels/` : dictionnaire, référentiel des contrôles, lignage (flux + chemins), plan de campagne, historique | Source de vérité |
 | Atelier HTML | `app/template.html` + `app/moteur.js` + `app/contenu.js` → `scripts/construire_appli.py` | Parité JS = Python testée |
-| Application | `streamlit_app.py` : menu latéral en 4 rubriques (Pilotage QDD : Synthèse, Note & données, Contrôles, Anomalies, Lignage & dictionnaire ; Comprendre ; Se former ; Technique) ; tuiles de la Synthèse dans `synthese.py` (valeur = moteur = lignes de la liste ouverte : `tests/test_synthese.py`) ; guide dans `guide_terrain.py`, explications « d'où sortent les chiffres » et lecture des graphiques dans `explications.py` (recalcul vérifié égal au moteur : `tests/test_explications.py`), habillage dans `style_app.py` + `.streamlit/config.toml` | Testée avec `streamlit.testing` (`tests/test_streamlit.py`) |
+| Application | `streamlit_app.py` : menu latéral en 4 rubriques (Pilotage QDD : Synthèse, Note & données, Contrôles, Anomalies, Lignes en anomalie, Règles de contrôle, Lignage & dictionnaire ; Comprendre ; Se former ; Technique) ; tuiles de la Synthèse dans `synthese.py` (valeur = moteur = lignes de la liste ouverte : `tests/test_synthese.py`) ; guide dans `guide_terrain.py`, explications « d'où sortent les chiffres » et lecture des graphiques dans `explications.py` (recalcul vérifié égal au moteur : `tests/test_explications.py`), habillage dans `style_app.py` + `.streamlit/config.toml` | Testée avec `streamlit.testing` (`tests/test_streamlit.py`) |
 | Exercices SAS | Corrigés dans `sas/10_exercices_corriges.sas` (source unique, non appelé par `99_executer.sas`) ; énoncés et résultats attendus (DuckDB sur `sas/donnees_demo`) dans `exercices_sas.py` | Lint SAS OK, résultats attendus testés (`tests/test_exercices_sas.py`) ; **jamais exécutés dans SAS** |
+| Lignes en anomalie | `sql/lignes/C01…C10` (une ligne par objet fautif) + `lignes_anomalie.py` (lignes, regroupements, catalogue des règles) | Par contrôle et par maille, nombre de lignes = nombre d'anomalies du contrôle agrégé, sur N-1 et N (`tests/test_lignes_anomalie.py`) ; pas d'équivalent SAS |
 | Données fictives | `scripts/generer_donnees_btp.py` → `data/btp_fictif.duckdb` ; CSV pour SAS dans `sas/donnees_demo/` | Déterministes |
 
 ## Commandes
@@ -26,7 +27,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py      # base fictive
 python -m qdd_s2                           # campagnes N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
-python -m pytest -q                        # 59 tests, tous doivent passer
+python -m pytest -q                        # 66 tests, tous doivent passer
 python scripts/lint_sas.py                 # vérification statique du SAS (doit afficher « Lint SAS OK »)
 python scripts/construire_appli.py         # régénère l'atelier HTML (après python -m qdd_s2)
 streamlit run streamlit_app.py
@@ -65,6 +66,7 @@ Si l'une de ces valeurs change, c'est une **régression**, sauf si le changement
 - Exécution SAS : à faire sur SAS OnDemand ou en entreprise avec `99_executer.sas`, puis lire le log et `WORK.VERIFICATION`.
 - Script Qlik `app/chargement_qdd.qvs` et gabarit ODBC : jamais exécutés.
 - SCR : formule standard simplifiée, non réglementaire. Corrélations entre segments illustratives.
+- Données fictives, défaut connu : la date de survenance des sinistres est tirée sans tenir compte de la date d'effet du contrat (`generer_donnees_btp.py`), d'où ~46 % de lignes C07 (2 282 au 30/09/2026) au lieu de ~1 % visé. Sans effet sur les valeurs de référence (C07 non réalisé dans les campagnes de démo). Corriger le générateur modifie les sinistres (triangles, C06…) : décision du propriétaire.
 
 ## Conventions
 - Commits en français, au présent, avec un corps qui explique le pourquoi.

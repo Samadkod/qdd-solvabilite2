@@ -1,7 +1,8 @@
 """Atelier QDD Solvabilité 2 — application Streamlit.
 
 Navigation par menu latéral, en quatre rubriques :
-  Pilotage QDD : Synthèse (tuiles cliquables + actions), Note & données, Contrôles, Anomalies, Lignage & dictionnaire
+  Pilotage QDD : Synthèse (tuiles cliquables + actions), Note & données, Contrôles, Anomalies, Lignes en anomalie,
+                 Règles de contrôle, Lignage & dictionnaire
   Comprendre   : D'où sortent les chiffres, Guide terre à terre
   Se former    : SAS pratique, Atelier (révision)
   Technique    : Code SAS / SQL
@@ -25,6 +26,7 @@ from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MO
                           lire_axe, lire_variation)
 from guide_terrain import afficher_guide
 from style_app import appliquer_style, bandeau, entete_page
+from lignes_anomalie import afficher_lignes, afficher_regles, lignes as lignes_en_anomalie
 from synthese import afficher_synthese
 from scripts.generer_donnees_btp import generer
 
@@ -78,13 +80,17 @@ PAGES = {
     "donnees": ("Pilotage QDD", "Note & données", "🎯", "La note de chaque donnée, pourquoi elle a bougé et où sont les écarts."),
     "controles": ("Pilotage QDD", "Contrôles", "🔍", "Chaque point de contrôle : résultat, retard, seuil et statut."),
     "anomalies": ("Pilotage QDD", "Anomalies", "🚩", "Le registre : qui doit corriger quoi, pour quand."),
+    "lignes": ("Pilotage QDD", "Lignes en anomalie", "🧾",
+               "Chaque ligne en erreur, contrôle par contrôle : quoi corriger, exactement."),
+    "regles": ("Pilotage QDD", "Règles de contrôle", "🛡️",
+               "Le catalogue des 20 contrôles : famille, message, responsable, état dans la campagne."),
     "lignage": ("Pilotage QDD", "Lignage & dictionnaire", "🗂️",
                 "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", "🔎", "Le calcul pas à pas, sur les vrais chiffres."),
     "guide": ("Comprendre", "Guide terre à terre", "🧭", "Le métier, les chiffres et le poste, sans jargon."),
     "sas": ("Se former", "SAS pratique", "🧪", "13 exercices progressifs, corrigés, avec le résultat attendu."),
     "atelier": ("Se former", "Atelier (révision)", "📚", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
-    "code": ("Technique", "Code SAS / SQL", "🧾", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
+    "code": ("Technique", "Code SAS / SQL", "💻", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
 }
 
 if "page" not in st.session_state:
@@ -304,7 +310,10 @@ def page_code() -> None:
 
 
 {
-    "synthese": lambda: afficher_synthese(c, prev, xlsx, aller),
+    "synthese": lambda: afficher_synthese(c, prev, xlsx, aller,
+                                          st.cache_data(show_spinner=False)(lignes_en_anomalie)(str(base_fictive()), c["date"])),
+    "lignes": lambda: afficher_lignes(c, base_fictive()),
+    "regles": lambda: afficher_regles(c, base_fictive()),
     "donnees": page_donnees,
     "controles": page_controles,
     "anomalies": page_anomalies,
