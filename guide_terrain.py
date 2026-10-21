@@ -166,7 +166,7 @@ def afficher_guide(c: dict, var: pd.DataFrame | None) -> None:
         "poste et comment s'y préparer. Il est écrit pour quelqu'un qui vient de la **data** plutôt que de "
         "l'actuariat. Les chiffres sont recalculés en direct : ils changent si vous modifiez les paramètres "
         "dans le menu (*Paramètres de la méthode*).")
-    s = st.tabs(["L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
+    s = st.tabs(["L'essentiel", "D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
                  "Se former", "Calendrier", "Glossaire"])
     with s[0]:
         _essentiel(c)
@@ -200,7 +200,7 @@ def _essentiel(c: dict) -> None:
         "rapide, répétable et traçable.")
     scr = f"{c['scr']:.1f}".replace(".", ",")
     st.info(f"Dans l'application, l'assureur est **fictif** (spécialisé BTP) et son SCR simplifié vaut "
-            f"**{scr} M€**.", icon="🏗️")
+            f"**{scr} M€**.", icon=":material/apartment:")
 
     st.header("L'image à garder en tête : le contrôle technique")
     st.markdown(
@@ -261,7 +261,7 @@ def _chiffres(c: dict, var: pd.DataFrame | None) -> None:
         st.warning(
             f"Attention : la note globale passe, mais **{I['nb_donnees_hors_tolerance']} donnée(s) critique(s) "
             f"sur {I['nb_donnees_critiques']}** n'atteignent pas leur propre minimum. Une moyenne correcte "
-            "peut cacher un vrai problème : il faut toujours regarder le détail.", icon="⚠️")
+            "peut cacher un vrai problème : il faut toujours regarder le détail.", icon=":material/warning:")
 
     st.subheader("Les données qui posent problème")
     a_traiter = critiques[critiques["statut"] != "vert"]
@@ -273,7 +273,7 @@ def _chiffres(c: dict, var: pd.DataFrame | None) -> None:
             f"« {r.libelle} » ({_p(r.resultat)} pour un seuil de {_p(r.seuil)}"
             + (", contrôle en retard" if r.anteriorite > 0 else "") + ")"
             for r in pire.itertuples())
-        icone = "🔴" if d["statut"] == "rouge" else "🟠"
+        icone = ":red[:material/cancel:]" if d["statut"] == "rouge" else ":orange[:material/error:]"
         st.markdown(
             f"{icone} **{d['libelle']}** — propriétaire : {d['proprietaire']}\n"
             f"- Elle pèse **{_p(d['sensibilite'], 1)}** dans le SCR, donc on exige au moins "
@@ -296,7 +296,7 @@ def _chiffres(c: dict, var: pd.DataFrame | None) -> None:
         "les chiffres des états officiels aux outils internes. Elles sont jugées en oui / non et ne comptent "
         "pas dans la note, pour qu'un bon résultat ici ne masque pas un problème sur une donnée.")
     for r in ko.itertuples():
-        st.markdown(f"- ❌ « {r.libelle} » ({r.maille}) : {_p(r.resultat)} de concordance pour {_p(r.seuil)} exigé.")
+        st.markdown(f"- :red[:material/cancel:] « {r.libelle} » ({r.maille}) : {_p(r.resultat)} de concordance pour {_p(r.seuil)} exigé.")
 
     st.subheader("Les problèmes en cours (anomalies)")
     reg = c["registre"]
@@ -494,7 +494,7 @@ def _calendrier() -> None:
         f"5 semaines pour les QRT trimestriels (vers le **{_j(remise_trim)}**) et de 14 semaines pour les QRT "
         f"annuels (vers le **{_j(remise_ann)}**). Le calendrier interne fixe des jalons plus tôt : à demander "
         "dès l'arrivée. Votre première clôture annuelle tombera donc pendant vos premiers mois : c'est le "
-        "meilleur moment pour observer tout le circuit.", icon="📅")
+        "meilleur moment pour observer tout le circuit.", icon=":material/event:")
 
     etapes = [
         (f"Avant le premier jour (du {_j(j(-19))} au {_j(j(-1))})", True, [

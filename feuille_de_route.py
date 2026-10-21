@@ -27,6 +27,15 @@ ELEMENTS = [
                    "afficher les contrôles les plus longs. Sur les données fictives, les durées sont de quelques "
                    "millisecondes : l'intérêt est la méthode.",
          effort="Faible"),
+    dict(id="E7", statut="Plus tard", titre="Justifier le poids de la date de survenance",
+         pourquoi="Cette donnée est critique à dire d'expert : faute de sensibilité mesurable, elle reçoit la moyenne des "
+                  "sensibilités mesurées (17,27 %), ce qui en fait la 3e donnée la plus lourde de la note.",
+         prerequis="Choix de méthode à documenter dans la politique QDD, ou à remplacer par une mesure (par exemple "
+                   "l'effet d'un décalage d'année de survenance sur le Best Estimate).", effort="Moyen"),
+    dict(id="E8", statut="Plus tard", titre="Montrer une anomalie qui se clôture",
+         pourquoi="Avec deux campagnes, aucune anomalie n'est encore clôturée : le cycle de vie complet du registre "
+                   "(ouverte, récurrente, clôturée) n'est pas visible.",
+         prerequis="Une troisième campagne fictive où un propriétaire corrige ses données (lié à E5).", effort="Moyen"),
     # ---------------------------------------------------------------- à vérifier
     dict(id="V1", statut="À vérifier", titre="Exécuter la chaîne SAS complète",
          pourquoi="Le SAS est écrit et vérifié statiquement, jamais exécuté.",
@@ -54,6 +63,12 @@ ELEMENTS = [
     dict(id="F4", statut="Fait", titre="Lignes en anomalie et catalogue des règles",
          pourquoi="Montrer quelles lignes sont fausses, avec un message en clair, et décrire chaque règle.",
          prerequis="—", effort="—"),
+    dict(id="F7", statut="Fait", titre="Recalcul des formules du rapport Excel vérifié",
+         pourquoi="Prouver que le rapport Excel, avec ses propres formules, donne les mêmes chiffres que le moteur.",
+         prerequis="Recalcul par LibreOffice : 11 valeurs sur 11 identiques ; test automatique ajouté.", effort="—"),
+    dict(id="F8", statut="Fait", titre="Icônes Material et affichage sur téléphone",
+         pourquoi="Une iconographie sobre et cohérente ; la note visible dès le premier écran sur téléphone.",
+         prerequis="—", effort="—"),
     dict(id="F6", statut="Fait", titre="Dates de sinistres fictives réalistes (C07)",
          pourquoi="Le générateur tirait la survenance sans tenir compte de la date d'effet du contrat (2 282 sinistres "
                   "signalés par C07, 46 %) et laissait des déclarations après l'arrêté (182).",
@@ -64,7 +79,8 @@ ELEMENTS = [
 ]
 
 ORDRE = ["En attente de décision", "Plus tard", "À vérifier", "Fait"]
-ICONES = {"En attente de décision": "🟠", "Plus tard": "🗓️", "À vérifier": "🔬", "Fait": "✅"}
+ICONES = {"En attente de décision": ":material/pending:", "Plus tard": ":material/schedule:",
+          "À vérifier": ":material/science:", "Fait": ":material/check_circle:"}
 
 
 def tableau() -> pd.DataFrame:
@@ -88,5 +104,5 @@ def afficher_feuille_de_route() -> None:
                 st.markdown(f"*Pourquoi* : {e['pourquoi']}")
                 if e["prerequis"] != "—":
                     st.markdown(f"*Prérequis / décision* : {e['prerequis']}")
-    st.download_button("⬇️ Exporter la feuille de route (CSV)", df.to_csv(index=False, sep=";").encode("utf-8-sig"),
+    st.download_button("Exporter la feuille de route (CSV)", icon=":material/download:", data=df.to_csv(index=False, sep=";").encode("utf-8-sig"),
                        file_name="feuille_de_route.csv", mime="text/csv")

@@ -280,9 +280,9 @@ def afficher_d_ou_sortent(c: dict) -> None:
                "peut se permettre plus d'erreurs.")
 
     st.subheader("Étape 5 — Le verdict pour cette donnée")
-    verdict = {"vert": "🟢 **Vert** : la note atteint le minimum.",
-               "orange": f"🟠 **Orange** : la note est sous le minimum, mais de moins de {par.marge_alerte * 100:g} points.",
-               "rouge": f"🔴 **Rouge** : la note est sous le minimum de plus de {par.marge_alerte * 100:g} points."}
+    verdict = {"vert": ":green[:material/check_circle:] **Vert** : la note atteint le minimum.",
+               "orange": f":orange[:material/error:] **Orange** : la note est sous le minimum, mais de moins de {par.marge_alerte * 100:g} points.",
+               "rouge": f":red[:material/cancel:] **Rouge** : la note est sous le minimum de plus de {par.marge_alerte * 100:g} points."}
     st.markdown(f"{p(x['note'])} contre {p(x['note_min'])} exigés → {verdict[x['statut']]}")
 
     st.header("Et la note globale ?")

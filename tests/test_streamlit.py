@@ -60,7 +60,7 @@ def test_action_ouvre_les_controles_filtres():
 
 def test_sous_onglets_du_guide(guide):
     onglets = [t.label for t in guide.tabs]
-    for sous in ("L'essentiel", "🔎 D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
+    for sous in ("L'essentiel", "D'où sortent les chiffres", "Les chiffres", "Le poste", "L'assurance en clair",
                  "Se former", "Calendrier", "Glossaire"):
         assert sous in onglets
 

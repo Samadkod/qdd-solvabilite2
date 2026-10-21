@@ -163,7 +163,7 @@ def afficher_lignes(c: dict, base: Path) -> None:
     with contenu:
         for code, texte in DEFAUTS_CONNUS.items():
             if code in set(vue["controle"]):
-                st.warning(f"**{code}** — {texte}", icon="⚠️")
+                st.warning(f"**{code}** — {texte}", icon=":material/warning:")
         resultats, groupes = st.tabs(["Résultats", "Regroupements"])
         with resultats:
             st.caption(f"**{int(vue['poids'].sum())} ligne(s) en anomalie** ({len(vue)} objet(s) affiché(s)) · "
@@ -174,7 +174,7 @@ def afficher_lignes(c: dict, base: Path) -> None:
                          [["Contrôle", "Objet", "Segment", "Valeurs en cause", "Message", "Montant (€)", "Responsable"]],
                          hide_index=True, width="stretch",
                          column_config={"Montant (€)": st.column_config.NumberColumn(format="%.2f")})
-            st.download_button("⬇️ Exporter ces lignes (CSV)", vue.to_csv(index=False, sep=";").encode("utf-8-sig"),
+            st.download_button("Exporter ces lignes (CSV)", icon=":material/download:", data=vue.to_csv(index=False, sep=";").encode("utf-8-sig"),
                                file_name=f"lignes_en_anomalie_{c['campagne']}.csv", mime="text/csv")
         with groupes:
             st.caption("Une ligne par message, du plus fréquent au plus rare : par où commencer les corrections.")
@@ -214,14 +214,14 @@ def afficher_regles(c: dict, base: Path) -> None:
                    "orange": "background-color:#FBEBCB;color:#9C6400", "vert": "background-color:#DCF1E4;color:#22744A"}
         st.dataframe(vue.style.map(lambda v: couleur.get(v, ""), subset=["Pire statut"]), hide_index=True,
                      width="stretch", column_config={"Lignes en anomalie": st.column_config.NumberColumn(format="%d")})
-        st.download_button("⬇️ Télécharger les règles de contrôle (CSV)",
+        st.download_button("Télécharger les règles de contrôle (CSV)", icon=":material/download:", data=
                            vue.to_csv(index=False, sep=";").encode("utf-8-sig"), file_name="regles_de_controle.csv",
                            mime="text/csv")
         choix = st.selectbox("Voir le détail d'une règle", list(vue["ID"]),
                              format_func=lambda i: f"{i} · {MESSAGES.get(i, i)}") if len(vue) else None
         if choix:
             if choix in DEFAUTS_CONNUS:
-                st.warning(DEFAUTS_CONNUS[choix], icon="⚠️")
+                st.warning(DEFAUTS_CONNUS[choix], icon=":material/warning:")
             ref = referentiel().set_index("controle_id").loc[choix]
             pts = c["controles"][c["controles"]["controle_id"].str.split("|").str[0] == choix]
             from explications import p as pct

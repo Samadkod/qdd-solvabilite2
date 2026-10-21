@@ -14,7 +14,8 @@ import pandas as pd
 from explications import AIDE_COMPTEURS as AIDE, p
 
 COULEURS = {"rouge": "#AD3030", "orange": "#9C6400", "vert": "#22744A", "gris": "#566370", "bleu": "#0E5A69"}
-BLOCS = [("La note", "📊"), ("Les contrôles", "🔍"), ("Les anomalies", "🚩"), ("Le chargement et l'exploitation", "⚙️")]
+BLOCS = [("La note", ":material/speed:"), ("Les contrôles", ":material/fact_check:"), ("Les anomalies", ":material/flag:"),
+         ("Le chargement et l'exploitation", ":material/settings:")]
 CHARGEMENT = "Le chargement et l'exploitation"
 
 
@@ -208,7 +209,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
             st.success("Rien à signaler : la liste est vide.")
         else:
             st.dataframe(t.liste, hide_index=True, width="stretch")
-            st.download_button("⬇️ Exporter cette liste (CSV)", t.liste.to_csv(index=False, sep=";").encode("utf-8-sig"),
+            st.download_button("Exporter cette liste (CSV)", icon=":material/download:", data=t.liste.to_csv(index=False, sep=";").encode("utf-8-sig"),
                                file_name=f"{t.cle}_{c['campagne']}.csv", mime="text/csv")
 
     ts = tuiles(c, prev, df_lignes, volumes, execution)
@@ -236,7 +237,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
                                         f'{t.delta}</div>', unsafe_allow_html=True)
         if df_lignes is not None and not df_lignes.empty:
             from lignes_anomalie import regroupements
-            st.markdown("#### 🏷️ Top 5 des messages en anomalie")
+            st.markdown("#### :material/leaderboard: Top 5 des messages en anomalie")
             top = regroupements(df_lignes).head(5)
             st.dataframe(top[["Contrôle", "Message", "Lignes en anomalie", "Part"]], hide_index=True, width="stretch",
                          column_config={"Contrôle": st.column_config.TextColumn(width="small"),
@@ -263,14 +264,14 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
                 aller(page, **etat)
         st.divider()
         reg = c["registre"]
-        st.download_button("⬇️ Exporter le registre des anomalies", _liste_anomalies(reg).to_csv(index=False, sep=";")
+        st.download_button("Exporter le registre des anomalies", icon=":material/download:", data=_liste_anomalies(reg).to_csv(index=False, sep=";")
                            .encode("utf-8-sig"), file_name=f"registre_anomalies_{c['campagne']}.csv",
                            mime="text/csv", type="tertiary")
         ko = c["controles"][c["controles"]["statut"].isin(["rouge", "orange"])]
-        st.download_button("⬇️ Exporter les contrôles en anomalie", _liste_controles(ko).to_csv(index=False, sep=";")
+        st.download_button("Exporter les contrôles en anomalie", icon=":material/download:", data=_liste_controles(ko).to_csv(index=False, sep=";")
                            .encode("utf-8-sig"), file_name=f"controles_en_anomalie_{c['campagne']}.csv",
                            mime="text/csv", type="tertiary")
-        st.download_button("⬇️ Rapport Excel complet", xlsx, file_name="rapport_qdd.xlsx", type="tertiary",
+        st.download_button("Rapport Excel complet", xlsx, icon=":material/download:", file_name="rapport_qdd.xlsx", type="tertiary",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         st.caption("Cliquez sur ↗ dans une tuile pour voir la liste qui la compose. Sous chaque chiffre : son "
                    "évolution depuis la campagne précédente, en vert si elle va dans le bon sens, en rouge sinon.")

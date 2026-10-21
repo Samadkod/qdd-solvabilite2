@@ -61,6 +61,15 @@ h5{font-family:Spectral,serif; color:var(--qdd-accent); margin-top:.6rem !import
 .qdd-tag.or{background:var(--qdd-or-doux); color:var(--qdd-or);}
 .qdd-tag.gris{background:#E3E7EB; color:var(--qdd-gris);}
 
+/* petit écran : bandeau compact, pour voir les premiers chiffres sans faire défiler */
+@media (max-width: 640px){
+  .qdd-hero{padding:1rem 1.1rem; margin-bottom:.8rem;}
+  .qdd-hero h1{font-size:1.45rem;}
+  .qdd-hero p, .qdd-badges{display:none;}
+  .qdd-entete h1{font-size:1.5rem;}
+  .qdd-tuile-valeur{font-size:1.7rem;}
+}
+
 /* barre latérale : menu */
 section[data-testid="stSidebar"] h2{font-family:Spectral,serif;}
 .qdd-marque{font-family:Spectral,serif; font-size:1.35rem; font-weight:600; color:var(--qdd-accent); margin:-.4rem 0 .6rem;}

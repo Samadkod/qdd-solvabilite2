@@ -33,7 +33,7 @@ from synthese import afficher_synthese, tuiles
 from scripts.generer_donnees_btp import generer
 
 RACINE = Path(__file__).parent
-st.set_page_config(page_title="Atelier QDD Solvabilité 2", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Atelier QDD Solvabilité 2", page_icon=":material/verified_user:", layout="wide")
 
 
 @st.cache_resource
@@ -88,27 +88,30 @@ COULEUR = {"vert": "background-color:#DCF1E4;color:#22744A", "orange": "backgrou
 
 # page -> (rubrique, titre, icône, description)
 PAGES = {
-    "synthese": ("Pilotage QDD", "Synthèse", "📊", "Tout l'état de la campagne en un écran. Cliquez sur ↗ pour le détail."),
-    "donnees": ("Pilotage QDD", "Note & données", "🎯", "La note de chaque donnée, pourquoi elle a bougé et où sont les écarts."),
-    "controles": ("Pilotage QDD", "Contrôles", "🔍", "Chaque point de contrôle : résultat, retard, seuil et statut."),
-    "anomalies": ("Pilotage QDD", "Anomalies", "🚩", "Le registre : qui doit corriger quoi, pour quand."),
-    "lignes": ("Pilotage QDD", "Lignes en anomalie", "🧾",
+    "synthese": ("Pilotage QDD", "Synthèse", ":material/dashboard:", "Tout l'état de la campagne en un écran. Cliquez sur ↗ pour le détail."),
+    "donnees": ("Pilotage QDD", "Note & données", ":material/monitoring:", "La note de chaque donnée, pourquoi elle a bougé et où sont les écarts."),
+    "controles": ("Pilotage QDD", "Contrôles", ":material/fact_check:", "Chaque point de contrôle : résultat, retard, seuil et statut."),
+    "anomalies": ("Pilotage QDD", "Anomalies", ":material/flag:", "Le registre : qui doit corriger quoi, pour quand."),
+    "lignes": ("Pilotage QDD", "Lignes en anomalie", ":material/table_rows:",
                "Chaque ligne en erreur, contrôle par contrôle : quoi corriger, exactement."),
-    "regles": ("Pilotage QDD", "Règles de contrôle", "🛡️",
+    "regles": ("Pilotage QDD", "Règles de contrôle", ":material/rule:",
                "Le catalogue des 20 contrôles : famille, message, responsable, état dans la campagne."),
-    "lignage": ("Pilotage QDD", "Lignage & dictionnaire", "🗂️",
+    "lignage": ("Pilotage QDD", "Lignage & dictionnaire", ":material/account_tree:",
                 "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
-    "chargement": ("Exploitation", "Chargement & exécution", "⚙️",
+    "chargement": ("Exploitation", "Chargement & exécution", ":material/settings:",
                    "Les données sont-elles bien arrivées, et chaque contrôle a-t-il pu tourner ?"),
-    "feuille": ("Évolutions", "Feuille de route", "🗺️",
+    "feuille": ("Évolutions", "Feuille de route", ":material/route:",
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
-    "comprendre": ("Comprendre", "D'où sortent les chiffres", "🔎", "Le calcul pas à pas, sur les vrais chiffres."),
-    "guide": ("Comprendre", "Guide terre à terre", "🧭", "Le métier, les chiffres et le poste, sans jargon."),
-    "sas": ("Se former", "SAS pratique", "🧪", "13 exercices progressifs, corrigés, avec le résultat attendu."),
-    "atelier": ("Se former", "Atelier (révision)", "📚", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
-    "code": ("Technique", "Code SAS / SQL", "💻", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
+    "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),
+    "guide": ("Comprendre", "Guide terre à terre", ":material/explore:", "Le métier, les chiffres et le poste, sans jargon."),
+    "sas": ("Se former", "SAS pratique", ":material/school:", "13 exercices progressifs, corrigés, avec le résultat attendu."),
+    "atelier": ("Se former", "Atelier (révision)", ":material/quiz:", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
+    "code": ("Technique", "Code SAS / SQL", ":material/terminal:", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
 }
 
+MARQUE_SVG = ('<svg width="22" height="22" viewBox="0 0 24 24" fill="#0E5A69" style="vertical-align:-4px;margin-right:6px">'
+              '<path d="M12 1 3 5v6c0 5.6 3.8 10.7 9 12 5.2-1.3 9-6.4 9-12V5l-9-4zm-2 16-4-4 1.4-1.4L10 14.2l6.6-6.6L18 9l-8 8z"/>'
+              '</svg>')
 DOC = {"Comprendre", "Se former", "Technique"}  # rubriques rangées sous le bouton « Documentation »
 
 if "page" not in st.session_state:
@@ -131,13 +134,13 @@ appliquer_style()
 
 # ---------------------------------------------------------------- menu latéral
 with st.sidebar:
-    st.markdown('<div class="qdd-marque">🛡️ Atelier QDD<span>Solvabilité 2 · données fictives</span></div>',
+    st.markdown('<div class="qdd-marque">' + MARQUE_SVG + 'Atelier QDD<span>Solvabilité 2 · données fictives</span></div>',
                 unsafe_allow_html=True)
     en_doc = PAGES[st.session_state["page"]][0] in DOC
     if en_doc:
-        st.markdown('<div class="qdd-espace">📖 Documentation</div>', unsafe_allow_html=True)
-        st.button("←  Retour à l'atelier QDD", key="menu_retour", on_click=_choisir, args=("synthese",),
-                  width="stretch", type="secondary")
+        st.markdown("#### :material/menu_book: Documentation")
+        st.button("Retour à l'atelier QDD", key="menu_retour", on_click=_choisir, args=("synthese",),
+                  width="stretch", type="secondary", icon=":material/arrow_back:")
     rubrique = None
     for cle, (rub, titre, icone, _) in PAGES.items():
         if (rub in DOC) != en_doc:
@@ -145,15 +148,15 @@ with st.sidebar:
         if rub != rubrique:
             st.markdown(f'<div class="qdd-rubrique">{rub}</div>', unsafe_allow_html=True)
             rubrique = rub
-        st.button(f"{icone}  {titre}", key=f"menu_{cle}", on_click=_choisir, args=(cle,), width="stretch",
+        st.button(titre, key=f"menu_{cle}", on_click=_choisir, args=(cle,), width="stretch", icon=icone,
                   type="primary" if st.session_state["page"] == cle else "tertiary")
     if not en_doc:
         st.divider()
-        st.button("📖  Documentation", key="menu_documentation", on_click=_choisir, args=("guide",), width="stretch",
-                  type="secondary", help="Comprendre (guide, explication des chiffres), se former (SAS, atelier) et "
+        st.button("Documentation", key="menu_documentation", on_click=_choisir, args=("guide",), width="stretch",
+                  type="secondary", icon=":material/menu_book:", help="Comprendre (guide, explication des chiffres), se former (SAS, atelier) et "
                                          "code technique.")
     st.divider()
-    with st.expander("⚙️ Paramètres de la méthode"):
+    with st.expander("Paramètres de la méthode", icon=":material/tune:"):
         st.caption("Les valeurs par défaut redonnent les chiffres de référence.")
         seuil = st.number_input("Seuil de significativité (%)", 0.1, 20.0, 1.0, 0.1) / 100
         dscr = st.number_input("ΔSCR max par donnée (%)", 0.0, 20.0, 0.5, 0.05) / 100
@@ -184,7 +187,7 @@ rub, titre, icone, description = PAGES[page]
 if page == "synthese":
     bandeau(c["campagne"], pd.Timestamp(c["date"]))
 else:
-    entete_page(rub, f"{icone} {titre}", description, f"Campagne {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}")
+    entete_page(rub, titre, description, f"Campagne {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}")
 
 
 # ================================================================ pages
@@ -268,7 +271,7 @@ def page_donnees() -> None:
         x="points:Q", text="texte:N")
     zero = alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(color="#566370").encode(x="x:Q")
     st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(44)), width="stretch")
-    st.info(lire_variation(var), icon="📖")
+    st.info(lire_variation(var), icon=":material/menu_book:")
 
     st.subheader("Où sont les problèmes ? Écart au minimum, par groupe")
     axe = st.selectbox("Regrouper par", ["maille", "etape", "criteres", "responsable"],
@@ -297,7 +300,7 @@ def page_donnees() -> None:
                   + base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=12, color="#15202A")
                   .encode(x="points:Q", text="texte:N"))
     st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(40)), width="stretch")
-    st.info(lire_axe(a, axe), icon="📖")
+    st.info(lire_axe(a, axe), icon=":material/menu_book:")
 
     with st.expander("Sensibilités du SCR et test de linéarité"):
         s = c["sens"]
@@ -310,7 +313,7 @@ def page_donnees() -> None:
             "Les colonnes *s_choc_…* refont le calcul avec d'autres chocs (−15 %, +5 %, +30 %) : si elles restent "
             "proches, la sensibilité est fiable (*lineaire* = vrai). Au-delà de 10 % d'écart (*non_linearite*), "
             "il faut la manier avec prudence.")
-    st.download_button("⬇️ Rapport Excel de la campagne", xlsx, file_name="rapport_qdd.xlsx",
+    st.download_button("Rapport Excel de la campagne", xlsx, icon=":material/download:", file_name="rapport_qdd.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
@@ -344,7 +347,7 @@ def page_anomalies() -> None:
     st.dataframe(vue.style.map(lambda v: {"Récurrente": COULEUR["rouge"], "Ouverte": COULEUR["orange"],
                                           "Clôturée": COULEUR["vert"]}.get(v, ""), subset=["statut"]),
                  hide_index=True, width="stretch")
-    st.download_button("⬇️ Exporter ces anomalies (CSV)", vue.to_csv(index=False, sep=";").encode("utf-8-sig"),
+    st.download_button("Exporter ces anomalies (CSV)", icon=":material/download:", data=vue.to_csv(index=False, sep=";").encode("utf-8-sig"),
                        file_name=f"anomalies_{c['campagne']}.csv", mime="text/csv")
 
 

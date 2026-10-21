@@ -253,7 +253,7 @@ def afficher_exercices() -> None:
                      f"{total // 60} h {total % 60:02d}")
     niveaux = st.segmented_control("Niveau", list(NIVEAUX.values()), selection_mode="multi",
                                    default=list(NIVEAUX.values()))
-    st.download_button("⬇️ Télécharger tous les corrigés (10_exercices_corriges.sas)",
+    st.download_button("Télécharger tous les corrigés (10_exercices_corriges.sas)", icon=":material/download:", data=
                        FICHIER_SAS.read_bytes(), file_name=FICHIER_SAS.name, mime="text/plain")
 
     for e in EXERCICES:
@@ -268,14 +268,14 @@ def afficher_exercices() -> None:
             with coche:
                 st.checkbox("Fait", key=f"fait_{e['id']}")
             st.markdown(e["enonce"])
-            with st.expander("💡 Indice"):
+            with st.expander("Indice", icon=":material/lightbulb:"):
                 st.markdown(e["indice"])
-            with st.expander("✅ Corrigé SAS"):
+            with st.expander("Corrigé SAS", icon=":material/code:"):
                 st.code(code[e["id"]][1], language="sql")
-            with st.expander("🎯 Résultat attendu"):
+            with st.expander("Résultat attendu", icon=":material/task_alt:"):
                 st.dataframe(_formater(attendus[e["id"]]), hide_index=True, width="stretch")
                 if e.get("remarque"):
-                    st.info(e["remarque"], icon="🔎")
+                    st.info(e["remarque"], icon=":material/search_insights:")
     st.caption("Résultats attendus recalculés en SQL (DuckDB) sur les mêmes fichiers CSV que ceux chargés par SAS "
                "(sas/donnees_demo). Les corrigés SAS passent la vérification statique du projet mais n'ont pas "
                "encore été exécutés dans SAS : signalez tout écart.")
