@@ -31,8 +31,10 @@ def _execution(r, rejeu: dict) -> str:
     return "Échec technique" if rejeu.get(r.controle, "Exécuté") == "Échec technique" else "Exécuté"
 
 
-def liste_suivi(c: dict, execution: pd.DataFrame | None = None) -> pd.DataFrame:
-    """c : vue d'une campagne (clés « controles » et « date ») ; execution : rejeu des requêtes (chargement.execution)."""
+def liste_suivi(c: dict, execution: pd.DataFrame | None = None, historique: list[dict] | None = None) -> pd.DataFrame:
+    """c : vue d'une campagne (clés « controles » et « date ») ; execution : rejeu des requêtes (chargement.execution) ;
+    historique : vues des campagnes jusqu'à c incluse, dans l'ordre, pour la colonne « Tendance »."""
+    hist = [dict(zip(h["controles"]["controle_id"], h["controles"]["resultat"])) for h in (historique or [])]
     ctrl = c["controles"]
     arrete = pd.Timestamp(c["date"])
     rejeu = {} if execution is None else dict(zip(execution["Contrôle"], execution["Statut"]))
@@ -52,6 +54,7 @@ def liste_suivi(c: dict, execution: pd.DataFrame | None = None) -> pd.DataFrame:
             "Durée (ms)": duree.get(r.controle) if exe == "Exécuté" else None,
             "À surveiller": statut in ("rouge", "orange") or retard > 0 or exe != "Exécuté",
             "Lignes": r.controle in CONTROLES_AVEC_LIGNES,
+            "Tendance": [round(h[r.controle_id] * 100, 2) for h in hist if r.controle_id in h],
         })
     out = pd.DataFrame(lignes)
     out["Réalisé cette campagne"] = out["Réalisé le"] == arrete
@@ -105,20 +108,49 @@ def detail_campagne(df: pd.DataFrame) -> dict:
 
 
 # ====================================================================== affichage Streamlit
-def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict) -> None:
+CLES_FILTRES = {"suivi_recherche": "", "filtre_periode": "Toutes", "filtre_execution": [], "filtre_controles": [],
+                "filtre_surveiller": False}
+PASTILLES = {"rouge": ":red[:material/fiber_manual_record:]", "orange": ":orange[:material/fiber_manual_record:]",
+             "vert": ":green[:material/fiber_manual_record:]", "non noté": ":gray[:material/radio_button_unchecked:]",
+             "en retard": ":red[:material/schedule:]"}
+ICONES_EXECUTION = {"Exécuté": ":material/check:", "Saisi hors outil": ":material/edit_note:",
+                    "Non réalisé": ":material/do_not_disturb_on:", "Échec technique": ":material/error:"}
+
+
+def _effacer() -> None:
+    import streamlit as st
+    st.session_state.update(CLES_FILTRES)
+
+
+def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict, historique: list[dict] | None = None) -> None:
     import streamlit as st
 
-    df = liste_suivi(c, execution)
-    filtres, contenu, detail = st.columns([1, 3.4, 1.15], gap="medium")
-    with filtres, st.container(border=True):
+    df = liste_suivi(c, execution, historique)
+    nb_exe = df["Exécution"].value_counts()
+    nb_res = df["Statut"].value_counts().to_dict() | {"en retard": int((df["Retard (périodes)"] > 0).sum())}
+    nb_per = {"Toutes": len(df), "Cette campagne": int(df["Réalisé cette campagne"].sum()),
+              "Avant cette campagne": int((~df["Réalisé cette campagne"]).sum())}
+    filtres, contenu, detail = st.columns([1.15, 3.3, 1.1], gap="medium")
+    with filtres, st.container(border=True, key="qdd_filtres"):
         st.markdown("**Filtres**")
-        recherche = st.text_input("Recherche", placeholder="Contrôle, donnée, responsable…",
+        st.caption("Les nombres comptent des points de contrôle (un contrôle × un segment).")
+        recherche = st.text_input("Recherche", placeholder="Contrôle, donnée, responsable…", icon=":material/search:",
                                   label_visibility="collapsed", key="suivi_recherche")
-        periode = st.segmented_control("Réalisé", PERIODES, default="Toutes", key="filtre_periode") or "Toutes"
-        executions = st.pills("Exécution", EXECUTIONS, selection_mode="multi", key="filtre_execution")
-        resultats = st.pills("Résultat", RESULTATS + ["en retard"], selection_mode="multi", key="filtre_controles")
-        surveiller = st.toggle("Seulement les points à surveiller", key="filtre_surveiller",
+        surveiller = st.toggle(f"À surveiller seulement ({int(df['À surveiller'].sum())})", key="filtre_surveiller",
                                help="Rouge ou orange, en retard, ou pas exécuté normalement pour cet arrêté.")
+        st.markdown("###### :material/event_available: Réalisé")
+        periode = st.pills("Réalisé", PERIODES, default="Toutes", key="filtre_periode", label_visibility="collapsed",
+                           format_func=lambda x: f"{x} · {nb_per[x]}") or "Toutes"
+        st.markdown("###### :material/play_circle: Exécution")
+        executions = st.pills("Exécution", [e for e in EXECUTIONS if nb_exe.get(e, 0)], selection_mode="multi",
+                              key="filtre_execution", label_visibility="collapsed",
+                              format_func=lambda x: f"{ICONES_EXECUTION[x]} {x} · {nb_exe.get(x, 0)}")
+        st.markdown("###### :material/traffic: Résultat")
+        resultats = st.pills("Résultat", RESULTATS + ["en retard"], selection_mode="multi", key="filtre_controles",
+                             label_visibility="collapsed",
+                             format_func=lambda x: f"{PASTILLES[x]} {x} · {nb_res.get(x, 0)}")
+        st.button("Effacer les filtres", icon=":material/filter_alt_off:", on_click=_effacer, key="suivi_effacer",
+                  type="tertiary")
     vue = filtrer(df, executions, resultats, periode, surveiller, recherche)
 
     with contenu:
@@ -126,8 +158,8 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict) -> N
                    "ses lignes en anomalie ou son détail.")
         aff = vue.assign(**{"Réalisé le": vue["Réalisé le"].dt.strftime("%d/%m/%Y"),
                             "Échéance": vue["Échéance"].dt.strftime("%d/%m/%Y")})
-        cols = ["Contrôle", "Segment", "Libellé", "Exécution", "Statut", "Résultat", "Seuil", "Réalisé le",
-                "Échéance", "Retard (périodes)", "Durée (ms)", "Responsable"]
+        cols = ["Contrôle", "Segment", "Exécution", "Statut", "Tendance", "Résultat", "Seuil", "Échéance",
+                "Retard (périodes)", "Réalisé le", "Durée (ms)", "Libellé", "Responsable"]
         ton_exe = {"Exécuté": couleurs["vert"], "Saisi hors outil": couleurs["orange"],
                    "Non réalisé": couleurs["orange"], "Échec technique": couleurs["rouge"]}
         sel = st.dataframe(
@@ -135,7 +167,12 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict) -> N
             .map(lambda v: couleurs.get(v, ""), subset=["Statut"])
             .map(lambda v: ton_exe.get(v, ""), subset=["Exécution"])
             .map(lambda v: couleurs["rouge"] if isinstance(v, (int, float)) and v > 0 else "", subset=["Retard (périodes)"]),
-            hide_index=True, width="stretch", on_select="rerun", selection_mode="single-row", key="suivi_selection")
+            hide_index=True, width="stretch", on_select="rerun", selection_mode="single-row", key="suivi_selection",
+            column_config={"Segment": st.column_config.TextColumn(width="small"),
+                           "Tendance": st.column_config.LineChartColumn(
+                "Tendance", y_min=85, y_max=100,
+                help="Résultat du point de contrôle, campagne après campagne, jusqu'à celle affichée. Même échelle "
+                     "pour toutes les lignes (85 % en bas, 100 % en haut) : une pente visible est une vraie baisse.")})
         lignes_sel = sel.selection.rows if sel is not None else []
         if lignes_sel:
             r = vue.iloc[lignes_sel[0]]
@@ -150,7 +187,9 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict) -> N
                     st.caption("Ce contrôle compare des totaux entre outils : il n'y a pas de ligne fautive à lister, "
                                "l'écart est dans la colonne « detail » de la page Note & données.")
         st.download_button("Exporter cette liste (CSV)", icon=":material/download:",
-                           data=aff[cols].to_csv(index=False, sep=";").encode("utf-8-sig"),
+                           data=aff[cols].assign(Tendance=aff["Tendance"].map(
+                               lambda t: " → ".join(f"{v:.2f}".replace(".", ",") for v in t)))
+                           .to_csv(index=False, sep=";").encode("utf-8-sig"),
                            file_name=f"suivi_controles_{c['campagne']}.csv", mime="text/csv")
         st.caption("**Échéance** : prochaine fin de période (trimestre, semestre, année) après la dernière réalisation. "
                    "Échéance passée à la date d'arrêté = contrôle en retard, son résultat est pénalisé de 5 % par "
@@ -165,8 +204,8 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict) -> N
         st.caption(f"des contrôles exécutés pour l'arrêté ({d['nb_executes']} sur {d['nb_controles']})")
         st.progress(d["avancement"])
         st.markdown(
-            f"Non réalisés : **{d['nb_non_realises']}**  \n"
-            + (f"Saisis hors outil : **{d['nb_saisis']}**  \n" if d["nb_saisis"] else "")
+            f"Contrôles non réalisés : **{d['nb_non_realises']}**  \n"
+            + (f"Contrôles saisis hors outil : **{d['nb_saisis']}**  \n" if d["nb_saisis"] else "")
             + f"Échecs techniques : **{d['nb_echecs']}**")
         st.divider()
         st.markdown(

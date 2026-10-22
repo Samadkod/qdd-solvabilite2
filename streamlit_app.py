@@ -320,7 +320,7 @@ def page_donnees() -> None:
 
 
 def page_controles() -> None:
-    afficher_suivi(c, execution_cache(str(base_fictive()), c["date"]), aller, COULEUR)
+    afficher_suivi(c, execution_cache(str(base_fictive()), c["date"]), aller, COULEUR, camps[:k + 1])
     with st.expander("Tableau technique (toutes les colonnes du moteur)"):
         _tableau_technique()
 

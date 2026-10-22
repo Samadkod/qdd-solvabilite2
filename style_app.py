@@ -82,6 +82,12 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button{justify-content
 section[data-testid="stSidebar"] [data-testid="stButton"] button > div{justify-content:flex-start !important; width:100%;}
 section[data-testid="stSidebar"] [data-testid="stButton"] button p{font-size:.93rem; text-align:left;}
 
+/* panneau de filtres (page Contrôles) : une rubrique = un titre court, en capitales, séparé par un trait */
+.st-key-qdd_filtres h6{font-family:"IBM Plex Sans",sans-serif !important; font-size:.72rem !important; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--qdd-accent) !important; margin:.6rem 0 .35rem !important;
+  padding:.75rem 0 0 !important; border-top:1px solid var(--qdd-ligne);}
+.st-key-qdd_filtres h6 [data-testid="stIconMaterial"]{font-size:1.1rem !important; vertical-align:-4px; margin-right:.3rem;}
+
 /* panneau Actions : libellés sur plusieurs lignes plutôt que tronqués */
 [data-testid="stMain"] [data-testid="stButton"] button p, [data-testid="stMain"] [data-testid="stDownloadButton"] button p{
   white-space:normal !important; overflow:visible !important; text-overflow:clip !important; text-align:left;}

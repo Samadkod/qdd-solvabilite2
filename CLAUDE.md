@@ -13,7 +13,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Couche | Chemin | Statut |
 |---|---|---|
 | Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution) | Écrite, vérifiée statiquement, **jamais exécutée** (pas de SAS dans l'environnement d'origine) |
-| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 93 tests verts |
+| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 94 tests verts |
 | Contrôles | `sql/controles/*.sql` (20, ANSI, sans CTE) + macros SAS équivalentes dans `sas/02_controles.sas` | Testés sur DuckDB |
 | Référentiels | `referentiels/` : dictionnaire, référentiel des contrôles, lignage (flux + chemins), plan de campagne, historique | Source de vérité |
 | Atelier HTML | `app/template.html` + `app/moteur.js` + `app/contenu.js` → `scripts/construire_appli.py` | Parité JS = Python testée |
@@ -21,7 +21,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Exercices SAS | Corrigés dans `sas/10_exercices_corriges.sas` (source unique, non appelé par `99_executer.sas`) ; énoncés et résultats attendus (DuckDB sur `sas/donnees_demo`) dans `exercices_sas.py` | Lint SAS OK, résultats attendus testés (`tests/test_exercices_sas.py`) ; **jamais exécutés dans SAS** |
 | Contrôles de chargement (niveau 0) | `chargement.py` + `sas/08_chargement.sas` (%qdd_volumetrie) : table vide = Bloquant ; variation > 10 % (ou petite table < 50 lignes modifiée) = À expliquer ; rejeu des requêtes de contrôle (échec technique, durée). Hors note | Règle testée (`tests/test_chargement.py`), aucune fausse alerte sur le SI fictif ; SAS jamais exécuté |
 | Lignes en anomalie | `sql/lignes/C01…C10` (une ligne par objet fautif) + `lignes_anomalie.py` (lignes, regroupements, catalogue des règles) | Par contrôle et par maille, nombre de lignes = nombre d'anomalies du contrôle agrégé, sur N-1 et N (`tests/test_lignes_anomalie.py`) ; pas d'équivalent SAS |
-| Suivi des contrôles | `suivi_controles.py` (page Contrôles) : statut d'exécution (Exécuté, Saisi hors outil, Non réalisé, Échec technique) séparé du résultat, dernière réalisation, prochaine échéance (`qdd_s2.anteriorite.prochaine_echeance`), durée au rejeu, filtres, avancement de la campagne, accès aux lignes en anomalie | Échéance passée ⇔ antériorité > 0 sur les 3 campagnes ; compteurs = moteur (`tests/test_suivi_controles.py`) ; pas d'équivalent SAS |
+| Suivi des contrôles | `suivi_controles.py` (page Contrôles) : statut d'exécution (Exécuté, Saisi hors outil, Non réalisé, Échec technique) séparé du résultat, dernière réalisation, prochaine échéance (`qdd_s2.anteriorite.prochaine_echeance`), durée au rejeu, tendance sur les campagnes (échelle commune 85-100 %), filtres, avancement de la campagne, accès aux lignes en anomalie | Échéance passée ⇔ antériorité > 0 sur les 3 campagnes ; compteurs = moteur (`tests/test_suivi_controles.py`) ; pas d'équivalent SAS |
 | Données fictives | `scripts/generer_donnees_btp.py` → `data/btp_fictif.duckdb` (3 arrêtés : 31/03, 30/06, 30/09/2026) ; CSV pour SAS dans `sas/donnees_demo/` | Déterministes ; un flux aléatoire par arrêté |
 
 ## Commandes
@@ -29,7 +29,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py      # base fictive
 python -m qdd_s2                           # campagnes N-2, N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
-python -m pytest -q                        # 93 tests, tous doivent passer
+python -m pytest -q                        # 94 tests, tous doivent passer
 python scripts/lint_sas.py                 # vérification statique du SAS (doit afficher « Lint SAS OK »)
 python scripts/construire_appli.py         # régénère l'atelier HTML (après python -m qdd_s2)
 streamlit run streamlit_app.py

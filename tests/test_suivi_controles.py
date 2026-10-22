@@ -56,3 +56,12 @@ def test_saisi_hors_outil_en_n_moins_2(vues):
     """Au 31/03/2026, C08 n'est pas exécuté : son résultat vient de l'historique, daté de l'arrêté."""
     df = liste_suivi(vues[0])
     assert set(df.loc[df["Exécution"] == "Saisi hors outil", "Contrôle"]) == {"C08"}
+
+
+def test_tendance_sur_les_campagnes(vues):
+    """La tendance reprend le résultat du moteur à chaque campagne, jusqu'à celle affichée."""
+    df = liste_suivi(vues[-1], None, vues).set_index(["Contrôle", "Segment"])
+    assert df.loc[("R03", "RC décennale"), "Tendance"] == [98.59, 98.82, 95.98]   # incident entrepôt en N
+    assert df.loc[("C06", "Transverse (tous segments)"), "Tendance"] == [95.64, 99.26, 99.74]  # corrigé après N-2
+    assert (df["Tendance"].map(len) == 3).all()
+    assert (liste_suivi(vues[1], None, vues[:2])["Tendance"].map(len) == 2).all()

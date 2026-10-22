@@ -79,7 +79,7 @@ ELEMENTS = [
                    "déclaration après l'arrêté ; note N 97,45 % → 97,49 %, tous les compteurs inchangés.", effort="—"),
     dict(id="F10", statut="Fait", titre="Liste de suivi des contrôles",
          pourquoi="Chaque point de contrôle avec deux statuts séparés (exécution / résultat), sa dernière "
-                  "réalisation, sa prochaine échéance, sa durée ; filtres, points à surveiller, panneau "
+                  "réalisation, sa prochaine échéance, sa durée, sa tendance sur les campagnes ; filtres, points à surveiller, panneau "
                   "d'avancement de la campagne, et accès direct aux lignes en anomalie.",
          prerequis="Principes repris d'un outil de pilotage de migration (aucun contenu repris). Les boutons d'action "
                    "(suspendre, valider, relancer) sont écartés : ils supposent un vrai serveur et des utilisateurs.",
