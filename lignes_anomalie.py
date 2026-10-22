@@ -77,6 +77,7 @@ def lignes(base: Path | str, arrete: str) -> pd.DataFrame:
         return pd.DataFrame(columns=cols)
     out = pd.concat(morceaux, ignore_index=True)[cols]
     out["poids"] = out["poids"].astype(int)
+    out["valeurs"] = out["valeurs"].astype(str).str.replace(" 00:00:00", "", regex=False)  # dates sans heure
     return out.sort_values(["controle", "maille", "objet"]).reset_index(drop=True)
 
 
@@ -145,7 +146,7 @@ def afficher_lignes(c: dict, base: Path) -> None:
     with filtres, st.container(border=True):
         st.markdown("**Filtres**")
         recherche = st.text_input("Recherche", placeholder="Identifiant, valeur…", label_visibility="collapsed")
-        ctrls = st.multiselect("Contrôles", sorted(df["controle"].unique()), placeholder="Tous")
+        ctrls = st.multiselect("Contrôles", sorted(df["controle"].unique()), placeholder="Tous", key="lignes_controles")
         mailles = st.multiselect("Segment / classe", sorted(df["maille"].unique()), placeholder="Tous")
         seulement = st.toggle("Seulement les contrôles réalisés ce trimestre", value=False,
                               help="Les contrôles non refaits (ex. C07, C08) reprennent un ancien résultat dans la note ; "

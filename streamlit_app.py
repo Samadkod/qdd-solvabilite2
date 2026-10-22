@@ -21,6 +21,7 @@ import streamlit as st
 from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
+from suivi_controles import afficher_suivi
 from qdd_s2.rapport_excel import ecrire_rapport
 from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
@@ -91,7 +92,7 @@ COULEUR = {"vert": "background-color:#DCF1E4;color:#22744A", "orange": "backgrou
 PAGES = {
     "synthese": ("Pilotage QDD", "Synthèse", ":material/dashboard:", "Tout l'état de la campagne en un écran. Cliquez sur ↗ pour le détail."),
     "donnees": ("Pilotage QDD", "Note & données", ":material/monitoring:", "La note de chaque donnée, pourquoi elle a bougé et où sont les écarts."),
-    "controles": ("Pilotage QDD", "Contrôles", ":material/fact_check:", "Chaque point de contrôle : résultat, retard, seuil et statut."),
+    "controles": ("Pilotage QDD", "Contrôles", ":material/fact_check:", "Liste de suivi : exécution, résultat, échéance et durée de chaque point de contrôle."),
     "anomalies": ("Pilotage QDD", "Anomalies", ":material/flag:", "Le registre : qui doit corriger quoi, pour quand."),
     "lignes": ("Pilotage QDD", "Lignes en anomalie", ":material/table_rows:",
                "Chaque ligne en erreur, contrôle par contrôle : quoi corriger, exactement."),
@@ -319,14 +320,13 @@ def page_donnees() -> None:
 
 
 def page_controles() -> None:
-    f = st.pills("Filtrer", ["rouge", "orange", "vert", "en retard"], selection_mode="multi", key="filtre_controles")
+    afficher_suivi(c, execution_cache(str(base_fictive()), c["date"]), aller, COULEUR)
+    with st.expander("Tableau technique (toutes les colonnes du moteur)"):
+        _tableau_technique()
+
+
+def _tableau_technique() -> None:
     ctrl = c["controles"]
-    if f:
-        mask = ctrl["statut"].isin([x for x in f if x != "en retard"])
-        if "en retard" in f:
-            mask |= ctrl["anteriorite"] > 0
-        ctrl = ctrl[mask]
-    st.caption(f"{len(ctrl)} point(s) de contrôle affiché(s) sur {len(c['controles'])}.")
     cols = ["controle_id", "libelle", "donnee_id", "etape", "responsable", "resultat_brut", "anteriorite",
             "resultat", "seuil", "statut", "detail"]
     st.dataframe(ctrl[cols].style.format({"resultat_brut": pct, "resultat": pct, "seuil": pct})

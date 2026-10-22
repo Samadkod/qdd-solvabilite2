@@ -24,8 +24,8 @@ ELEMENTS = [
     dict(id="E6", statut="Plus tard", titre="Durées d'exécution des contrôles",
          pourquoi="Mission optimisation : repérer les traitements les plus longs, suivre leur durée dans le temps, "
                   "alerter si une durée double.",
-         prerequis="Les durées sont déjà mesurées (page « Chargement & exécution ») ; reste à les historiser et à "
-                   "afficher les contrôles les plus longs. Sur les données fictives, les durées sont de quelques "
+         prerequis="Les durées sont mesurées et affichées pour chaque contrôle (page « Contrôles ») ; reste à les "
+                   "historiser d'une campagne à l'autre et à alerter si une durée double. Sur les données fictives, les durées sont de quelques "
                    "millisecondes : l'intérêt est la méthode.",
          effort="Faible"),
     dict(id="E7", statut="Plus tard", titre="Justifier le poids de la date de survenance",
@@ -33,6 +33,12 @@ ELEMENTS = [
                   "sensibilités mesurées (17,27 %), ce qui en fait la 3e donnée la plus lourde de la note.",
          prerequis="Choix de méthode à documenter dans la politique QDD, ou à remplacer par une mesure (par exemple "
                    "l'effet d'un décalage d'année de survenance sur le Best Estimate).", effort="Moyen"),
+    dict(id="E9", statut="Plus tard", titre="Statut « correction déclarée, à vérifier » dans le registre",
+         pourquoi="Le propriétaire signale qu'il a corrigé ; l'anomalie attend la prochaine exécution du contrôle "
+                  "avant d'être clôturée. Montre où en est la résolution entre deux campagnes.",
+         prerequis="Touche la règle de clôture (règle de méthode n° 2) : accord explicite du propriétaire requis. "
+                   "Suppose aussi un outil où chacun peut déclarer sa correction (pas l'application publique).",
+         effort="Moyen"),
     # ---------------------------------------------------------------- à vérifier
     dict(id="V1", statut="À vérifier", titre="Exécuter la chaîne SAS complète",
          pourquoi="Le SAS est écrit et vérifié statiquement, jamais exécuté.",
@@ -71,6 +77,13 @@ ELEMENTS = [
                   "signalés par C07, 46 %) et laissait des déclarations après l'arrêté (182).",
          prerequis="Décision du propriétaire (octobre 2026). Après correction : 60 lignes C07 (1,2 %), aucune "
                    "déclaration après l'arrêté ; note N 97,45 % → 97,49 %, tous les compteurs inchangés.", effort="—"),
+    dict(id="F10", statut="Fait", titre="Liste de suivi des contrôles",
+         pourquoi="Chaque point de contrôle avec deux statuts séparés (exécution / résultat), sa dernière "
+                  "réalisation, sa prochaine échéance, sa durée ; filtres, points à surveiller, panneau "
+                  "d'avancement de la campagne, et accès direct aux lignes en anomalie.",
+         prerequis="Principes repris d'un outil de pilotage de migration (aucun contenu repris). Les boutons d'action "
+                   "(suspendre, valider, relancer) sont écartés : ils supposent un vrai serveur et des utilisateurs.",
+         effort="—"),
     dict(id="F9", statut="Fait", titre="Cycle de vie complet du registre (campagne N-2)",
          pourquoi="Avec deux campagnes, aucune anomalie n'était clôturée. La campagne fictive du 31/03/2026 ouvre "
                   "13 anomalies ; N-1 en clôture 3 (dates de survenance C06, règlements R04 RC décennale, primes "

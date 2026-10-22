@@ -15,6 +15,18 @@ def _dates_attendues(debut: date, fin: date, freq_mois: int) -> list[pd.Timestam
     return [d for d in ends if d.month % freq_mois == 0 and pd.Timestamp(debut) < d <= pd.Timestamp(fin)]
 
 
+def prochaine_echeance(date_derniere_real, frequence: str) -> pd.Timestamp:
+    """Première fin de période calendaire strictement après la dernière réalisation.
+
+    Même convention que l'antériorité : le contrôle est en retard à un arrêté si et seulement si
+    cette échéance est <= arrêté (antériorité > 0).
+    """
+    fm = FREQ_MOIS[frequence]
+    d = pd.Timestamp(date_derniere_real)
+    fins = pd.date_range(d + pd.Timedelta(days=1), d + pd.DateOffset(months=fm) + pd.offsets.MonthEnd(0), freq="ME")
+    return next(x for x in fins if x.month % fm == 0)
+
+
 def anteriorite(date_derniere_real, date_campagne, frequence: str, base: str = "frequence") -> float:
     """Éq. 34 / 35.
 
