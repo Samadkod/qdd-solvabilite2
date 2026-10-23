@@ -144,15 +144,15 @@ fiches: [
   points:[
    "États à connaître : S.02.01 (bilan prudentiel), S.05.01 (primes, sinistres et dépenses par ligne d'activité), S.06.02 (liste des actifs), S.17.01 (provisions techniques non-vie), S.19.01 (triangles de sinistres non-vie).",
    "Contrôles inter-états : les placements du bilan S.02.01 sont recoupés avec la somme de S.06.02, le BE de S.17.01 avec l'outil de provisionnement, la dernière diagonale de S.19.01 avec les règlements de gestion, et les primes de S.05.01 avec la comptabilité. L'EIOPA applique elle-même des règles de validation entre états.",
-   "Un écart entre un état et sa source est une erreur de production, pas une incertitude. Ces contrôles ont donc un seuil fixe (0,1 % dans le prototype) et un statut binaire, vert ou rouge.",
-   "Ils sont suivis à part et exclus de la note QDD. Sinon, des contrôles parfaits en aval diluent un défaut amont : dans le cas fictif, ajouter deux contrôles QRT à 100 % faisait passer à tort les provisions RC décennale du rouge à l'orange."],
-  formule:"Statut restitution = vert si résultat ≥ 99,9 %, sinon rouge (anomalie de gravité haute si l'écart est significatif)",
+   "Un écart entre un état et sa source est une erreur de production, pas une incertitude. Ces contrôles ont donc un seuil fixe (0,1 % dans le prototype) et un statut binaire : Conforme (vert) ou Bloquant (rouge).",
+   "Ils sont suivis à part et exclus de la note QDD. Sinon, des contrôles parfaits en aval diluent un défaut amont : dans le cas fictif, ajouter deux contrôles QRT à 100 % faisait passer à tort les provisions RC décennale de « Bloquant » à « À corriger »."],
+  formule:"Statut restitution = Conforme si résultat ≥ 99,9 %, sinon Bloquant (anomalie de gravité haute si l'écart est significatif)",
   retenir:"Dans le cas fictif en N, le BE dommages-ouvrage de S.17.01 diffère de 3 % de l'outil de provisionnement. La note QDD ne le voit pas, le contrôle de restitution si.",
   piege:"Ne jamais régler un écart QRT en ajustant l'état à la main sans tracer l'ajustement (notice, point 37)." },
 { id:"anomalies", partie:"Offre · coordination", titre:"Registre des anomalies et piste d'audit",
   points:[
-   "Chaque point de contrôle rouge ou orange, et chaque zone de risque non couverte, ouvre une anomalie avec un propriétaire, une gravité, une échéance (30 jours si haute, 60 si moyenne), un constat et une action attendue.",
-   "Une anomalie toujours constatée à la campagne suivante devient « récurrente ». Une anomalie de qualité n'est clôturée que si le contrôle a été refait et repasse au vert : un ancien résultat ne prouve pas la correction.",
+   "Chaque point de contrôle Bloquant ou À corriger, et chaque zone de risque non couverte, ouvre une anomalie avec un propriétaire, une gravité, une échéance (30 jours si haute, 60 si moyenne), un constat et une action attendue.",
+   "Une anomalie toujours constatée à la campagne suivante devient « récurrente ». Une anomalie de qualité n'est clôturée que si le contrôle a été refait et redevient Conforme : un ancien résultat ne prouve pas la correction.",
    "Le journal d'exécution enregistre, pour chaque campagne, qui l'a lancée, quand, avec quels paramètres, quelle version du code, l'empreinte des référentiels et la volumétrie de chaque table source. C'est ce que demandent l'ACPR et les commissaires aux comptes.",
    "Le registre transforme un indicateur en plan d'action : c'est le support naturel d'un comité opérationnel."],
   retenir:"Coordonner la résolution des anomalies, c'est suivre leur cycle de vie (ouverte, récurrente, clôturée) et relancer les propriétaires à l'échéance. Ce n'est pas corriger soi-même.",
@@ -189,8 +189,8 @@ qcm: [
 ,
 {p:3,q:"Quel état QRT contient la liste ligne à ligne des actifs détenus ?",o:["S.02.01","S.06.02","S.17.01","S.19.01"],a:1,e:"S.06.02 est la liste des actifs. S.02.01 est le bilan, S.17.01 les provisions techniques non-vie, S.19.01 les triangles de sinistres non-vie."},
 {p:3,q:"Dans quel état QRT sont déclarés les triangles de développement des sinistres non-vie ?",o:["S.05.01","S.12.01","S.19.01","S.06.02"],a:2,e:"S.19.01 : sinistres non-vie, triangles de développement."},
-{p:3,q:"Pourquoi le prototype exclut-il les contrôles de restitution QRT de la note QDD ?",o:["Parce qu'ils sont trop nombreux","Pour éviter que des contrôles parfaits en aval diluent un défaut de la donnée en amont","Parce que l'ACPR l'interdit","Parce qu'ils n'ont pas de résultat quantitatif"],a:1,e:"Constaté sur le cas fictif : deux contrôles QRT à 100 % faisaient passer les provisions RC décennale du rouge à l'orange sans que la donnée change. Ils sont suivis à part, avec un seuil fixe."},
-{p:3,q:"Quand une anomalie de qualité est-elle clôturée dans le registre ?",o:["Dès que le statut paraît vert","Quand le contrôle a été refait dans la campagne et repasse au vert","Après 60 jours","Quand le propriétaire le demande"],a:1,e:"Un ancien résultat dégradé ou un contrôle non refait ne prouve pas la correction."},
+{p:3,q:"Pourquoi le prototype exclut-il les contrôles de restitution QRT de la note QDD ?",o:["Parce qu'ils sont trop nombreux","Pour éviter que des contrôles parfaits en aval diluent un défaut de la donnée en amont","Parce que l'ACPR l'interdit","Parce qu'ils n'ont pas de résultat quantitatif"],a:1,e:"Constaté sur le cas fictif : deux contrôles QRT à 100 % faisaient passer les provisions RC décennale de « Bloquant » à « À corriger » sans que la donnée change. Ils sont suivis à part, avec un seuil fixe."},
+{p:3,q:"Quand une anomalie de qualité est-elle clôturée dans le registre ?",o:["Dès que le statut paraît conforme","Quand le contrôle a été refait dans la campagne et redevient conforme","Après 60 jours","Quand le propriétaire le demande"],a:1,e:"Un ancien résultat dégradé ou un contrôle non refait ne prouve pas la correction."},
 {p:3,q:"Que révèle le croisement du lignage avec le référentiel des contrôles ?",o:["Les données non critiques","Les zones de risque traversées par une donnée critique sans aucun contrôle","Les erreurs de calcul du SCR","Les doublons de contrats"],a:1,e:"C'est l'indicateur de couverture : 25 zones sur 33 couvertes dans le cas fictif."},
 {p:3,q:"Lequel de ces éléments n'a PAS sa place dans un journal d'exécution destiné à l'audit ?",o:["Les paramètres de la campagne","La version du code","L'empreinte des référentiels","Le mot de passe de connexion ODBC"],a:3,e:"Aucun secret dans les journaux : on utilise un DSN système ou un authdomain SAS."}
 ],
@@ -225,6 +225,6 @@ vf: [
 {p:3,q:"Un écart de 0,5 % entre S.17.01 et l'outil de provisionnement est acceptable si la donnée est peu sensible.",a:false,e:"Un écart de restitution est une erreur de production : seuil fixe, quasi nul, quelle que soit la sensibilité."},
 {p:3,q:"Avec une moyenne pondérée, ajouter des contrôles parfaits en aval peut améliorer la note d'une donnée défaillante en amont.",a:true,e:"C'est l'effet de dilution. Le prototype l'évite en excluant les contrôles de restitution de la note."},
 {p:3,q:"Une zone de risque d'une donnée critique sans contrôle ouvre une anomalie de type « Couverture ».",a:true,e:"Elle est confiée au propriétaire de la donnée, avec une échéance de 60 jours."},
-{p:3,q:"Un contrôle non refait dont l'ancien résultat est vert suffit à clôturer une anomalie de qualité.",a:false,e:"La clôture exige un contrôle réalisé dans la campagne et repassé au vert."}
+{p:3,q:"Un contrôle non refait dont l'ancien résultat est conforme suffit à clôturer une anomalie de qualité.",a:false,e:"La clôture exige un contrôle réalisé dans la campagne et redevenu conforme."}
 ]
 };
