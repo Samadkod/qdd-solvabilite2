@@ -41,9 +41,10 @@ ELEMENTS = [
          effort="Moyen"),
     # ---------------------------------------------------------------- à vérifier
     dict(id="V1", statut="À vérifier", titre="Exécuter la chaîne SAS complète",
-         pourquoi="Le SAS est écrit et vérifié statiquement, jamais exécuté.",
-         prerequis="SAS OnDemand for Academics : lancer sas/99_executer.sas, lire le journal et WORK.VERIFICATION "
-                   "(59 valeurs comparées à la référence Python).",
+         pourquoi="Première exécution sur SAS OnDemand le 23/10/2026 : N-1, N et variation identiques à Python "
+                  "(44 valeurs sur 59) ; les 15 écarts de N-2 venaient d'un fichier de relances SCR incomplet, corrigé.",
+         prerequis="Relancer sas/lancer_qdd.sas avec le relances_scr.csv corrigé : attendu 59 valeurs sur 59 dans "
+                   "WORK.VERIFICATION.",
          effort="Moyen"),
     dict(id="V2", statut="À vérifier", titre="Exécuter les corrigés des exercices SAS",
          pourquoi="Les 13 corrigés passent le contrôle statique mais n'ont jamais tourné.",

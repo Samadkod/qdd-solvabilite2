@@ -12,8 +12,8 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 ## Architecture
 | Couche | Chemin | Statut |
 |---|---|---|
-| Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution ; point d'entrée `lancer_qdd.sas` : `&RACINE` + contrôle des fichiers) | Écrite, vérifiée statiquement, **jamais exécutée** (pas de SAS dans l'environnement d'origine) |
-| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 95 tests verts |
+| Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution ; point d'entrée `lancer_qdd.sas` : `&RACINE` + contrôle des fichiers) | Vérifiée statiquement ; **exécutée une fois sur SAS OnDemand (23/10/2026)** : N-1, N et variation égales à Python, N-2 corrigée depuis, à réexécuter |
+| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 96 tests verts |
 | Contrôles | `sql/controles/*.sql` (20, ANSI, sans CTE) + macros SAS équivalentes dans `sas/02_controles.sas` | Testés sur DuckDB |
 | Référentiels | `referentiels/` : dictionnaire, référentiel des contrôles, lignage (flux + chemins), plan de campagne, historique | Source de vérité |
 | Atelier HTML | `app/template.html` + `app/moteur.js` + `app/contenu.js` → `scripts/construire_appli.py` | Parité JS = Python testée |
@@ -29,7 +29,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py      # base fictive
 python -m qdd_s2                           # campagnes N-2, N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
-python -m pytest -q                        # 95 tests, tous doivent passer
+python -m pytest -q                        # 96 tests, tous doivent passer
 python scripts/lint_sas.py                 # vérification statique du SAS (doit afficher « Lint SAS OK »)
 python scripts/construire_appli.py         # régénère l'atelier HTML (après python -m qdd_s2)
 streamlit run streamlit_app.py
@@ -50,7 +50,7 @@ Recalcul des formules Excel : `tests/test_excel_recalcul.py` recalcule le rappor
 - Python ↔ JavaScript : `tests/parite_js.mjs` (lancé par pytest si Node est présent).
 - Python ↔ SQL : `sql/agregation_note_qdd.sql` (test `test_parite_sql_python`).
 - Python ↔ Excel : formules des onglets « Contrôles », « Données critiques », « Synthèse ».
-- Python ↔ SAS : régénérer `sas/donnees_demo/valeurs_attendues.csv` (59 valeurs, `python scripts/valeurs_attendues.py`) si un calcul ou une donnée change. `sas/98_verifier.sas` les compare à l'exécution SAS.
+- Python ↔ SAS : régénérer `sas/donnees_demo/relances_scr.csv` (relances du SCR lues par SAS, un bloc par arrêté du plan : `python scripts/relances_scr.py`) puis `sas/donnees_demo/valeurs_attendues.csv` (59 valeurs, `python scripts/valeurs_attendues.py`) si un calcul, une donnée ou le plan de campagnes change ; `test_relances_scr_pour_sas_suivent_le_plan_et_le_moteur` le vérifie. `sas/98_verifier.sas` les compare à l'exécution SAS.
 - Les tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire doivent rester reproduits (`tests/test_memoire.py`).
 
 ## Valeurs de référence (campagne N, 30/09/2026)
@@ -68,7 +68,7 @@ Historique : 97,45 % → 97,49 % (octobre 2026) après correction, validée par 
 Ajout (octobre 2026, validé par le propriétaire) d'une campagne N-2 au 31/03/2026 pour montrer le cycle de vie complet du registre : nouvel arrêté généré avec son propre flux aléatoire (indice 2), données N-1 et N identiques au bit près ; note, objectif et compteurs de N inchangés ; seuls changent les identifiants d'anomalies, les dates de détection et 4 valeurs attendues (N-1 : récurrentes 0 → 10, en retard 0 → 10, clôturées 0 → 3 ; N : clôturées 0 → 3).
 
 ## Ce qui n'est PAS vérifié
-- Exécution SAS : à faire sur SAS OnDemand ou en entreprise avec `99_executer.sas`, puis lire le log et `WORK.VERIFICATION`.
+- Exécution SAS : première exécution complète sur SAS OnDemand le 23/10/2026 (`lancer_qdd.sas`, SAS 9.4M9) : campagnes N-1 et N et analyse de variation identiques à Python (44 valeurs sur 59) ; les 15 écarts venaient tous de N-2 (relances SCR manquantes pour le 31/03/2026, corrigé). Nouvelle exécution à faire pour confirmer 59/59.
 - Script Qlik `app/chargement_qdd.qvs` et gabarit ODBC : jamais exécutés.
 - SCR : formule standard simplifiée, non réglementaire. Corrélations entre segments illustratives.
 

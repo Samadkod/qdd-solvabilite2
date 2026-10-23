@@ -104,3 +104,21 @@ def test_cycle_de_vie_du_registre(campagnes):
     cycle = cycle_de_vie(reg, [(c.campagne, c.date_arrete) for c in camps])
     assert cycle["Détectées"].tolist() == [13, 1, 3] and cycle["Clôturées"].tolist() == [0, 3, 0]
     assert cycle["Ouvertes en fin de campagne"].tolist() == [c.gouvernance["nb_anomalies_ouvertes"] for c in camps]
+
+
+def test_relances_scr_pour_sas_suivent_le_plan_et_le_moteur(campagnes):
+    """sas/donnees_demo/relances_scr.csv : un bloc par arrêté du plan, et la sensibilité que SAS en tire
+    (%qdd_sensibilites) est celle du moteur Python. Oublier un arrêté vide les notes SAS de la campagne."""
+    import pandas as pd
+    camps, _ = campagnes
+    rel = pd.read_csv(RACINE / "sas" / "donnees_demo" / "relances_scr.csv", sep=";")
+    plan = pd.read_csv(RACINE / "referentiels" / "plan_campagnes.csv")
+    assert sorted(rel["arrete"].unique()) == sorted(plan["date_arrete"])
+    for c in camps:
+        r = rel[rel["arrete"] == c.date_arrete]
+        ref = r[r["choc"] == 0].set_index("donnee_id")["scr"]
+        ch = r[r["choc"] == 0.15].set_index("donnee_id")["scr"]
+        s_sas = ((ch - ref).abs() / ref / 0.15)
+        s_py = c.sensibilites["sensibilite"]
+        assert set(s_sas.index) == set(s_py.index), c.campagne
+        assert (s_sas - s_py.reindex(s_sas.index)).abs().max() < 1e-12, c.campagne

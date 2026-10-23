@@ -1,7 +1,7 @@
 """Régénère sas/donnees_demo/valeurs_attendues.csv : les 59 valeurs que sas/98_verifier.sas compare à l'exécution SAS.
 
 À lancer après toute modification d'un calcul ou des données fictives (invariant de parité Python ↔ SAS) :
-    python scripts/generer_donnees_btp.py && python scripts/valeurs_attendues.py
+    python scripts/generer_donnees_btp.py && python scripts/relances_scr.py && python scripts/valeurs_attendues.py
 """
 from __future__ import annotations
 

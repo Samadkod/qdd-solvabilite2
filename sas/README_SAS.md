@@ -24,7 +24,12 @@ Même logique, mêmes noms, mêmes résultats attendus que la référence Python
    L'import des CSV est fait par `01_import_demo.sas` (étapes DATA, types et longueurs fixés) : pas de PROC IMPORT.
 4. Le log doit afficher `NOTE: [QDD] PARITÉ SAS / PYTHON OK`. En cas d'écart, la table `WORK.VERIFICATION` indique les valeurs en écart.
 
-⚠️ **Ce code n'a pas pu être exécuté** dans l'environnement de développement. Il a été :
+**Première exécution réelle : SAS OnDemand, 23/10/2026** (`lancer_qdd.sas`, SAS 9.4M9). Campagnes N-1 et N et
+analyse de variation identiques à la référence Python (44 valeurs sur 59). Les 15 écarts venaient tous de la
+campagne N-2 : le fichier `relances_scr.csv` ne contenait pas l'arrêté du 31/03/2026. Corrigé (script
+`scripts/relances_scr.py` et test de cohérence) ; une nouvelle exécution doit donner 59 sur 59.
+
+Avant cette exécution, le code avait été :
 - vérifié statiquement (`scripts/lint_sas.py` : blocs, macros, guillemets, parenthèses, `%if` hors macro, `%include`) ;
 - testé par injection de fautes, pour s'assurer que le vérificateur les détecte ;
 - aligné ligne à ligne sur le Python. La logique d'antériorité a été comparée sur les 100 points des deux campagnes.
