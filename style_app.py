@@ -88,6 +88,17 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button p{font-size:.93
   padding:.75rem 0 0 !important; border-top:1px solid var(--qdd-ligne);}
 .st-key-qdd_filtres h6 [data-testid="stIconMaterial"]{font-size:1.1rem !important; vertical-align:-4px; margin-right:.3rem;}
 
+/* pastilles de statut : contour et texte de la couleur, fond très clair (la couleur porte la gravité) */
+.qdd-pastille{display:inline-block; font-size:.78rem; font-weight:600; line-height:1.5; padding:.05rem .6rem;
+  border-radius:999px; border:1px solid var(--c); color:var(--c);
+  background:color-mix(in srgb, var(--c) 9%, white); white-space:nowrap;}
+.qdd-compteurs{display:flex; flex-direction:column; gap:.35rem; margin:.2rem 0;}
+.qdd-compteurs-titre{font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--qdd-gris); margin-bottom:.15rem;}
+.qdd-compteur{display:flex; justify-content:space-between; align-items:center;}
+.qdd-compteur b{font-family:Spectral,serif; font-size:1.05rem; color:var(--qdd-encre);}
+.qdd-legende{display:flex; flex-wrap:wrap; gap:.4rem 1.4rem; font-size:.84rem; color:var(--qdd-gris); margin:.1rem 0 .6rem;}
+
 /* panneau Actions : libellés sur plusieurs lignes plutôt que tronqués */
 [data-testid="stMain"] [data-testid="stButton"] button p, [data-testid="stMain"] [data-testid="stDownloadButton"] button p{
   white-space:normal !important; overflow:visible !important; text-overflow:clip !important; text-align:left;}

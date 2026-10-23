@@ -190,8 +190,9 @@ AIDE_COMPTEURS = {
 LEGENDE_DONNEES = (
     "**Lire le tableau.** *Sensibilité SCR* : de combien le SCR bouge quand la donnée bouge (plus c'est haut, "
     "plus la donnée compte). *Note QDD* : la moyenne des résultats de ses contrôles, après pénalité de retard. "
-    "*Note min* : le minimum exigé, d'autant plus haut que la sensibilité est forte. *Statut* : vert si la note "
-    "atteint le minimum, orange si elle est à moins de 2 points en dessous, rouge au-delà. *E/X/P* : critères "
+    "*Note min* : le minimum exigé, d'autant plus haut que la sensibilité est forte. *Statut* : Conforme si la "
+    "note atteint le minimum ; À corriger si elle est à moins de 2 points en dessous (non bloquant) ; Bloquant "
+    "au-delà (correction obligatoire) ; Non noté pour une donnée non critique. *E/X/P* : critères "
     "couverts (Exhaustivité, eXactitude, Pertinence). Les données non critiques n'ont ni minimum ni statut.")
 
 LEGENDE_CONTROLES = (
@@ -288,9 +289,11 @@ def afficher_d_ou_sortent(c: dict) -> None:
                "peut se permettre plus d'erreurs.")
 
     st.subheader("Étape 5 — Le verdict pour cette donnée")
-    verdict = {"vert": ":green[:material/check_circle:] **Vert** : la note atteint le minimum.",
-               "orange": f":orange[:material/error:] **Orange** : la note est sous le minimum, mais de moins de {par.marge_alerte * 100:g} points.",
-               "rouge": f":red[:material/cancel:] **Rouge** : la note est sous le minimum de plus de {par.marge_alerte * 100:g} points."}
+    verdict = {"vert": ":green[:material/check_circle:] **Conforme** : la note atteint le minimum, rien à faire.",
+               "orange": f":orange[:material/error:] **À corriger** : la note est sous le minimum, mais de moins de "
+                         f"{par.marge_alerte * 100:g} points. Non bloquant, correction à prévoir.",
+               "rouge": f":red[:material/cancel:] **Bloquant** : la note est sous le minimum de plus de "
+                        f"{par.marge_alerte * 100:g} points. Correction obligatoire."}
     st.markdown(f"{p(x['note'])} contre {p(x['note_min'])} exigés → {verdict[x['statut']]}")
 
     st.header("Et la note globale ?")

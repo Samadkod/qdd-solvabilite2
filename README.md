@@ -26,7 +26,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 | | Rôle | Vérification |
 |---|---|---|
 | **SAS / PROC SQL** (`sas/`) | Version **production** | Vérification statique (`scripts/lint_sas.py`) ; comparaison automatique de 59 valeurs à la référence Python (`sas/98_verifier.sas`) |
-| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 105 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
+| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 106 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
 | JavaScript (`app/moteur.js`) | Calculs de l'atelier HTML | Parité avec le Python testée sur toutes les valeurs |
 | Excel (rapport) | Restitution | Les 11 indicateurs calculés par formules sont égaux à ceux du moteur |
 
@@ -37,7 +37,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py     # SI fictif (DuckDB)
 python -m qdd_s2                          # campagnes N-2, N-1 et N -> output/
-python -m pytest -q                       # 105 tests
+python -m pytest -q                       # 106 tests
 python scripts/lint_sas.py                # vérification statique du SAS
 streamlit run streamlit_app.py            # application
 ```

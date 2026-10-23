@@ -22,6 +22,7 @@ from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
+from statuts import legende as legende_statuts, tableau
 from verification_sas import afficher as afficher_verification_sas
 from passage_entreprise import afficher as afficher_passage_entreprise
 from visite import afficher as afficher_visite
@@ -223,10 +224,8 @@ def page_chargement() -> None:
         f"**bloquante**. Une table dont le nombre de lignes varie de plus de **{SEUIL_VARIATION * 100:.0f} %** depuis le "
         "trimestre précédent est **à expliquer** avant toute conclusion. Pour les petites tables (moins de 50 lignes, "
         "une par segment ou par poste), tout changement du nombre de lignes est à expliquer.")
-    couleur = {"Bloquant": "background-color:#F8DEDE;color:#AD3030;font-weight:600",
-               "À expliquer": "background-color:#FBEBCB;color:#9C6400", "Normal": "background-color:#DCF1E4;color:#22744A"}
-    st.dataframe(vol.style.format({"Variation": lambda v: "—" if pd.isna(v) else f"{v:+.1%}".replace(".", ",")})
-                 .map(lambda v: couleur.get(v, ""), subset=["Statut"]), hide_index=True, width="stretch")
+    tableau(vol, formats={"Variation": lambda v: "—" if pd.isna(v) else f"{v:+.1%}".replace(".", ",")},
+            hide_index=True, width="stretch")
     with st.expander("Pourquoi un seuil de 10 % ?"):
         st.markdown(
             "- **Ce qui est normal** : sur le SI fictif, d'un trimestre à l'autre, les tables bougent d'au plus "
@@ -240,7 +239,7 @@ def page_chargement() -> None:
     st.subheader("Exécution des contrôles")
     st.caption("Chaque requête de contrôle est rejouée sur les données de l'arrêté. Un contrôle en échec technique ne "
                "dit rien de la qualité : ce n'est ni une anomalie, ni un résultat conforme.")
-    st.dataframe(exe, hide_index=True, width="stretch")
+    tableau(exe, hide_index=True, width="stretch")
     st.subheader("Journal d'exécution (piste d'audit)")
     st.json(c["journal"], expanded=False)
 
@@ -250,9 +249,9 @@ def page_donnees() -> None:
     d = c["donnees"][["libelle", "donnee_id", "proprietaire", "sensibilite", "critique", "note", "note_min",
                       "statut", "criteres_couverts", "nb_controles"]].sort_values(
         ["critique", "sensibilite"], ascending=False)
-    st.dataframe(
-        d.style.format({"sensibilite": pct, "note": pct, "note_min": pct})
-         .map(lambda v: COULEUR.get(v, ""), subset=["statut"]),
+    legende_statuts()
+    tableau(
+        d, formats={"sensibilite": pct, "note": pct, "note_min": pct},
         hide_index=True, width="stretch",
         column_config={"libelle": "Donnée", "donnee_id": "Identifiant", "proprietaire": "Propriétaire",
                        "sensibilite": "Sensibilité SCR", "critique": "Critique", "note": "Note QDD",
@@ -272,13 +271,17 @@ def page_donnees() -> None:
     base = alt.Chart(v).encode(y=alt.Y("cause:N", sort=ordre, title=None,
                                        axis=alt.Axis(labelLimit=320, labelFontSize=13, labelOverlap=False),
                                        scale=alt.Scale(paddingInner=0.35)))
+    bornes = [min(0.0, v["points"].min()) * 1.35, max(0.0, v["points"].max()) * 1.35]  # place pour les étiquettes
     barres = base.mark_bar(cornerRadius=4).encode(
-        x=alt.X("points:Q", title="Effet sur la note (points)", axis=alt.Axis(format="+.1f", grid=True)),
+        x=alt.X("points:Q", title="Effet sur la note (points)", scale=alt.Scale(domain=bornes, nice=False),
+                axis=alt.Axis(format="+.2f", grid=True, tickCount=6)),
         color=alt.Color("sens:N", scale=alt.Scale(domain=["Hausse", "Baisse"], range=["#22744A", "#AD3030"]),
                         legend=None),
         tooltip=[alt.Tooltip("cause:N", title="Cause"), alt.Tooltip("texte:N", title="Effet")])
-    etiquettes = base.mark_text(align="right", dx=-6, fontSize=13, color="#15202A").encode(
-        x="points:Q", text="texte:N")
+    etiquettes = (base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=13, color="#15202A")
+                  .encode(x="points:Q", text="texte:N")
+                  + base.transform_filter("datum.points >= 0").mark_text(align="left", dx=6, fontSize=13, color="#15202A")
+                  .encode(x="points:Q", text="texte:N"))
     zero = alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(color="#566370").encode(x="x:Q")
     st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(44)), width="stretch")
     st.info(lire_variation(var), icon=":material/menu_book:")
@@ -337,9 +340,7 @@ def _tableau_technique() -> None:
     ctrl = c["controles"]
     cols = ["controle_id", "libelle", "donnee_id", "etape", "responsable", "resultat_brut", "anteriorite",
             "resultat", "seuil", "statut", "detail"]
-    st.dataframe(ctrl[cols].style.format({"resultat_brut": pct, "resultat": pct, "seuil": pct})
-                 .map(lambda v: COULEUR.get(v, ""), subset=["statut"]),
-                 hide_index=True, width="stretch")
+    tableau(ctrl[cols], formats={"resultat_brut": pct, "resultat": pct, "seuil": pct}, hide_index=True, width="stretch")
     st.caption(LEGENDE_CONTROLES)
 
 
@@ -360,9 +361,18 @@ def page_anomalies() -> None:
         vue = vue[vue["gravite"].isin(gravites)]
     st.caption(f"{len(vue)} anomalie(s) affichée(s) sur {len(reg)}. « Récurrente » : déjà présente à la campagne "
                "précédente. Une anomalie se clôture quand le contrôle est refait à temps et revient au vert.")
-    st.dataframe(vue.style.map(lambda v: {"Récurrente": COULEUR["rouge"], "Ouverte": COULEUR["orange"],
-                                          "Clôturée": COULEUR["vert"]}.get(v, ""), subset=["statut"]),
-                 hide_index=True, width="stretch")
+    vue_aff = vue.assign(**{col: pd.to_datetime(vue[col]).dt.strftime("%d/%m/%Y").fillna("")
+                            for col in ("echeance", "date_detection", "date_cloture")})
+    tableau(vue_aff, hide_index=True, width="stretch",
+            column_order=["anomalie_id", "statut", "gravite", "libelle", "proprietaire", "echeance", "type",
+                          "objet", "donnee_id", "constat", "action_attendue", "campagne_detection", "date_detection",
+                          "nb_campagnes", "derniere_campagne", "date_cloture"],
+            column_config={"anomalie_id": "Anomalie", "statut": "Statut", "gravite": "Gravité", "libelle": "Libellé",
+                           "proprietaire": "Propriétaire", "echeance": "Échéance", "type": "Type", "objet": "Objet",
+                           "donnee_id": "Donnée", "constat": "Constat", "action_attendue": "Action attendue",
+                           "campagne_detection": "Détectée en", "date_detection": "Détectée le",
+                           "nb_campagnes": "Campagnes", "derniere_campagne": "Dernière campagne",
+                           "date_cloture": "Clôturée le"})
     st.download_button("Exporter ces anomalies (CSV)", icon=":material/download:", data=vue.to_csv(index=False, sep=";").encode("utf-8-sig"),
                        file_name=f"anomalies_{c['campagne']}.csv", mime="text/csv")
 

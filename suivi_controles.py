@@ -15,6 +15,7 @@ from __future__ import annotations
 import pandas as pd
 
 from explications import MODALITES
+from statuts import compteurs, libelle, tableau
 from qdd_s2.anteriorite import prochaine_echeance
 
 EXECUTIONS = ["Exécuté", "Saisi hors outil", "Non réalisé", "Échec technique"]
@@ -148,7 +149,7 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict, hist
         st.markdown("###### :material/traffic: Résultat")
         resultats = st.pills("Résultat", RESULTATS + ["en retard"], selection_mode="multi", key="filtre_controles",
                              label_visibility="collapsed",
-                             format_func=lambda x: f"{PASTILLES[x]} {x} · {nb_res.get(x, 0)}")
+                             format_func=lambda x: f"{PASTILLES[x]} {libelle(x) if x != 'en retard' else 'En retard'} · {nb_res.get(x, 0)}")
         st.button("Effacer les filtres", icon=":material/filter_alt_off:", on_click=_effacer, key="suivi_effacer",
                   type="tertiary")
     vue = filtrer(df, executions, resultats, periode, surveiller, recherche)
@@ -160,13 +161,8 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict, hist
                             "Échéance": vue["Échéance"].dt.strftime("%d/%m/%Y")})
         cols = ["Contrôle", "Segment", "Exécution", "Statut", "Tendance", "Résultat", "Seuil", "Échéance",
                 "Retard (périodes)", "Réalisé le", "Durée (ms)", "Libellé", "Responsable"]
-        ton_exe = {"Exécuté": couleurs["vert"], "Saisi hors outil": couleurs["orange"],
-                   "Non réalisé": couleurs["orange"], "Échec technique": couleurs["rouge"]}
-        sel = st.dataframe(
-            aff[cols].style.format({"Résultat": _pct, "Seuil": _pct, "Durée (ms)": lambda v: "" if pd.isna(v) else f"{v:.1f}"})
-            .map(lambda v: couleurs.get(v, ""), subset=["Statut"])
-            .map(lambda v: ton_exe.get(v, ""), subset=["Exécution"])
-            .map(lambda v: couleurs["rouge"] if isinstance(v, (int, float)) and v > 0 else "", subset=["Retard (périodes)"]),
+        sel = tableau(
+            aff[cols], formats={"Résultat": _pct, "Seuil": _pct, "Durée (ms)": lambda v: "" if pd.isna(v) else f"{v:.1f}"},
             hide_index=True, width="stretch", on_select="rerun", selection_mode="single-row", key="suivi_selection",
             column_config={"Segment": st.column_config.TextColumn(width="small"),
                            "Tendance": st.column_config.LineChartColumn(
@@ -203,16 +199,14 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict, hist
                     unsafe_allow_html=True)
         st.caption(f"des contrôles exécutés pour l'arrêté ({d['nb_executes']} sur {d['nb_controles']})")
         st.progress(d["avancement"])
-        st.markdown(
-            f"Contrôles non réalisés : **{d['nb_non_realises']}**  \n"
-            + (f"Contrôles saisis hors outil : **{d['nb_saisis']}**  \n" if d["nb_saisis"] else "")
-            + f"Échecs techniques : **{d['nb_echecs']}**")
+        st.markdown(compteurs([("Exécuté", d["nb_executes"]), ("Non réalisé", d["nb_non_realises"])]
+                              + ([("Saisi hors outil", d["nb_saisis"])] if d["nb_saisis"] else [])
+                              + [("Échec technique", d["nb_echecs"])], "Contrôles"), unsafe_allow_html=True)
         st.divider()
-        st.markdown(
-            f"Points de contrôle : **{d['nb_points']}**  \n"
-            f":red[Rouges] : **{d['nb_rouge']}**  \n:orange[Orange] : **{d['nb_orange']}**  \n"
-            f":green[Verts] : **{d['nb_vert']}**  \nNon notés : **{d['nb_non_noté']}**  \n"
-            f"En retard : **{d['nb_en_retard']}**")
+        st.markdown(compteurs([("Bloquant", d["nb_rouge"]), ("À corriger", d["nb_orange"]),
+                               ("Conforme", d["nb_vert"]), ("Non noté", d["nb_non_noté"]),
+                               ("En retard", d["nb_en_retard"])], f"Points de contrôle · {d['nb_points']}"),
+                    unsafe_allow_html=True)
         st.divider()
         st.markdown(f"À surveiller : **{d['nb_a_surveiller']}**  \n"
                     f"Durée totale du rejeu : **{d['duree_totale_ms']:.0f} ms**")

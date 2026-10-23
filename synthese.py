@@ -97,9 +97,9 @@ def tuiles(c: dict, prev: dict | None, df_lignes: pd.DataFrame | None = None,
                      _liste_controles(notes), len(notes), float(len(notes))))
     out.append(_compte("ctrl_retard", "Les contrôles", "Contrôles en retard", _liste_controles(retard), len(retard),
                        None, "orange", AIDE["a_jour"]))
-    out.append(_compte("ctrl_rouges", "Les contrôles", "Contrôles en rouge", _liste_controles(rouges), len(rouges),
+    out.append(_compte("ctrl_rouges", "Les contrôles", "Contrôles bloquants", _liste_controles(rouges), len(rouges),
                        None, "rouge", "Contrôles dont le résultat est nettement sous le seuil (QRT compris)."))
-    out.append(_compte("ctrl_oranges", "Les contrôles", "Contrôles en orange", _liste_controles(oranges), len(oranges),
+    out.append(_compte("ctrl_oranges", "Les contrôles", "Contrôles à corriger", _liste_controles(oranges), len(oranges),
                        None, "orange", "Contrôles juste sous leur seuil (moins de 2 points)."))
     out.append(_compte("qrt_ko", "Les contrôles", "États QRT non conformes", _liste_controles(qrt_ko), len(qrt_ko),
                        len(qrt), "rouge", AIDE["qrt"]))
@@ -210,7 +210,8 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         if t.liste is None or t.liste.empty:
             st.success("Rien à signaler : la liste est vide.")
         else:
-            st.dataframe(t.liste, hide_index=True, width="stretch")
+            from statuts import tableau
+            tableau(t.liste, hide_index=True, width="stretch")
             st.download_button("Exporter cette liste (CSV)", icon=":material/download:", data=t.liste.to_csv(index=False, sep=";").encode("utf-8-sig"),
                                file_name=f"{t.cle}_{c['campagne']}.csv", mime="text/csv")
 
@@ -253,7 +254,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         st.markdown('<div class="qdd-actions-titre">ACTIONS</div>', unsafe_allow_html=True)
         for libelle, page, etat in [
             ("Voir les données hors tolérance", "donnees", {}),
-            ("Voir les contrôles en rouge", "controles", {"filtre_controles": ["rouge"]}),
+            ("Voir les contrôles bloquants", "controles", {"filtre_controles": ["rouge"]}),
             ("Voir les contrôles en retard", "controles", {"filtre_controles": ["en retard"]}),
             ("Voir les anomalies ouvertes", "anomalies", {}),
             ("Voir les lignes en anomalie", "lignes", {}),

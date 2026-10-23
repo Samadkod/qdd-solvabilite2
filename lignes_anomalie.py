@@ -198,7 +198,8 @@ def afficher_regles(c: dict, base: Path) -> None:
         recherche = st.text_input("Recherche", placeholder="Mot du message…", label_visibility="collapsed",
                                   key="regles_recherche")
         familles = st.multiselect("Familles", list(FAMILLES.values()), placeholder="Toutes")
-        statuts = st.multiselect("Pire statut", ["rouge", "orange", "vert"], placeholder="Tous")
+        statuts = st.multiselect("Pire statut", ["rouge", "orange", "vert"], placeholder="Tous",
+                                 format_func=lambda s: {"rouge": "Bloquant", "orange": "À corriger", "vert": "Conforme"}[s])
         resp = st.multiselect("Responsable", sorted(cat["Responsable"].unique()), placeholder="Tous")
     vue = cat
     if familles:
@@ -211,10 +212,9 @@ def afficher_regles(c: dict, base: Path) -> None:
         vue = vue[vue["Message"].str.lower().str.contains(recherche.lower(), regex=False)]
     with contenu:
         st.caption(f"**{len(vue)} règle(s)** sur {len(cat)} · source : referentiels/referentiel_controles.csv")
-        couleur = {"rouge": "background-color:#F8DEDE;color:#AD3030;font-weight:600",
-                   "orange": "background-color:#FBEBCB;color:#9C6400", "vert": "background-color:#DCF1E4;color:#22744A"}
-        st.dataframe(vue.style.map(lambda v: couleur.get(v, ""), subset=["Pire statut"]), hide_index=True,
-                     width="stretch", column_config={"Lignes en anomalie": st.column_config.NumberColumn(format="%d")})
+        from statuts import tableau
+        tableau(vue, hide_index=True, width="stretch",
+                column_config={"Lignes en anomalie": st.column_config.NumberColumn(format="%d")})
         st.download_button("Télécharger les règles de contrôle (CSV)", icon=":material/download:", data=
                            vue.to_csv(index=False, sep=";").encode("utf-8-sig"), file_name="regles_de_controle.csv",
                            mime="text/csv")
@@ -226,11 +226,10 @@ def afficher_regles(c: dict, base: Path) -> None:
             ref = referentiel().set_index("controle_id").loc[choix]
             pts = c["controles"][c["controles"]["controle_id"].str.split("|").str[0] == choix]
             from explications import p as pct
-            st.dataframe(pd.DataFrame({"Point de contrôle": pts["controle_id"], "Résultat": pts["resultat"].map(pct),
-                                       "Seuil": pts["seuil"].map(pct), "Retard (périodes)": pts["anteriorite"].astype(int),
-                                       "Statut": pts["statut"].fillna("non évalué (donnée non critique)"),
-                                       "Ce qui a été compté": pts["detail"]}),
-                         hide_index=True, width="stretch")
+            tableau(pd.DataFrame({"Point de contrôle": pts["controle_id"], "Résultat": pts["resultat"].map(pct),
+                                  "Seuil": pts["seuil"].map(pct), "Retard (périodes)": pts["anteriorite"].astype(int),
+                                  "Statut": pts["statut"], "Ce qui a été compté": pts["detail"]}),
+                    hide_index=True, width="stretch")
             with st.expander("Requête SQL du contrôle"):
                 st.code(_sql(SQL_CONTROLES, ref["fichier_sql"]), language="sql")
             if (SQL_LIGNES / ref["fichier_sql"]).exists():

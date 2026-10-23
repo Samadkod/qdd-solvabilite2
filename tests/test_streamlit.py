@@ -53,7 +53,7 @@ def test_menu_change_de_page():
 
 def test_action_ouvre_les_controles_filtres():
     at = ouvrir("synthese")
-    next(b for b in at.button if b.key and b.key.startswith("action_controles_Voir les contrôles en rouge")).click().run()
+    next(b for b in at.button if b.key and b.key.startswith("action_controles_Voir les contrôles bloquants")).click().run()
     assert at.session_state["page"] == "controles" and not at.exception
     assert any(c.value.startswith("4 point(s) de contrôle affiché(s)") for c in at.caption)
 
@@ -82,3 +82,13 @@ def test_calendrier_suit_la_date_de_prise_de_poste(guide):
     texte = " ".join(i.value for i in guide.info)
     # clôture annuelle 31/12/2026 : QRT trimestriels à 5 semaines, annuels à 14 semaines
     assert "**31/12/2026**" in texte and "**04/02/2027**" in texte and "**08/04/2027**" in texte
+
+
+def test_statuts_affiches_en_clair():
+    """Les statuts du moteur (vert/orange/rouge) s'affichent Conforme / À corriger / Bloquant / Non noté."""
+    from statuts import libelle
+    assert [libelle(s) for s in ["vert", "orange", "rouge", None, "non noté"]] == \
+        ["Conforme", "À corriger", "Bloquant", "Non noté", "Non noté"]
+    at = ouvrir("donnees")
+    assert not at.exception
+    assert any("correction obligatoire" in m.value for m in at.markdown)
