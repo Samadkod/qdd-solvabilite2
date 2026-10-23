@@ -23,6 +23,8 @@ from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
 from verification_sas import afficher as afficher_verification_sas
+from passage_entreprise import afficher as afficher_passage_entreprise
+from visite import afficher as afficher_visite
 from qdd_s2.rapport_excel import ecrire_rapport
 from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
@@ -109,8 +111,11 @@ PAGES = {
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),
     "guide": ("Comprendre", "Guide terre à terre", ":material/explore:", "Le métier, les chiffres et le poste, sans jargon."),
+    "visite": ("Comprendre", "Visite de l'application", ":material/map:", "Chaque page en une ligne : à quoi elle sert, quand l'ouvrir."),
     "sas": ("Se former", "SAS pratique", ":material/school:", "13 exercices progressifs, corrigés, avec le résultat attendu."),
     "atelier": ("Se former", "Atelier (révision)", ":material/quiz:", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
+    "entreprise": ("Technique", "Mise en place en entreprise", ":material/business_center:",
+                   "Ce qu'il faut changer une fois, puis faire chaque trimestre, pour faire tourner la chaîne SAS sur les vraies données."),
     "code": ("Technique", "Code SAS / SQL", ":material/terminal:", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
 }
 
@@ -413,4 +418,6 @@ def page_code() -> None:
     "sas": afficher_exercices,
     "atelier": page_atelier,
     "code": page_code,
+    "visite": lambda: afficher_visite(PAGES, aller),
+    "entreprise": afficher_passage_entreprise,
 }[page]()
