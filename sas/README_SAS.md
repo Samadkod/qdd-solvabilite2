@@ -27,7 +27,7 @@ Même logique, mêmes noms, mêmes résultats attendus que la référence Python
 **Première exécution réelle : SAS OnDemand, 23/10/2026** (`lancer_qdd.sas`, SAS 9.4M9). Campagnes N-1 et N et
 analyse de variation identiques à la référence Python (44 valeurs sur 59). Les 15 écarts venaient tous de la
 campagne N-2 : le fichier `relances_scr.csv` ne contenait pas l'arrêté du 31/03/2026. Corrigé (script
-`scripts/relances_scr.py` et test de cohérence) ; une nouvelle exécution doit donner 59 sur 59.
+`scripts/relances_scr.py` et test de cohérence). **Seconde exécution le même jour : 59 sur 59, 0 écart.**
 
 Avant cette exécution, le code avait été :
 - vérifié statiquement (`scripts/lint_sas.py` : blocs, macros, guillemets, parenthèses, `%if` hors macro, `%include`) ;

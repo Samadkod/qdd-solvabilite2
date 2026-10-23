@@ -40,15 +40,9 @@ ELEMENTS = [
                    "Suppose aussi un outil où chacun peut déclarer sa correction (pas l'application publique).",
          effort="Moyen"),
     # ---------------------------------------------------------------- à vérifier
-    dict(id="V1", statut="À vérifier", titre="Exécuter la chaîne SAS complète",
-         pourquoi="Première exécution sur SAS OnDemand le 23/10/2026 : N-1, N et variation identiques à Python "
-                  "(44 valeurs sur 59) ; les 15 écarts de N-2 venaient d'un fichier de relances SCR incomplet, corrigé.",
-         prerequis="Relancer sas/lancer_qdd.sas avec le relances_scr.csv corrigé : attendu 59 valeurs sur 59 dans "
-                   "WORK.VERIFICATION.",
-         effort="Moyen"),
     dict(id="V2", statut="À vérifier", titre="Exécuter les corrigés des exercices SAS",
          pourquoi="Les 13 corrigés passent le contrôle statique mais n'ont jamais tourné.",
-         prerequis="Après V1 ; comparer chaque sortie au résultat attendu affiché dans « SAS pratique ».",
+         prerequis="La chaîne complète tourne (F11) ; comparer chaque sortie au résultat attendu affiché dans « SAS pratique ».",
          effort="Faible"),
     dict(id="V3", statut="À vérifier", titre="Charger le modèle dans Qlik Sense",
          pourquoi="Le script app/chargement_qdd.qvs et le gabarit ODBC n'ont jamais été exécutés.",
@@ -78,6 +72,11 @@ ELEMENTS = [
                   "signalés par C07, 46 %) et laissait des déclarations après l'arrêté (182).",
          prerequis="Décision du propriétaire (octobre 2026). Après correction : 60 lignes C07 (1,2 %), aucune "
                    "déclaration après l'arrêté ; note N 97,45 % → 97,49 %, tous les compteurs inchangés.", effort="—"),
+    dict(id="F11", statut="Fait", titre="Chaîne SAS exécutée : 59 valeurs sur 59 égales à Python",
+         pourquoi="SAS OnDemand, 23/10/2026, lancer_qdd.sas : les 3 campagnes, la variation et le registre sont "
+                  "identiques à la référence Python. La première exécution (44/59) a révélé un fichier de relances "
+                  "SCR incomplet pour N-2, corrigé et désormais testé.",
+         prerequis="—", effort="—"),
     dict(id="F10", statut="Fait", titre="Liste de suivi des contrôles",
          pourquoi="Chaque point de contrôle avec deux statuts séparés (exécution / résultat), sa dernière "
                   "réalisation, sa prochaine échéance, sa durée, sa tendance sur les campagnes ; filtres, points à surveiller, panneau "
