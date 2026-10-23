@@ -245,7 +245,8 @@ def afficher_exercices() -> None:
                     "il y a souvent plusieurs bonnes façons d'écrire.")
     with st.expander("E00 · Préparer la session SAS (à lancer une fois par session)"):
         st.code(code["E00"][1], language="sql")
-        st.caption("Si votre dossier n'est pas /home/<identifiant>/qdd-s2, modifiez la première ligne (&RACINE).")
+        st.caption("Si votre dossier n'est pas /home/<identifiant>/qdd-s2, lancez d'abord "
+                   "%let RACINE = <votre dossier qdd-s2>; (ou lancer_qdd.sas, qui le fixe).")
 
     total = sum(e["duree"] for e in EXERCICES)
     st.progress(len(fait) / len(EXERCICES),

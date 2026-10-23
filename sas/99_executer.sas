@@ -1,8 +1,11 @@
 /* =====================================================================
    99 — EXÉCUTION COMPLÈTE (démo : 3 campagnes + variation + rapport)
-   Dans SAS Studio : ouvrir ce fichier, ajuster &RACINE dans 00_config.sas, F3.
+   Normalement lancé par lancer_qdd.sas (qui fixe &RACINE et vérifie
+   l'installation). Lancé seul, il suppose le projet dans /home/<identifiant>/qdd-s2.
    ===================================================================== */
-%let RACINE = /home/&sysuserid./qdd-s2;
+/* &RACINE : défini par lancer_qdd.sas ; sinon, valeur par défaut ci-dessous */
+%global RACINE;
+%let RACINE = %sysfunc(coalescec(&RACINE, /home/&sysuserid./qdd-s2));
 
 %include "&RACINE./sas/00_config.sas";
 %include "&RACINE./sas/01_import_demo.sas";     /* à retirer en production */

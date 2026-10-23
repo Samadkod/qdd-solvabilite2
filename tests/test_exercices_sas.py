@@ -51,3 +51,13 @@ def test_isin_fictifs_valides():
     bons = p[p["isin"].str.len() == 12]["isin"]
     assert len(bons) == 1235 and all(_cle_isin(i[:11]) == i[11] for i in bons)
     assert set(p.loc[p["isin"].str.len() != 12, "isin"]) == {"", "N/A", "FR12"}
+
+
+def test_lanceur_sas_liste_tous_les_fichiers():
+    """lancer_qdd.sas vérifie la présence de chaque fichier de sas/ : sa liste doit suivre le dépôt."""
+    import re
+    racine = Path(__file__).resolve().parents[1] / "sas"
+    texte = (racine / "lancer_qdd.sas").read_text(encoding="utf-8")
+    liste = set(re.search(r"%let liste =(.*?);", texte, re.S).group(1).split())
+    attendu = {p.relative_to(racine).as_posix() for p in racine.rglob("*") if p.is_file() and p.name != "lancer_qdd.sas"}
+    assert liste == attendu

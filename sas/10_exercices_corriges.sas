@@ -11,7 +11,9 @@
 
 /* ===== E00 | Préparer la session ===== */
 /* À lancer une fois par session SAS : déclare les bibliothèques et charge les tables fictives. */
-%let RACINE = /home/&sysuserid./qdd-s2;
+/* &RACINE : défini par lancer_qdd.sas ; sinon, valeur par défaut ci-dessous */
+%global RACINE;
+%let RACINE = %sysfunc(coalescec(&RACINE, /home/&sysuserid./qdd-s2));
 %include "&RACINE./sas/00_config.sas";
 %include "&RACINE./sas/01_import_demo.sas";
 %let ARRETE = 30SEP2026;    /* date d'arrêté utilisée par tous les exercices */

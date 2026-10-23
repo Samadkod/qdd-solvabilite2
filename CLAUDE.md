@@ -12,8 +12,8 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 ## Architecture
 | Couche | Chemin | Statut |
 |---|---|---|
-| Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution) | Écrite, vérifiée statiquement, **jamais exécutée** (pas de SAS dans l'environnement d'origine) |
-| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 94 tests verts |
+| Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution ; point d'entrée `lancer_qdd.sas` : `&RACINE` + contrôle des fichiers) | Écrite, vérifiée statiquement, **jamais exécutée** (pas de SAS dans l'environnement d'origine) |
+| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 95 tests verts |
 | Contrôles | `sql/controles/*.sql` (20, ANSI, sans CTE) + macros SAS équivalentes dans `sas/02_controles.sas` | Testés sur DuckDB |
 | Référentiels | `referentiels/` : dictionnaire, référentiel des contrôles, lignage (flux + chemins), plan de campagne, historique | Source de vérité |
 | Atelier HTML | `app/template.html` + `app/moteur.js` + `app/contenu.js` → `scripts/construire_appli.py` | Parité JS = Python testée |
@@ -29,7 +29,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py      # base fictive
 python -m qdd_s2                           # campagnes N-2, N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
-python -m pytest -q                        # 94 tests, tous doivent passer
+python -m pytest -q                        # 95 tests, tous doivent passer
 python scripts/lint_sas.py                 # vérification statique du SAS (doit afficher « Lint SAS OK »)
 python scripts/construire_appli.py         # régénère l'atelier HTML (après python -m qdd_s2)
 streamlit run streamlit_app.py
