@@ -277,6 +277,10 @@ def afficher_exercices() -> None:
                 st.dataframe(_formater(attendus[e["id"]]), hide_index=True, width="stretch")
                 if e.get("remarque"):
                     st.info(e["remarque"], icon=":material/search_insights:")
+    with st.expander("E99 · Afficher tous les résultats pour les comparer", icon=":material/fact_check:"):
+        st.code(code["E99"][1], language="sql")
+        st.caption("E04, E05, E06, E09, E12 et E13 créent une table sans l'afficher : ce bloc les imprime. "
+                   "E11 écrit son résultat dans le journal (lignes « NOTE: [QDD] »).")
     st.caption("Résultats attendus recalculés en SQL (DuckDB) sur les mêmes fichiers CSV que ceux chargés par SAS "
-               "(sas/donnees_demo). Les corrigés SAS passent la vérification statique du projet mais n'ont pas "
-               "encore été exécutés dans SAS : signalez tout écart.")
+               "(sas/donnees_demo). Corrigés exécutés sur SAS OnDemand le 23/10/2026 : E01, E02, E03, E07, E08 et "
+               "E10 conformes ; les autres sont à comparer avec le bloc E99.")

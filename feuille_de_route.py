@@ -41,8 +41,9 @@ ELEMENTS = [
          effort="Moyen"),
     # ---------------------------------------------------------------- à vérifier
     dict(id="V2", statut="À vérifier", titre="Exécuter les corrigés des exercices SAS",
-         pourquoi="Les 13 corrigés passent le contrôle statique mais n'ont jamais tourné.",
-         prerequis="La chaîne complète tourne (F11) ; comparer chaque sortie au résultat attendu affiché dans « SAS pratique ».",
+         pourquoi="Exécutés sur SAS OnDemand le 23/10/2026 : E01, E02, E03, E07, E08 et E10 donnent exactement le "
+                  "résultat attendu ; les 7 autres créent une table sans l'afficher.",
+         prerequis="Lancer le bloc E99 (affiche les 6 tables restantes) et lire E11 dans le journal ; comparer à « SAS pratique ».",
          effort="Faible"),
     dict(id="V3", statut="À vérifier", titre="Charger le modèle dans Qlik Sense",
          pourquoi="Le script app/chargement_qdd.qvs et le gabarit ODBC n'ont jamais été exécutés.",

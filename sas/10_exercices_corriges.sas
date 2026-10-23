@@ -221,3 +221,15 @@ proc datasets lib=work nolist nowarn; delete journal_exercices; quit;   /* NOWAR
 proc export data=work.journal_exercices outfile="&SORTIE./journal_exercices.csv" dbms=dlm replace;
   delimiter=";";
 run;
+
+/* ===== E99 | Afficher tous les résultats pour les comparer ===== */
+/* Les exercices E04, E05, E06, E09, E12 et E13 créent une table sans l'afficher : ce bloc les imprime,
+   à comparer au « résultat attendu » de chaque exercice dans l'application (page SAS pratique).
+   E11 écrit son résultat dans le JOURNAL : chercher les lignes « NOTE: [QDD] ». */
+title "E04 - Primes acquises par segment";        proc print data=work.primes_gestion noobs; run;
+title "E05 - Rapprochement gestion / comptabilité"; proc print data=work.rappro_primes noobs; run;
+title "E06 - Contrats en double";                  proc print data=work.doublons_contrats noobs; run;
+title "E09 - Codes activité hors nomenclature";     proc print data=work.activites_inconnues noobs; run;
+title "E12 - Rapprochement par boucle macro";       proc print data=work.rappro noobs; run;
+title "E13 - Journal des contrôles automatisés";    proc print data=work.journal_exercices noobs; run;
+title;

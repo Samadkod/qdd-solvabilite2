@@ -8,7 +8,7 @@ import exercices_sas as ex  # noqa: E402
 
 def test_un_corrige_par_exercice():
     code = ex.corriges()
-    assert list(code) == ["E00"] + [e["id"] for e in ex.EXERCICES]
+    assert list(code) == ["E00"] + [e["id"] for e in ex.EXERCICES] + ["E99"]
     for e in ex.EXERCICES:
         assert code[e["id"]][0] == e["titre"], e["id"]  # même titre dans l'application et dans le SAS
         assert code[e["id"]][1].strip()
