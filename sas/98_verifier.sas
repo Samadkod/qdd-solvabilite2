@@ -43,6 +43,18 @@ quit;
 title "Vérification SAS vs référence Python — &_nko écart(s)";
 proc print data=work.verification noobs; run;
 title;
+/* Export pour l'application (page « Vérification SAS ») : à télécharger depuis &SORTIE */
+data work._verif_export;
+  length execution $19 version_sas $20;
+  set work.verification;
+  execution   = put(datetime(), e8601dt19.);
+  version_sas = "&sysvlong";
+  format valeur_attendue valeur_sas ecart best32.;   /* toute la précision dans le CSV */
+run;
+proc export data=work._verif_export outfile="&SORTIE./verification_sas.csv" dbms=dlm replace;
+  delimiter=';';
+run;
+
 data _null_;
   if &_nko = 0 then put 'NOTE: [QDD] PARITÉ SAS / PYTHON OK sur toutes les valeurs.';
   else put "WARNING: [QDD] &_nko valeur(s) en écart : voir WORK.VERIFICATION.";

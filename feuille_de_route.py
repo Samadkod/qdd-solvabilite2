@@ -75,7 +75,8 @@ ELEMENTS = [
     dict(id="F11", statut="Fait", titre="Chaîne SAS exécutée : 59 valeurs sur 59 égales à Python",
          pourquoi="SAS OnDemand, 23/10/2026, lancer_qdd.sas : les 3 campagnes, la variation et le registre sont "
                   "identiques à la référence Python. La première exécution (44/59) a révélé un fichier de relances "
-                  "SCR incomplet pour N-2, corrigé et désormais testé.",
+                  "SCR incomplet pour N-2, corrigé et désormais testé. Page « Vérification SAS » : 98_verifier.sas "
+                  "écrit verification_sas.csv, que l'application affiche.",
          prerequis="—", effort="—"),
     dict(id="F10", statut="Fait", titre="Liste de suivi des contrôles",
          pourquoi="Chaque point de contrôle avec deux statuts séparés (exécution / résultat), sa dernière "

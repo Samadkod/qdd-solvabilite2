@@ -22,6 +22,7 @@ from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
+from verification_sas import afficher as afficher_verification_sas
 from qdd_s2.rapport_excel import ecrire_rapport
 from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
@@ -102,6 +103,8 @@ PAGES = {
                 "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
     "chargement": ("Exploitation", "Chargement & exécution", ":material/settings:",
                    "Les données sont-elles bien arrivées, et chaque contrôle a-t-il pu tourner ?"),
+    "verif_sas": ("Exploitation", "Vérification SAS", ":material/verified:",
+                  "La même campagne calculée par la chaîne SAS, comparée valeur par valeur au moteur Python."),
     "feuille": ("Évolutions", "Feuille de route", ":material/route:",
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),
@@ -397,6 +400,7 @@ def page_code() -> None:
 {
     "synthese": page_synthese,
     "chargement": page_chargement,
+    "verif_sas": afficher_verification_sas,
     "feuille": afficher_feuille_de_route,
     "lignes": lambda: afficher_lignes(c, base_fictive()),
     "regles": lambda: afficher_regles(c, base_fictive()),
