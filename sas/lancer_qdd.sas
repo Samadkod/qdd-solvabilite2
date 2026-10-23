@@ -8,7 +8,7 @@
    ===================================================================== */
 %let RACINE = /home/&sysuserid./qdd-s2;
 /* Exemple SAS OnDemand, projet rangé dans un sous-dossier :
-   %let RACINE = /home/&sysuserid./sasuser.v94/PROJET_CAM/qdd-s2; */
+   %let RACINE = /home/&sysuserid./sasuser.v94/MON_DOSSIER/qdd-s2; */
 
 options mprint nosymbolgen nomlogic;
 
