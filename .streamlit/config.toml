@@ -1,22 +1,22 @@
-# Thème aligné sur l'atelier HTML (app/template.html) : mêmes couleurs, mêmes polices.
+# Thème du dashboard assurance ; les calculs métier restent inchangés.
 [theme]
 base = "light"
-primaryColor = "#0E5A69"
-backgroundColor = "#EEF1F3"
-secondaryBackgroundColor = "#F6F8F9"
-textColor = "#15202A"
-linkColor = "#0E5A69"
+primaryColor = "#087E8B"
+backgroundColor = "#F5F7FA"
+secondaryBackgroundColor = "#EDF2F6"
+textColor = "#162C41"
+linkColor = "#087E8B"
 font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
-headingFont = "Spectral:https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&display=swap"
+headingFont = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
 codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
 headingFontWeights = [600, 600, 600, 600, 600, 600]
-baseRadius = "0.7rem"
-borderColor = "#D3DAE0"
-dataframeBorderColor = "#E3E7EB"
+baseRadius = "0.5rem"
+borderColor = "#DCE5EB"
+dataframeBorderColor = "#DCE5EB"
 showWidgetBorder = true
 chartCategoricalColors = ["#0E5A69", "#8E6210", "#22744A", "#AD3030", "#5B7FA6", "#9C6400", "#566370"]
 
 [theme.sidebar]
-backgroundColor = "#E2EAEC"
-secondaryBackgroundColor = "#FFFFFF"
-borderColor = "#C9D3D8"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F8"
+borderColor = "#DCE5EB"
