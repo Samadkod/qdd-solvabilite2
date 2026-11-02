@@ -6,7 +6,7 @@ from synthese import Tuile, tuiles, evolutions, COULEURS, BLOCS, CHARGEMENT, _li
 
 def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes: pd.DataFrame | None = None,
                       volumes: pd.DataFrame | None = None, execution: pd.DataFrame | None = None,
-                      precedentes: list[Tuile] | None = None) -> None:
+                      precedentes: list[Tuile] | None = None, base=None, methode=None) -> None:
     """aller(page, **etat) : change de page (fourni par l'application)."""
     import streamlit as st
 
@@ -87,6 +87,10 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
             if col.button(libelle, key=f"action_{page}_{libelle}", width="stretch"):
                 aller(page, **etat)
 
+    if df_lignes is not None:
+        from operations_qdd.ui import afficher_diagnostic
+        afficher_diagnostic(c, prev, df_lignes, aller)
+
     titres = {
         "La note": ("Performance de la qualité", "Objectif et évolution de la note"),
         "Les contrôles": ("Contrôles & restitutions réglementaires", "Résultats, retards et couverture des risques"),
@@ -137,6 +141,9 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
                            mime="text/csv", width="stretch")
         cols[2].download_button("Rapport complet · Excel", xlsx, icon=":material/download:", file_name="rapport_qdd.xlsx", type="primary", width="stretch",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    if base is not None and methode is not None:
+        from operations_qdd.ui import afficher_dossier
+        afficher_dossier(c, prev, df_lignes, volumes, execution, xlsx, base, methode)
     st.markdown('<div class="qdd-footer">Démonstration sur un assureur dommages BTP fictif. '
                 'SCR simplifié, non réglementaire ; QRT simplifiés, hors taxonomie EIOPA. '
                 'Méthode C. Motard (ISFA / Grant Thornton, 2024), corrigée.<br>'
