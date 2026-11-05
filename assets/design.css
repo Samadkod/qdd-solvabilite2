@@ -107,4 +107,39 @@ button:focus-visible,a:focus-visible {outline: 3px solid #36a9b8 !important; out
   .qdd-section {margin-top: 1rem;}
   .qdd-entete h1 {font-size: 1.5rem;}
 }
+/* Raffinement professionnel : hiérarchie, sobriété et parcours guidé. */
+.qdd-hero {border-radius: 8px; background: #122c43; padding: 1.5rem 1.8rem;
+  border-left: 5px solid #087e8b; box-shadow: none;}
+.qdd-hero:after {display: none;}
+.qdd-hero h1 {font-size: clamp(1.6rem,2.3vw,2.15rem);}
+.qdd-hero p {opacity: 1; color: #d6e2eb;}
+.qdd-badges {margin-top: .8rem;}
+[class*="st-key-qdd_card_"] {border-radius: 8px !important; box-shadow: none; min-height: 186px;}
+.qdd-tuile-valeur {color: var(--qdd-encre) !important;}
+.qdd-card-meta {font-size: .67rem; letter-spacing: .045em;}
+.qdd-card-meta:before {width: 8px; height: 8px;}
+.qdd-entete {border-bottom: 1px solid var(--qdd-ligne); padding-bottom: .8rem; margin-bottom: .4rem;}
+.qdd-process {display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .6rem; margin: .3rem 0 .6rem;}
+.qdd-step {display: flex; align-items: center; gap: .55rem; padding: .8rem;
+  background: #fff; border: 1px solid var(--qdd-ligne); border-radius: 6px; color: var(--qdd-gris);}
+.qdd-step b {display: grid; place-items: center; width: 1.65rem; height: 1.65rem;
+  flex-shrink: 0; border-radius: 50%; background: #edf2f6; font-size: .72rem;}
+.qdd-step span {font-size: .78rem; font-weight: 500;}
+.qdd-step.active {background: var(--qdd-accent-doux); color: #075d68; border-color: #badbdd;}
+.qdd-step.active b {background: var(--qdd-accent); color: white;}
+.qdd-work-heading {display: flex; align-items: baseline; gap: .65rem; border-top: 1px solid var(--qdd-ligne);
+  margin-top: .7rem; padding-top: 1.1rem;}
+.qdd-work-heading > span {color: var(--qdd-accent); font-size: .72rem; font-weight: 600; letter-spacing: .08em;}
+.qdd-work-heading h2 {font-size: 1.1rem; padding: 0; margin: 0; color: var(--qdd-encre);}
+[data-testid="stForm"] {background: white; border-radius: 8px; border-color: var(--qdd-ligne);}
+[data-testid="stWidgetLabel"] p {color: var(--qdd-encre); font-size: .84rem;}
+[data-testid="stMain"] button[kind="primary"] {background: #087e8b; border-color: #087e8b; color: white;}
+[data-testid="stMain"] button[kind="primary"]:disabled {background: #e5ecef; border-color: #e5ecef; color: #6c7e8b;}
+[data-testid="stMain"] h3 {font-size: 1.15rem;}
+@media(max-width: 640px) {
+  .qdd-process {grid-template-columns: repeat(2,minmax(0,1fr));}
+  .qdd-step {padding: .65rem;}
+  .qdd-hero {padding: 1.1rem;}
+  [class*="st-key-qdd_card_"] {min-height: unset;}
+}
 @media(prefers-reduced-motion: reduce) { * {scroll-behavior: auto !important; transition: none !important;} }

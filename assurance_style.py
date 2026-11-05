@@ -14,13 +14,12 @@ def bandeau(campagne: str, date) -> None:
         f"""
 <div class="qdd-hero">
   <div class="qdd-surtitre">SOLVABILITÉ II / PILOTAGE DE LA QUALITÉ DES DONNÉES</div>
-  <h1>Une vision claire de la qualité des données.</h1>
+  <h1>Pilotage de la qualité des données</h1>
   <p>Campagne {escape(str(campagne))} · Arrêté du {date:%d/%m/%Y}<br>
-  Contrôles, anomalies et traçabilité des données qui alimentent le SCR et les restitutions QRT.</p>
+  Identifier les écarts. Prioriser la revue. Documenter les contrôles.</p>
   <div class="qdd-badges">
     <span class="qdd-badge">Environnement de démonstration · données fictives</span>
     <span class="qdd-badge">Assurance dommages · BTP</span>
-    <span class="qdd-badge">Python · SAS · SQL · Qlik Sense</span>
   </div>
 </div>
 """,

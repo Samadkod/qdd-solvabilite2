@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from html import escape
 import pandas as pd
 import streamlit as st
 from .diagnostic import diagnostic, impact
@@ -88,23 +89,48 @@ def afficher_impact(c):
 
 
 def afficher_resolution(c, base, methode):
-    st.warning('Bac à sable sur données fictives. Aucune écriture dans la base ou le registre de référence. '
-               'Session volatile : exporter les preuves avant de quitter. Noms et rôles déclaratifs, sans droits réels.')
-    st.markdown('**1. Déclarer → 2. Recontrôler → 3. Valider dans le bac à sable**')
-    st.caption('C02 et C05 sont modifiables ici ; pour les autres règles, utiliser le diagnostic et le lignage. '
-               'Aucune propagation automatique vers la comptabilité, l’entrepôt, l’actuariat ou les QRT.')
+    def etape(numero, titre):
+        st.markdown(f'<div class="qdd-work-heading"><span>{numero:02d}</span>'
+                    f'<h2>{escape(titre)}</h2></div>', unsafe_allow_html=True)
+
+    st.caption('Bac à sable · données fictives · campagne historique inchangée')
+    scenarios = scenarios_contexte(c, methode)
+    choix = st.session_state.get('qdd_scenario_choix')
+    courant = next((s for s in scenarios if s['id'] == choix), scenarios[-1] if scenarios else None)
+    actif = (4 if courant and courant['statut'] == 'Validée dans le bac à sable' else
+             3 if courant and courant['statut'] == 'Recontrôle réussi · à valider' else
+             2 if courant else 1)
+    st.markdown('<div class="qdd-process">' + ''.join(
+        f'<div class="qdd-step{" active" if i == actif else ""}"><b>{i}</b><span>{titre}</span></div>'
+        for i, titre in enumerate(['Proposer', 'Recontrôler', 'Valider', 'Exporter'], 1)) + '</div>',
+        unsafe_allow_html=True)
+    with st.expander('Premier essai : quelle valeur saisir ?', expanded=False):
+        st.markdown('**Campagne N → C05 → AUTO_FLOTTE → tous les objets modifiables.** '
+                    'Pour un exercice fictif, proposer **0 €**, puis déclarer et recontrôler.')
+        st.caption('Zéro permet de tester la règle « provision ≥ 0 ». Ce n’est pas une valeur métier prouvée : '
+                   'en situation réelle, utiliser une pièce source et l’avis du propriétaire de la donnée.')
+    with st.expander('Périmètre et limites du bac à sable', expanded=False):
+        st.warning('Session volatile : exporter les preuves avant de quitter. Aucune écriture dans la base '
+                   'ou le registre de référence. Noms et rôles déclaratifs, sans droits réels.')
+        st.caption('Seules C02 et C05 sont modifiables. Aucune propagation automatique vers les systèmes aval. '
+                   'Pour les autres règles, consulter le diagnostic et le lignage.')
     with st.expander('Rôles et règle de validation configurables'):
         role_correction = st.text_input('Rôle de correction', 'Propriétaire de donnée', key='qdd_role_correction')
         role_validation = st.text_input('Rôle de validation', 'Référent QDD', key='qdd_role_validation')
         separation = st.checkbox('Exiger un validateur différent du correcteur (déclaratif)', value=True,
                                  key='qdd_separation')
         st.caption('Configuration figée lors de la déclaration. À remplacer par les habilitations de l’organisation en usage réel.')
+    etape(1, 'Choisir les lignes à corriger')
     code = st.selectbox('Règle à corriger', list(REGLES), format_func=lambda v: {
         'C02': 'C02 · Prime acquise hors bornes', 'C05': 'C05 · Provision négative'}[v], key='qdd_regle')
     points = c['controles'][c['controles'].controle == code]
     maille = st.selectbox('Segment de correction', sorted(points.maille.unique()), key='qdd_maille')
     df = candidats(base, c['date'], code, maille)
-    st.dataframe(df, hide_index=True, width='stretch')
+    st.dataframe(df, hide_index=True, width='stretch', column_config={
+        'objet': st.column_config.TextColumn('Identifiant'),
+        'ancienne': st.column_config.NumberColumn('Valeur actuelle (€)', format='%.2f €'),
+        'modifiable': st.column_config.CheckboxColumn('Modifiable sur copie'),
+    })
     valides = df[df.modifiable]
     if not valides.empty:
         portee = st.radio('Périmètre de correction', ['Un objet', 'Tous les objets modifiables du segment'],
@@ -112,6 +138,7 @@ def afficher_resolution(c, base, methode):
         objet = st.selectbox('Objet ciblé', valides.objet.tolist(), key=f'qdd_objet_{code}_{maille}') if portee == 'Un objet' else None
         cible = valides[valides.objet == objet] if objet else valides
         st.caption(f'{len(cible)} objet(s). Les identifiants dupliqués sont exclus et peuvent empêcher la validation.')
+        etape(2, 'Proposer une correction justifiée')
         with st.form('qdd_declaration'):
             auteur = st.text_input('Correcteur (nom déclaré)')
             nouvelle = st.number_input('Nouvelle valeur (€), commune aux objets sélectionnés', min_value=0.0, value=0.0, step=1.0)
@@ -138,7 +165,7 @@ def afficher_resolution(c, base, methode):
     if not scenarios:
         return
     st.divider()
-    st.subheader('Scénarios de ce contexte de campagne')
+    etape(3, 'Recontrôler et comparer')
     st.caption('Un changement de campagne ou de paramètres masque les scénarios des autres contextes sans les supprimer.')
     par_id = {s['id']: s for s in scenarios}
     if st.session_state.get('qdd_scenario_choix') not in par_id:
@@ -176,10 +203,13 @@ def afficher_resolution(c, base, methode):
             st.dataframe(comp, hide_index=True, width='stretch')
             st.dataframe(pd.DataFrame(p['executions']), hide_index=True, width='stretch')
         if p['blocages']:
-            st.error('Validation bloquée :\n\n' + '\n\n'.join(p['blocages']))
+            st.error('Pourquoi la validation est bloquée :\n\n' + '\n\n'.join(p['blocages']))
         else:
             st.success('Cible sans ligne fautive, contrôles liés au-dessus des seuils, aucune nouvelle non-conformité '
                        'ni dégradation d’un point déjà sous seuil. Les variations de points encore conformes restent visibles.')
+    etape(4, 'Valider le scénario, puis exporter')
+    if record['statut'] != 'Recontrôle réussi · à valider' and record['statut'] != 'Validée dans le bac à sable':
+        st.caption('Prochaine action : obtenir un recontrôle réussi sans blocage pour activer la validation.')
     with st.form('qdd_validation'):
         acteur = st.text_input('Validateur (nom déclaré)')
         st.caption('Rôle attendu : ' + record['configuration']['role_validation'])
@@ -193,7 +223,8 @@ def afficher_resolution(c, base, methode):
         except ValueError as e:
             st.error(str(e))
     st.caption('Validation limitée au scénario : elle ne clôture aucune anomalie historique et n’approuve pas la campagne.')
-    st.dataframe(pd.DataFrame(record['evenements']), hide_index=True, width='stretch')
+    with st.expander('Journal du scénario', expanded=False):
+        st.dataframe(pd.DataFrame(record['evenements']), hide_index=True, width='stretch')
     st.download_button('Exporter le scénario et ses preuves · JSON', json_bytes(record),
                        file_name=f'scenario_qdd_{sid[:8]}.json', mime='application/json')
 

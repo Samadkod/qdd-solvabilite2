@@ -97,11 +97,12 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         "Les anomalies": ("Suivi des anomalies", "Gravité, échéances et cycle de vie"),
         CHARGEMENT: ("Fiabilité de l’exploitation", "Chargement des sources et exécution technique"),
     }
-    for bloc, _ in BLOCS:
-        groupe = [t for t in ts if t.bloc == bloc and t.cle not in majeures]
-        if groupe:
-            section(*titres[bloc])
-            cartes(groupe)
+    with st.expander("Indicateurs détaillés · note, contrôles, anomalies et exploitation", expanded=False):
+        for bloc, _ in BLOCS:
+            groupe = [t for t in ts if t.bloc == bloc and t.cle not in majeures]
+            if groupe:
+                section(*titres[bloc])
+                cartes(groupe)
 
     if df_lignes is not None and not df_lignes.empty:
         from lignes_anomalie import regroupements
