@@ -211,3 +211,21 @@ def test_roadmap_claude_futur_et_sas_preserve():
     assert 'Claude' in df.loc['E12', 'titre']
     assert 'Aucun service IA branché' in df.loc['E12', 'prerequis']
     assert '59 valeurs sur 59' in df.loc['F11', 'titre']
+
+
+def test_essais_validables_annonces_pour_la_campagne_n(contexte):
+    """Les scénarios annoncés comme validables sur N le sont vraiment, et C02 RC décennale est bloqué sur N-2
+    par le défaut Q04 injecté (déjà sous le seuil avant la correction)."""
+    from operations_qdd.correction import ESSAIS_VALIDABLES
+    base, camps, _ = contexte
+    cfg = dict(ROLES)
+    for nom, code, maille, attendu in [('N', *e, True) for e in ESSAIS_VALIDABLES['N']] + [('N-2', 'C02', 'RC_DECENNALE', False)]:
+        c = next(x for x in camps if x['campagne'] == nom)
+        df = candidats(base, c['date'], code, maille)
+        df = df[df.modifiable]
+        edits = [{'objet': o, 'nouvelle': 0.0 if code == 'C05' else float(p)}
+                 for o, p in zip(df.objet, df['plafond'] if 'plafond' in df else df.objet)]
+        s = rejouer(declarer(c, base, code, maille, edits, 'Alice', 'Pièce fictive', cfg, METHODE), base, c['params'])
+        assert (not s['preuve']['blocages']) == attendu, (nom, code, maille, s['preuve']['blocages'])
+        if not attendu:
+            assert any('déjà sous le seuil avant la correction' in b for b in s['preuve']['blocages'])

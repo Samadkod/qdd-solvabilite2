@@ -6,7 +6,7 @@ from html import escape
 import pandas as pd
 import streamlit as st
 from .diagnostic import diagnostic, impact
-from .correction import REGLES, candidats, declarer, rejouer, valider
+from .correction import ESSAIS_VALIDABLES, REGLES, candidats, declarer, rejouer, valider
 from .evidence import completude, dossier_zip, json_bytes
 from explications import MODALITES
 from statuts import tableau
@@ -121,6 +121,18 @@ def afficher_resolution(c, base, methode):
         f'<div class="qdd-step{" active" if i == actif else ""}"><b>{i}</b><span>{titre}</span></div>'
         for i, titre in enumerate(['Proposer', 'Recontrôler', 'Valider', 'Exporter'], 1)) + '</div>',
         unsafe_allow_html=True)
+    essais = ESSAIS_VALIDABLES.get(c['campagne'])
+    if essais is not None:
+        if essais:
+            liste = ' ; '.join(f"**{r} · {MODALITES.get(m, m)}**" for r, m in essais)
+            st.info(f"Scénarios qui vont jusqu'à la validation sur la campagne {c['campagne']} : {liste} "
+                    "(tous les objets du segment). Les autres sont bloqués par un autre défaut de la même donnée, "
+                    "ou par une donnée non critique.", icon=':material/lightbulb:')
+        else:
+            st.warning(f"Sur la campagne {c['campagne']}, aucun scénario ne peut être validé : ses défauts "
+                       "volontaires (dates C06, règlements R04, état S.05.01 Q04) touchent les mêmes données et ne "
+                       "sont réglés qu'à la campagne suivante. Pour l'essai complet, choisir la campagne **N** "
+                       "en haut du menu.", icon=':material/info:')
     with st.expander('Premier essai : quelle valeur saisir ?', expanded=False):
         st.markdown('**Campagne N → C05 → AUTO_FLOTTE → tous les objets modifiables.** '
                     'Pour un exercice fictif, proposer **0 €**, puis déclarer et recontrôler.')
@@ -241,7 +253,9 @@ def afficher_resolution(c, base, methode):
             tableau(comp, formats=fmt, hide_index=True, width='stretch')
             st.dataframe(pd.DataFrame(p['executions']), hide_index=True, width='stretch')
         if p['blocages']:
-            st.error('Pourquoi la validation est bloquée :\n\n' + '\n\n'.join(p['blocages']))
+            st.error('Pourquoi la validation est bloquée :\n\n' + '\n\n'.join(f'- {b}' for b in p['blocages'])
+                     + '\n\nLa validation exige que la donnée corrigée soit conforme sur **tous** ses contrôles, '
+                       'pas seulement sur la règle corrigée.')
         else:
             st.success('Cible sans ligne fautive, contrôles liés au-dessus des seuils, aucune nouvelle non-conformité '
                        'ni dégradation d’un point déjà sous seuil. Les variations de points encore conformes restent visibles.')

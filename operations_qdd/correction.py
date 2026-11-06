@@ -18,6 +18,14 @@ from lignes_anomalie import lignes
 from chargement import execution
 
 RACINE = Path(__file__).resolve().parents[1]
+# Scénarios qui vont jusqu'à la validation sur les données fictives (règle, segment), par campagne.
+# Vérifié en rejouant toutes les combinaisons ; tests/test_operations_qdd.py contrôle la campagne N.
+# N-2 n'en a aucun : ses défauts injectés (C06, R04, Q04) touchent les mêmes données et ne sont réglés qu'en N-1.
+ESSAIS_VALIDABLES = {
+    'N': [('C05', 'AUTO_FLOTTE'), ('C02', 'RC_DECENNALE')],
+    'N-1': [('C05', 'AUTO_FLOTTE'), ('C05', 'DOMMAGES_OUVRAGE'), ('C02', 'RC_DECENNALE')],
+    'N-2': [],
+}
 REGLES = {
     'C02': {'table': 'gestion_contrats', 'id': 'contrat_id', 'champ': 'prime_acquise',
             'condition': 'prime_acquise < 0 OR prime_acquise > prime_emise'},
@@ -137,13 +145,22 @@ def rejouer(dossier: dict, base: Path | str, params) -> dict:
             if pd.isna(b.loc[pid, 'seuil']):
                 blocages.append(f'{pid} : seuil QDD non calculé (hors périmètre de notation), validation non établie')
             elif b.loc[pid, 'resultat'] < b.loc[pid, 'seuil']:
-                blocages.append(f'{pid} : résultat sous seuil')
+                av, ap, sl = (float(a.loc[pid, 'resultat']), float(b.loc[pid, 'resultat']), float(b.loc[pid, 'seuil']))
+                pc = lambda v: f'{v * 100:.2f} %'.replace('.', ',')
+                if av < sl and ap <= av + 1e-10:
+                    blocages.append(f'{pid} : déjà sous le seuil avant la correction ({pc(av)} pour {pc(sl)} exigé) '
+                                    'et non réglé par ce scénario ; la donnée corrigée reste donc non conforme '
+                                    '(autre défaut, à traiter à part)')
+                else:
+                    blocages.append(f'{pid} : sous le seuil après la correction ({pc(ap)} pour {pc(sl)} exigé)')
         for pid in b.index:
             if a.loc[pid, 'resultat'] >= a.loc[pid, 'seuil'] and b.loc[pid, 'resultat'] < b.loc[pid, 'seuil']:
                 blocages.append(f'{pid} : nouvelle non-conformité')
             elif (a.loc[pid, 'resultat'] < a.loc[pid, 'seuil'] and
                   b.loc[pid, 'resultat'] < a.loc[pid, 'resultat'] - 1e-10):
-                blocages.append(f'{pid} : point déjà sous seuil dégradé')
+                pc = lambda v: f'{v * 100:.2f} %'.replace('.', ',')
+                blocages.append(f'{pid} : déjà sous le seuil, et encore dégradé par la correction '
+                                f'({pc(float(a.loc[pid, "resultat"]))} avant, {pc(float(b.loc[pid, "resultat"]))} après)')
         reste = lignes(copie, dossier['date'])
         reste = reste[(reste.controle == dossier['code']) & (reste.maille == dossier['maille'])]
         # Une validation d'atelier exige aussi zéro ligne fautive pour la règle et la maille ciblées.
