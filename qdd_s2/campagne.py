@@ -65,6 +65,9 @@ def executer_controle(con, ligne: pd.Series, arrete: str, cfg: Config) -> pd.Dat
     """Exécute le SQL d'un contrôle et renvoie un point de contrôle par maille."""
     sql = (cfg.sql / ligne.fichier_sql).read_text(encoding="utf-8")
     res = con.execute(sql, {"arrete": arrete}).df()
+    # La base ne garantit pas l'ordre des lignes d'un GROUP BY : on le fixe, pour des sorties identiques d'une
+    # exécution à l'autre (les valeurs, elles, ne dépendent pas de l'ordre).
+    res = res.sort_values("maille", kind="stable").reset_index(drop=True)
     pts = []
     for _, r in res.iterrows():
         if ligne.famille == "rapprochement":
@@ -135,7 +138,7 @@ def lancer_campagnes(cfg: Config = Config()) -> tuple[list[ResultatCampagne], pd
             historique = pd.concat([historique, pts], ignore_index=True)
         # 2. dernier résultat connu de chaque point à la date de campagne
         h = historique[pd.to_datetime(historique["date_realisation"]) <= pd.Timestamp(arrete)]
-        dernier = h.sort_values("date_realisation").groupby("point_id").tail(1).set_index("point_id")
+        dernier = h.sort_values("date_realisation", kind="stable").groupby("point_id").tail(1).set_index("point_id")
         lignes = []
         for pid, r in dernier.iterrows():
             cid, maille = pid.split("|")

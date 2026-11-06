@@ -8,7 +8,19 @@ import streamlit as st
 from .diagnostic import diagnostic, impact
 from .correction import REGLES, candidats, declarer, rejouer, valider
 from .evidence import completude, dossier_zip, json_bytes
+from explications import MODALITES
+from statuts import tableau
 
+
+
+def _pct(v) -> str:
+    """Pourcentage au format français : 97,49 %."""
+    return "—" if v is None or pd.isna(v) else f"{v * 100:.2f} %".replace(".", ",")
+
+
+def _euros(v) -> str:
+    """Montant au format français : -4 948,63 €."""
+    return "" if pd.isna(v) else f"{v:,.2f} €".replace(",", " ").replace(".", ",")
 
 def scenarios_contexte(c, methode):
     return [s for s in st.session_state.get('qdd_scenarios', []) if s['campagne'] == c['campagne']
@@ -73,10 +85,14 @@ def afficher_impact(c):
     st.write('Usages documentés :', im['usages'])
     st.write('Restitutions / destinations déclarées :', im['restitutions'])
     st.dataframe(im['parcours'][['ordre', 'flux_id', 'systeme_source', 'systeme_cible', 'traitement',
-                               'mode', 'couvert', 'controles']], hide_index=True, width='stretch')
+                               'mode', 'couvert', 'controles']], hide_index=True, width='stretch',
+                 column_config={'ordre': 'Ordre', 'flux_id': 'Flux', 'systeme_source': 'Source', 'systeme_cible': 'Cible',
+                                'traitement': 'Traitement', 'mode': 'Mode', 'couvert': 'Contrôlé', 'controles': 'Contrôles'})
     st.markdown('**Contrôles associés à cette donnée**')
-    st.dataframe(im['controles'][['controle_id', 'etape', 'responsable', 'resultat', 'seuil',
-                                'statut', 'realise_campagne']], hide_index=True, width='stretch')
+    tableau(im['controles'][['controle_id', 'etape', 'responsable', 'resultat', 'seuil', 'statut', 'realise_campagne']],
+            formats={'resultat': _pct, 'seuil': _pct}, hide_index=True, width='stretch',
+            column_config={'controle_id': 'Point de contrôle', 'etape': 'Étape', 'responsable': 'Responsable',
+                           'resultat': 'Résultat', 'seuil': 'Seuil', 'realise_campagne': 'Réalisé ce trimestre'})
     if im['parcours'].empty:
         st.warning('Aucun parcours documenté : absence de preuve de lignage, pas absence d’impact.')
     if not im['lacunes'].empty:
@@ -124,11 +140,14 @@ def afficher_resolution(c, base, methode):
     code = st.selectbox('Règle à corriger', list(REGLES), format_func=lambda v: {
         'C02': 'C02 · Prime acquise hors bornes', 'C05': 'C05 · Provision négative'}[v], key='qdd_regle')
     points = c['controles'][c['controles'].controle == code]
-    maille = st.selectbox('Segment de correction', sorted(points.maille.unique()), key='qdd_maille')
+    maille = st.selectbox('Segment de correction', sorted(points.maille.unique()), key='qdd_maille',
+                          format_func=lambda m: MODALITES.get(m, m))
     df = candidats(base, c['date'], code, maille)
-    st.dataframe(df, hide_index=True, width='stretch', column_config={
+    aff = df.assign(**{col: df[col].map(_euros) for col in ('ancienne', 'plafond') if col in df})
+    st.dataframe(aff, hide_index=True, width='stretch', column_config={
         'objet': st.column_config.TextColumn('Identifiant'),
-        'ancienne': st.column_config.NumberColumn('Valeur actuelle (€)', format='%.2f €'),
+        'ancienne': st.column_config.TextColumn('Valeur actuelle'),
+        'plafond': st.column_config.TextColumn('Plafond (prime émise)'),
         'modifiable': st.column_config.CheckboxColumn('Modifiable sur copie'),
     })
     valides = df[df.modifiable]
@@ -171,12 +190,16 @@ def afficher_resolution(c, base, methode):
     if st.session_state.get('qdd_scenario_choix') not in par_id:
         st.session_state['qdd_scenario_choix'] = scenarios[-1]['id']
     sid = st.selectbox('Scénario à suivre', list(par_id), key='qdd_scenario_choix',
-                       format_func=lambda id: f'{par_id[id]["code"]} · {par_id[id]["maille"]} · {id[:8]} · {par_id[id]["statut"]}')
+                       format_func=lambda id: f'{par_id[id]["code"]} · {MODALITES.get(par_id[id]["maille"], par_id[id]["maille"])} · '
+                                           f'scénario {id[:8]}')  # l'état est affiché juste en dessous, à jour
     record = par_id[sid]
     st.markdown(f'**État : {record["statut"]}**')
     st.write('Justification :', record['justification'])
     st.caption(f'Correcteur : {record["auteur"]} · Rôle déclaré : {record["configuration"]["role_correction"]}')
-    st.dataframe(pd.DataFrame(record['edits']), hide_index=True, width='stretch')
+    ed = pd.DataFrame(record['edits'])
+    st.dataframe(ed.assign(ancienne=ed['ancienne'].map(_euros), nouvelle=ed['nouvelle'].map(_euros)),
+                 hide_index=True, width='stretch',
+                 column_config={'objet': 'Identifiant', 'ancienne': 'Valeur avant', 'nouvelle': 'Valeur proposée'})
     if record['statut'] != 'Validée dans le bac à sable':
         if st.button('Relancer les 20 contrôles sur la copie', key='qdd_rejouer', type='primary'):
             try:
@@ -195,12 +218,13 @@ def afficher_resolution(c, base, methode):
     if p:
         st.info(p['limite'])
         cols = st.columns(2)
-        cols[0].metric('Note avant · recontrôle neuf', f'{p["note_avant_recontrole"]:.2%}')
-        cols[1].metric('Note après · scénario', f'{p["note_apres"]:.2%}')
+        cols[0].metric('Note avant · recontrôle neuf', _pct(p["note_avant_recontrole"]))
+        cols[1].metric('Note après · scénario', _pct(p["note_apres"]))
         comp = pd.DataFrame(p['comparaison'])
-        st.dataframe(comp[comp['Lié à la donnée corrigée']], hide_index=True, width='stretch')
+        fmt = {'Avant': _pct, 'Après': _pct, 'Seuil après': _pct}
+        tableau(comp[comp['Lié à la donnée corrigée']], formats=fmt, hide_index=True, width='stretch')
         with st.expander('Tous les points et preuves d’exécution'):
-            st.dataframe(comp, hide_index=True, width='stretch')
+            tableau(comp, formats=fmt, hide_index=True, width='stretch')
             st.dataframe(pd.DataFrame(p['executions']), hide_index=True, width='stretch')
         if p['blocages']:
             st.error('Pourquoi la validation est bloquée :\n\n' + '\n\n'.join(p['blocages']))
@@ -229,12 +253,12 @@ def afficher_resolution(c, base, methode):
                        file_name=f'scenario_qdd_{sid[:8]}.json', mime='application/json')
 
 
-def afficher_dossier(c, prev, lignes, volumes, executions, xlsx, base, methode):
-    with st.expander('Dossier de preuves de la campagne', expanded=False):
+def afficher_dossier(c, prev, lignes, volumes, executions, xlsx, base, methode, ouvert=False):
+    with st.expander('Dossier de preuves de la campagne', expanded=ouvert):
         scenarios = scenarios_contexte(c, methode)
         st.caption('Résultats historiques + référentiels + règles SQL + scénarios séparés + manifeste SHA-256. '
                    'Conserver le ZIP : aucun archivage durable n’est fourni par la session publique.')
-        st.dataframe(completude(scenarios), hide_index=True, width='stretch')
+        tableau(completude(scenarios), hide_index=True, width='stretch')
         st.warning('Dossier pédagogique, pas une attestation de conformité. Les pièces manquantes restent visibles ; '
                    'les noms et les validations sont déclaratifs.')
         key = f'qdd_zip_{c["campagne"]}'

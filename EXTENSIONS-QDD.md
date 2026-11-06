@@ -1,7 +1,6 @@
 # Extensions opérationnelles de l’Atelier QDD
 
-Les quatre axes sont disponibles via `streamlit_assurance.py`, sur la branche
-`design-assurance`. Le moteur, l’entrée historique et les référentiels originaux
+Les quatre axes sont intégrés à l’application unique (`streamlit_app.py`). Le moteur, l’entrée historique et les référentiels originaux
 restent inchangés. Toutes les données sont fictives.
 
 ## Où les trouver

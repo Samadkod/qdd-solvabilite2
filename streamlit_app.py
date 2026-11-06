@@ -31,11 +31,13 @@ from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
                           lire_axe, lire_variation)
 from guide_terrain import afficher_guide
-from style_app import appliquer_style, bandeau, entete_page
+from assurance_style import appliquer_style, bandeau, entete_page
 from chargement import SEUIL_VARIATION, execution as executer_controles, volumetrie
-from feuille_de_route import afficher_feuille_de_route
+from assurance_feuille import afficher_feuille_de_route
+from operations_qdd.ui import afficher_diagnostic, afficher_impact, afficher_resolution, afficher_dossier
 from lignes_anomalie import afficher_lignes, afficher_regles, lignes as lignes_en_anomalie, referentiel
-from synthese import afficher_synthese, tuiles
+from synthese import tuiles
+from assurance_synthese import afficher_synthese
 from scripts.generer_donnees_btp import generer
 
 RACINE = Path(__file__).parent
@@ -106,6 +108,8 @@ PAGES = {
                 "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
     "chargement": ("Exploitation", "Chargement & exécution", ":material/settings:",
                    "Les données sont-elles bien arrivées, et chaque contrôle a-t-il pu tourner ?"),
+    "resolution": ("Exploitation", "Atelier de résolution", ":material/build:", "Correction sur copie, recontrôle réel et validation déclarative sur données fictives."),
+    "dossier": ("Exploitation", "Dossier de campagne", ":material/folder:", "Preuves, résultats, règles et pièces manquantes de la campagne."),
     "verif_sas": ("Exploitation", "Vérification SAS", ":material/verified:",
                   "La même campagne calculée par la chaîne SAS, comparée valeur par valeur au moteur Python."),
     "feuille": ("Évolutions", "Feuille de route", ":material/route:",
@@ -114,7 +118,7 @@ PAGES = {
     "guide": ("Comprendre", "Guide terre à terre", ":material/explore:", "Le métier, les chiffres et le poste, sans jargon."),
     "visite": ("Comprendre", "Visite de l'application", ":material/map:", "Chaque page en une ligne : à quoi elle sert, quand l'ouvrir."),
     "sas": ("Se former", "SAS pratique", ":material/school:", "13 exercices progressifs, corrigés, avec le résultat attendu."),
-    "atelier": ("Se former", "Atelier (révision)", ":material/quiz:", "Fiches, QCM, vrai ou faux, simulateur, plan à 90 jours."),
+    "atelier": ("Se former", "Atelier QDD", ":material/quiz:", "Résolution fictive et atelier de révision conservé."),
     "entreprise": ("Technique", "Mise en place en entreprise", ":material/business_center:",
                    "Ce qu'il faut changer une fois, puis faire chaque trimestre, pour faire tourner la chaîne SAS sur les vraies données."),
     "code": ("Technique", "Code SAS / SQL", ":material/terminal:", "La version production en SAS / PROC SQL et les 20 contrôles SQL."),
@@ -147,6 +151,7 @@ appliquer_style()
 with st.sidebar:
     st.markdown('<div class="qdd-marque">' + MARQUE_SVG + 'Atelier QDD<span>Solvabilité 2 · données fictives</span></div>',
                 unsafe_allow_html=True)
+    campagne_slot = st.container()
     en_doc = PAGES[st.session_state["page"]][0] in DOC
     if en_doc:
         st.markdown("#### :material/menu_book: Documentation")
@@ -189,8 +194,8 @@ if dscr >= seuil:
 
 camps, var, xlsx = campagnes(seuil, dscr, coef, degradation, ecart, montant)
 noms = [f"{c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}" for c in camps]
-with st.sidebar:
-    choix = st.segmented_control("Campagne affichée", noms, default=noms[-1], key="campagne") or noms[-1]
+with campagne_slot:
+    choix = st.selectbox("Campagne affichée", noms, index=len(noms) - 1, key="campagne")
 k = noms.index(choix)
 c, prev = camps[k], camps[k - 1] if k > 0 else None
 
@@ -213,7 +218,7 @@ def page_synthese() -> None:
     if prev is not None:
         avant = camps[k - 2] if k >= 2 else None
         precedentes = tuiles(prev, avant, *_contexte(prev, avant))
-    afficher_synthese(c, prev, xlsx, aller, lig, vol, exe, precedentes)
+    afficher_synthese(c, prev, xlsx, aller, lig, vol, exe, precedentes, base=base_fictive(), methode={"methode_ecart": ecart, "ponderation_montant": montant})
 
 
 def page_chargement() -> None:
@@ -378,6 +383,7 @@ def page_anomalies() -> None:
 
 
 def page_lignage() -> None:
+    afficher_impact(c)
     st.subheader("Lignage et couverture des zones de risque")
     cv = c["couverture"]
     seul = st.toggle("Seulement les zones de risque non couvertes (données critiques)", value=True)
@@ -393,6 +399,10 @@ def page_lignage() -> None:
 
 
 def page_atelier() -> None:
+    mode = st.radio("Espace de travail", ["Résolution QDD", "Révision historique"], horizontal=True)
+    if mode == "Résolution QDD":
+        afficher_resolution(c, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant})
+        return
     html = (RACINE / "app" / "atelier_qdd_s2.html").read_text(encoding="utf-8")
     page_html = ('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
                  '<meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -413,6 +423,8 @@ def page_code() -> None:
 
 
 {
+    "resolution": lambda: afficher_resolution(c, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant}),
+    "dossier": lambda: afficher_dossier(c, prev, *_contexte(c, prev), xlsx, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant}, ouvert=True),
     "synthese": page_synthese,
     "chargement": page_chargement,
     "verif_sas": afficher_verification_sas,

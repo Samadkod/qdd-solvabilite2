@@ -24,7 +24,7 @@ def diagnostic(c: dict, lignes: pd.DataFrame, prev: dict | None = None) -> pd.Da
         if not actuel:
             faits.append('Non réalisé dans le plan de cette campagne ; résultat historique dégradé par antériorité.')
         if r.resultat < r.seuil:
-            faits.append(f'Résultat retenu {r.resultat:.4%} < seuil {r.seuil:.4%}.')
+            faits.append(f'Résultat retenu {r.resultat * 100:.2f} % < seuil {r.seuil * 100:.2f} %.'.replace('.', ',', 2))
         if pd.notna(r.resultat_brut) and r.resultat < r.resultat_brut:
             faits.append('La dégradation temporelle diminue le résultat brut connu.')
         avant = anciennes.loc[r.controle_id] if anciennes is not None and r.controle_id in anciennes.index else None

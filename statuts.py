@@ -30,6 +30,8 @@ COULEURS = {
     "Haute": ROUGE, "Moyenne": ORANGE,
     "Normal": VERT, "À expliquer": ORANGE, "Sans référence": GRIS,
     "En retard": ROUGE, "À jour": VERT,
+    # dossier de preuves (page Dossier de campagne)
+    "Disponible": VERT, "Manquant": ORANGE, "Incomplet": ORANGE, "Non produit": GRIS, "Non acquise": GRIS,
 }
 AIDE_COLONNES = {
     "Statut": "Conforme (vert) : rien à faire. À corriger (orange) : non bloquant, correction à prévoir. "

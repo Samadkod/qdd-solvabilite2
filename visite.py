@@ -22,6 +22,11 @@ USAGES = {
                 "comptes) ou pour trouver un trou de contrôle."),
     "chargement": ("Les tables sont-elles arrivées, avec un volume normal ; chaque requête de contrôle a-t-elle "
                    "tourné.", "Avant de lire les résultats : une table vide fausse tout le reste."),
+    "resolution": ("Proposer une correction sur une copie des données, relancer les 20 contrôles, faire valider "
+                   "par une autre personne, exporter la preuve. La campagne de référence n'est jamais modifiée.",
+                   "Pour montrer comment une anomalie se corrige et se prouve."),
+    "dossier": ("Le dossier de preuves de la campagne : résultats, règles, journal, pièces manquantes, à télécharger "
+                "en un seul fichier.", "Pour préparer un audit ou une revue de clôture."),
     "verif_sas": ("Le résultat de la chaîne SAS comparé valeur par valeur au moteur Python.", "Pour prouver que "
                   "la version SAS calcule juste."),
     "feuille": ("Ce qui est prévu, ce qui reste à vérifier, ce qui a été fait.", "Pour suivre le projet."),
@@ -32,8 +37,8 @@ USAGES = {
     "visite": ("Cette page.", "Pour s'y retrouver."),
     "sas": ("13 exercices SAS progressifs, avec indice, corrigé et résultat attendu.", "Pour s'entraîner sur "
             "SAS OnDemand."),
-    "atelier": ("Fiches, QCM, vrai ou faux, simulateur des paramètres, plan à 90 jours.", "Pour réviser la "
-                "méthode."),
+    "atelier": ("La résolution guidée et l'atelier de révision : fiches, QCM, vrai ou faux, simulateur, plan à "
+                "90 jours.", "Pour s'entraîner et réviser la méthode."),
     "entreprise": ("Ce qu'il faut changer une fois, puis faire chaque trimestre, pour faire tourner la chaîne "
                    "SAS sur les vraies données.", "Au moment d'installer le dispositif en entreprise."),
     "code": ("Les programmes SAS de la version production et les 20 contrôles SQL.", "Pour lire ou réutiliser "
