@@ -138,11 +138,21 @@ def afficher_resolution(c, base, methode):
                                  key='qdd_separation')
         st.caption('Configuration figée lors de la déclaration. À remplacer par les habilitations de l’organisation en usage réel.')
     etape(1, 'Choisir les lignes à corriger')
-    code = st.selectbox('Règle à corriger', list(REGLES), format_func=lambda v: {
+    regles = list(REGLES)
+    code = st.selectbox('Règle à corriger', regles, index=regles.index('C05'), format_func=lambda v: {
         'C02': 'C02 · Prime acquise hors bornes', 'C05': 'C05 · Provision négative'}[v], key='qdd_regle')
     points = c['controles'][c['controles'].controle == code]
-    maille = st.selectbox('Segment de correction', sorted(points.maille.unique()), key='qdd_maille',
+    mailles = sorted(points.maille.unique())
+    maille = st.selectbox('Segment de correction', mailles, key='qdd_maille',
+                          index=mailles.index('AUTO_FLOTTE') if 'AUTO_FLOTTE' in mailles else 0,
                           format_func=lambda m: MODALITES.get(m, m))
+    # Prévenir avant la déclaration : une donnée non critique n'a pas de seuil, le scénario ne pourra pas être validé.
+    donnee = points.loc[points.maille == maille, 'donnee_id'].iloc[0]
+    critique = bool(c['donnees'].set_index('donnee_id').loc[donnee, 'critique']) if 'donnee_id' in c['donnees'] else True
+    if not critique:
+        st.warning(f'« {donnee} » n’est pas une donnée critique : elle n’a pas de seuil QDD. Ce scénario pourra être '
+                   'recontrôlé, mais **jamais validé**. Pour le premier essai, choisir **C05 · Provision négative** '
+                   'et **Flottes auto**.', icon=':material/info:')
     df = candidats(base, c['date'], code, maille)
     aff = df.assign(**{col: df[col].map(_euros) for col in ('ancienne', 'plafond') if col in df})
     st.dataframe(aff, hide_index=True, width='stretch', column_config={
@@ -154,10 +164,13 @@ def afficher_resolution(c, base, methode):
     valides = df[df.modifiable]
     if not valides.empty:
         portee = st.radio('Périmètre de correction', ['Un objet', 'Tous les objets modifiables du segment'],
-                          horizontal=True, key='qdd_portee')
+                          index=1, horizontal=True, key='qdd_portee')
         objet = st.selectbox('Objet ciblé', valides.objet.tolist(), key=f'qdd_objet_{code}_{maille}') if portee == 'Un objet' else None
         cible = valides[valides.objet == objet] if objet else valides
         st.caption(f'{len(cible)} objet(s). Les identifiants dupliqués sont exclus et peuvent empêcher la validation.')
+        if len(cible) < len(df):
+            st.info(f'{len(df) - len(cible)} ligne(s) en anomalie ne seront pas corrigées : il restera des lignes '
+                    'fautives sur la cible, et la validation sera bloquée.', icon=':material/info:')
         etape(2, 'Proposer une correction justifiée')
         with st.form('qdd_declaration'):
             auteur = st.text_input('Correcteur (nom déclaré)')
@@ -233,7 +246,15 @@ def afficher_resolution(c, base, methode):
             st.success('Cible sans ligne fautive, contrôles liés au-dessus des seuils, aucune nouvelle non-conformité '
                        'ni dégradation d’un point déjà sous seuil. Les variations de points encore conformes restent visibles.')
     etape(4, 'Valider le scénario, puis exporter')
-    if record['statut'] != 'Recontrôle réussi · à valider' and record['statut'] != 'Validée dans le bac à sable':
+    if record['statut'] == 'Validée dans le bac à sable':
+        v = next((e for e in reversed(record['evenements']) if e.get('action') == 'Validation déclarative'), {})
+        st.success(f"Scénario validé par {v.get('acteur', '?')} ({v.get('role', '')}). Étape suivante : exporter la "
+                   "preuve ci-dessous.", icon=':material/verified:')
+    elif record['statut'] == 'Recontrôle bloquant':
+        st.warning('Validation impossible pour ce scénario : le recontrôle a trouvé des blocages (voir ci-dessus). '
+                   'Un scénario bloqué ne se valide jamais : faire une nouvelle déclaration à l’étape 1, '
+                   'par exemple C05 · Flottes auto · tous les objets.', icon=':material/block:')
+    elif record['statut'] != 'Recontrôle réussi · à valider' and record['statut'] != 'Validée dans le bac à sable':
         st.caption('Prochaine action : obtenir un recontrôle réussi sans blocage pour activer la validation.')
     with st.form('qdd_validation'):
         acteur = st.text_input('Validateur (nom déclaré)')
@@ -249,7 +270,14 @@ def afficher_resolution(c, base, methode):
             st.error(str(e))
     st.caption('Validation limitée au scénario : elle ne clôture aucune anomalie historique et n’approuve pas la campagne.')
     with st.expander('Journal du scénario', expanded=False):
-        st.dataframe(pd.DataFrame(record['evenements']), hide_index=True, width='stretch')
+        ev = pd.DataFrame(record['evenements'])
+        ev['date'] = pd.to_datetime(ev['date']).dt.strftime('%d/%m/%Y %H:%M')
+        for col in ev.columns:
+            ev[col] = ev[col].map(lambda v: ' ; '.join(v) if isinstance(v, list) else ('' if v is None or
+                                                                                        (isinstance(v, float) and pd.isna(v)) else v))
+        st.dataframe(ev, hide_index=True, width='stretch',
+                     column_config={'date': 'Date (UTC)', 'action': 'Action', 'acteur': 'Acteur', 'blocages': 'Blocages',
+                                    'role': 'Rôle', 'commentaire': 'Commentaire', 'erreur': 'Erreur'})
     st.download_button('Exporter le scénario et ses preuves · JSON', json_bytes(record),
                        file_name=f'scenario_qdd_{sid[:8]}.json', mime='application/json')
 
