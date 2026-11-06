@@ -15,6 +15,7 @@ from __future__ import annotations
 import pandas as pd
 
 from explications import MODALITES
+from langue import t as tr
 from statuts import compteurs, libelle, tableau
 from qdd_s2.anteriorite import prochaine_echeance
 
@@ -133,23 +134,23 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict, hist
               "Avant cette campagne": int((~df["Réalisé cette campagne"]).sum())}
     filtres, contenu, detail = st.columns([1.15, 3.3, 1.1], gap="medium")
     with filtres, st.container(border=True, key="qdd_filtres"):
-        st.markdown("**Filtres**")
+        st.markdown(f"**{tr('Filtres')}**")
         st.caption("Les nombres comptent des points de contrôle (un contrôle × un segment).")
         recherche = st.text_input("Recherche", placeholder="Contrôle, donnée, responsable…", icon=":material/search:",
                                   label_visibility="collapsed", key="suivi_recherche")
         surveiller = st.toggle(f"À surveiller seulement ({int(df['À surveiller'].sum())})", key="filtre_surveiller",
                                help="Rouge ou orange, en retard, ou pas exécuté normalement pour cet arrêté.")
-        st.markdown("###### :material/event_available: Réalisé")
+        st.markdown("###### :material/event_available: " + tr("Réalisé"))
         periode = st.pills("Réalisé", PERIODES, default="Toutes", key="filtre_periode", label_visibility="collapsed",
                            format_func=lambda x: f"{x} · {nb_per[x]}") or "Toutes"
-        st.markdown("###### :material/play_circle: Exécution")
+        st.markdown("###### :material/play_circle: " + tr("Exécution"))
         executions = st.pills("Exécution", [e for e in EXECUTIONS if nb_exe.get(e, 0)], selection_mode="multi",
                               key="filtre_execution", label_visibility="collapsed",
-                              format_func=lambda x: f"{ICONES_EXECUTION[x]} {x} · {nb_exe.get(x, 0)}")
-        st.markdown("###### :material/traffic: Résultat")
+                              format_func=lambda x: f"{ICONES_EXECUTION[x]} {tr(x)} · {nb_exe.get(x, 0)}")
+        st.markdown("###### :material/traffic: " + tr("Résultat"))
         resultats = st.pills("Résultat", RESULTATS + ["en retard"], selection_mode="multi", key="filtre_controles",
                              label_visibility="collapsed",
-                             format_func=lambda x: f"{PASTILLES[x]} {libelle(x) if x != 'en retard' else 'En retard'} · {nb_res.get(x, 0)}")
+                             format_func=lambda x: f"{PASTILLES[x]} {tr(libelle(x) if x != 'en retard' else 'En retard')} · {nb_res.get(x, 0)}")
         st.button("Effacer les filtres", icon=":material/filter_alt_off:", on_click=_effacer, key="suivi_effacer",
                   type="tertiary")
     vue = filtrer(df, executions, resultats, periode, surveiller, recherche)
@@ -201,11 +202,11 @@ def afficher_suivi(c: dict, execution: pd.DataFrame, aller, couleurs: dict, hist
         st.progress(d["avancement"])
         st.markdown(compteurs([("Exécuté", d["nb_executes"]), ("Non réalisé", d["nb_non_realises"])]
                               + ([("Saisi hors outil", d["nb_saisis"])] if d["nb_saisis"] else [])
-                              + [("Échec technique", d["nb_echecs"])], "Contrôles"), unsafe_allow_html=True)
+                              + [("Échec technique", d["nb_echecs"])], tr("Contrôles")), unsafe_allow_html=True)
         st.divider()
         st.markdown(compteurs([("Bloquant", d["nb_rouge"]), ("À corriger", d["nb_orange"]),
                                ("Conforme", d["nb_vert"]), ("Non noté", d["nb_non_noté"]),
-                               ("En retard", d["nb_en_retard"])], f"Points de contrôle · {d['nb_points']}"),
+                               ("En retard", d["nb_en_retard"])], f"{tr('Points de contrôle')} · {d['nb_points']}"),
                     unsafe_allow_html=True)
         st.divider()
         st.markdown(f"À surveiller : **{d['nb_a_surveiller']}**  \n"

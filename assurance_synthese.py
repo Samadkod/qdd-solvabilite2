@@ -2,6 +2,7 @@
 from __future__ import annotations
 from html import escape
 import pandas as pd
+from langue import t as tr
 from synthese import Tuile, tuiles, evolutions, COULEURS, BLOCS, CHARGEMENT, _liste_anomalies, _liste_controles
 
 def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes: pd.DataFrame | None = None,
@@ -28,7 +29,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
     par_cle = {t.cle: t for t in ts}
 
     def section(titre: str, contexte: str) -> None:
-        st.markdown(f'<div class="qdd-section"><h2>{escape(titre)}</h2><span>{escape(contexte)}</span></div>',
+        st.markdown(f'<div class="qdd-section"><h2>{escape(tr(titre))}</h2><span>{escape(tr(contexte))}</span></div>',
                     unsafe_allow_html=True)
 
     def cartes(groupe: list[Tuile]) -> None:
@@ -39,16 +40,16 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
             for col, t in zip(cols, groupe[i:i + 3]):
                 with col, st.container(border=True, key=f"qdd_card_{t.cle}"):
                     st.markdown(f'<div class="qdd-card-meta" style="--status:{COULEURS[t.ton]}">'
-                                f'{statuts[t.ton]}</div>', unsafe_allow_html=True)
-                    st.markdown(f'<div class="qdd-tuile-titre">{escape(t.titre)}</div>',
+                                f'{tr(statuts[t.ton])}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="qdd-tuile-titre">{escape(tr(t.titre))}</div>',
                                 unsafe_allow_html=True, help=t.aide)
                     st.markdown(f'<div class="qdd-tuile-valeur" style="color:{COULEURS[t.ton]}">'
-                                f'{escape(t.valeur)}</div>', unsafe_allow_html=True)
-                    delta = escape(t.delta) if t.delta else "&nbsp;"
+                                f'{escape(tr(t.valeur))}</div>', unsafe_allow_html=True)
+                    delta = escape(tr(t.delta)) if t.delta else "&nbsp;"
                     st.markdown(f'<div class="qdd-tuile-delta" style="color:{COULEURS[t.delta_ton]}">'
                                 f'{delta}</div>', unsafe_allow_html=True)
                     if t.liste is not None:
-                        if st.button("Voir le détail ↗", key=f"tuile_{t.cle}",
+                        if st.button(tr("Voir le détail ↗"), key=f"tuile_{t.cle}",
                                      help=t.aide, type="tertiary", width="stretch"):
                             detail(t)
 
@@ -63,28 +64,28 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
     n_qrt = par_cle["qrt_ko"].nombre or 0
     conforme = c["ind"]["note"] >= c["ind"]["note_min"]
     attention = any((n_crit, n_graves, n_retard, n_qrt))
-    bilan = "Objectif global atteint" if conforme else "Objectif global non atteint"
+    bilan = tr("Objectif global atteint" if conforme else "Objectif global non atteint")
     if attention:
-        lecture = (f'<b>{bilan} — des points de vigilance restent à traiter.</b><br>'
-                   f'<strong>{n_crit}</strong> donnée(s) critique(s) hors tolérance · '
-                   f'<strong>{n_qrt}</strong> restitution(s) QRT non conforme(s) · '
-                   f'<strong>{n_graves}</strong> anomalie(s) grave(s) · '
-                   f'<strong>{n_retard}</strong> échéance(s) dépassée(s). '
-                   'La note agrégée ne remplace pas la revue des risques individuels.')
+        lecture = (f'<b>{bilan} — {tr("des points de vigilance restent à traiter.")}</b><br>'
+                   f'<strong>{n_crit}</strong> {tr("donnée(s) critique(s) hors tolérance")} · '
+                   f'<strong>{n_qrt}</strong> {tr("restitution(s) QRT non conforme(s)")} · '
+                   f'<strong>{n_graves}</strong> {tr("anomalie(s) grave(s)")} · '
+                   f'<strong>{n_retard}</strong> {tr("échéance(s) dépassée(s)")}. '
+                   + tr('La note agrégée ne remplace pas la revue des risques individuels.'))
     else:
-        lecture = f'<b>{bilan}.</b> Aucun point de vigilance dans ces quatre catégories.'
+        lecture = f'<b>{bilan}.</b> ' + tr("Aucun point de vigilance dans ces quatre catégories.")
     st.markdown(f'<div class="qdd-summary{"" if attention else " qdd-summary-ok"}">{lecture}</div>',
                 unsafe_allow_html=True)
 
     # Actions conservées avec les mêmes clés et les mêmes filtres de navigation.
-    with st.expander("Agir sur les points de vigilance", icon=":material/arrow_forward:", expanded=True):
+    with st.expander(tr("Agir sur les points de vigilance"), icon=":material/arrow_forward:", expanded=True):
         actions = [
             ("Voir les données hors tolérance", "donnees", {}),
             ("Voir les contrôles bloquants", "controles", {"filtre_controles": ["rouge"]}),
             ("Voir les anomalies ouvertes", "anomalies", {}),
         ]
         for col, (libelle, page, etat) in zip(st.columns(3), actions):
-            if col.button(libelle, key=f"action_{page}_{libelle}", width="stretch"):
+            if col.button(tr(libelle), key=f"action_{page}_{libelle}", width="stretch"):
                 aller(page, **etat)
 
     if df_lignes is not None:
@@ -97,7 +98,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         "Les anomalies": ("Suivi des anomalies", "Gravité, échéances et cycle de vie"),
         CHARGEMENT: ("Fiabilité de l’exploitation", "Chargement des sources et exécution technique"),
     }
-    with st.expander("Indicateurs détaillés · note, contrôles, anomalies et exploitation", expanded=False):
+    with st.expander(tr("Indicateurs détaillés · note, contrôles, anomalies et exploitation"), expanded=True):
         for bloc, _ in BLOCS:
             groupe = [t for t in ts if t.bloc == bloc and t.cle not in majeures]
             if groupe:
@@ -117,7 +118,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         st.caption("Priorisation de Pareto : la part correspond aux lignes du message divisées par le total "
                    "des lignes en anomalie de cohérence. Elle ne mesure pas la gravité métier.")
 
-    with st.expander("Autres actions & accès rapides", icon=":material/apps:"):
+    with st.expander(tr("Autres actions & accès rapides"), icon=":material/apps:"):
         for libelle, page, etat in [
             ("Voir les contrôles en retard", "controles", {"filtre_controles": ["en retard"]}),
             ("Voir les lignes en anomalie", "lignes", {}),
@@ -133,14 +134,14 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
     with st.container(border=True):
         reg = c["registre"]
         cols = st.columns(3)
-        cols[0].download_button("Registre des anomalies · CSV", icon=":material/download:", data=_liste_anomalies(reg).to_csv(index=False, sep=";")
+        cols[0].download_button(tr("Registre des anomalies · CSV"), icon=":material/download:", data=_liste_anomalies(reg).to_csv(index=False, sep=";")
                            .encode("utf-8-sig"), file_name=f"registre_anomalies_{c['campagne']}.csv",
                            mime="text/csv", width="stretch")
         ko = c["controles"][c["controles"]["statut"].isin(["rouge", "orange"])]
-        cols[1].download_button("Contrôles en anomalie · CSV", icon=":material/download:", data=_liste_controles(ko).to_csv(index=False, sep=";")
+        cols[1].download_button(tr("Contrôles en anomalie · CSV"), icon=":material/download:", data=_liste_controles(ko).to_csv(index=False, sep=";")
                            .encode("utf-8-sig"), file_name=f"controles_en_anomalie_{c['campagne']}.csv",
                            mime="text/csv", width="stretch")
-        cols[2].download_button("Rapport complet · Excel", xlsx, icon=":material/download:", file_name="rapport_qdd.xlsx", type="primary", width="stretch",
+        cols[2].download_button(tr("Rapport complet · Excel"), xlsx, icon=":material/download:", file_name="rapport_qdd.xlsx", type="primary", width="stretch",
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     if base is not None and methode is not None:
         from operations_qdd.ui import afficher_dossier

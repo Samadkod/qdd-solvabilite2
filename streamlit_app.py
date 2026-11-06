@@ -23,6 +23,7 @@ from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
 from statuts import legende as legende_statuts, tableau
+from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
 from passage_entreprise import afficher as afficher_passage_entreprise
 from visite import afficher as afficher_visite
@@ -31,7 +32,7 @@ from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
                           lire_axe, lire_variation)
 from guide_terrain import afficher_guide
-from assurance_style import appliquer_style, bandeau, entete_page
+from assurance_style import appliquer_style, bandeau, couleur_texte, entete_page
 from chargement import SEUIL_VARIATION, execution as executer_controles, volumetrie
 from assurance_feuille import afficher_feuille_de_route
 from operations_qdd.ui import afficher_diagnostic, afficher_impact, afficher_resolution, afficher_dossier
@@ -145,34 +146,38 @@ def _choisir(page: str) -> None:
     st.session_state["page"] = page
 
 
+if "langue" not in st.session_state:  # français par défaut ; ?lang=en pour partager un lien en anglais
+    st.session_state["langue"] = "en" if st.query_params.get("lang") == "en" else "fr"
 appliquer_style()
 
 # ---------------------------------------------------------------- menu latéral
 with st.sidebar:
-    st.markdown('<div class="qdd-marque">' + MARQUE_SVG + 'Atelier QDD<span>Solvabilité 2 · données fictives</span></div>',
+    st.markdown('<div class="qdd-marque">' + MARQUE_SVG + 'Atelier QDD<span>' + t('Solvabilité 2 · données fictives') + '</span></div>',
                 unsafe_allow_html=True)
+    st.segmented_control("Langue · Language", list(LANGUES), format_func=LANGUES.get, key="langue",
+                         label_visibility="collapsed")
     campagne_slot = st.container()
     en_doc = PAGES[st.session_state["page"]][0] in DOC
     if en_doc:
-        st.markdown("#### :material/menu_book: Documentation")
-        st.button("Retour à l'atelier QDD", key="menu_retour", on_click=_choisir, args=("synthese",),
+        st.markdown("#### :material/menu_book: " + t("Documentation"))
+        st.button(t("Retour à l'atelier QDD"), key="menu_retour", on_click=_choisir, args=("synthese",),
                   width="stretch", type="secondary", icon=":material/arrow_back:")
     rubrique = None
     for cle, (rub, titre, icone, _) in PAGES.items():
         if (rub in DOC) != en_doc:
             continue
         if rub != rubrique:
-            st.markdown(f'<div class="qdd-rubrique">{rub}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="qdd-rubrique">{t(rub)}</div>', unsafe_allow_html=True)
             rubrique = rub
-        st.button(titre, key=f"menu_{cle}", on_click=_choisir, args=(cle,), width="stretch", icon=icone,
+        st.button(t(titre), key=f"menu_{cle}", on_click=_choisir, args=(cle,), width="stretch", icon=icone,
                   type="primary" if st.session_state["page"] == cle else "tertiary")
     if not en_doc:
         st.divider()
-        st.button("Documentation", key="menu_documentation", on_click=_choisir, args=("guide",), width="stretch",
+        st.button(t("Documentation"), key="menu_documentation", on_click=_choisir, args=("guide",), width="stretch",
                   type="secondary", icon=":material/menu_book:", help="Comprendre (guide, explication des chiffres), se former (SAS, atelier) et "
                                          "code technique.")
     st.divider()
-    with st.expander("Paramètres de la méthode", icon=":material/tune:"):
+    with st.expander(t("Paramètres de la méthode"), icon=":material/tune:"):
         st.caption("Les valeurs par défaut redonnent les chiffres de référence.")
         seuil = st.number_input("Seuil de significativité (%)", 0.1, 20.0, 1.0, 0.1) / 100
         dscr = st.number_input("ΔSCR max par donnée (%)", 0.0, 20.0, 0.5, 0.05) / 100
@@ -186,6 +191,10 @@ with st.sidebar:
 
 page = st.session_state["page"]
 st.query_params["page"] = page
+if st.session_state.get("langue") == "en":
+    st.query_params["lang"] = "en"
+elif "lang" in st.query_params:
+    del st.query_params["lang"]
 
 if dscr >= seuil:
     st.error(f"Paramètres incohérents : ΔSCR max ({pct(dscr)}) doit être inférieur au seuil de significativité "
@@ -195,7 +204,7 @@ if dscr >= seuil:
 camps, var, xlsx = campagnes(seuil, dscr, coef, degradation, ecart, montant)
 noms = [f"{c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}" for c in camps]
 with campagne_slot:
-    choix = st.selectbox("Campagne affichée", noms, index=len(noms) - 1, key="campagne")
+    choix = st.selectbox(t("Campagne affichée"), noms, index=len(noms) - 1, key="campagne")
 k = noms.index(choix)
 c, prev = camps[k], camps[k - 1] if k > 0 else None
 
@@ -203,7 +212,10 @@ rub, titre, icone, description = PAGES[page]
 if page == "synthese":
     bandeau(c["campagne"], pd.Timestamp(c["date"]))
 else:
-    entete_page(rub, titre, description, f"Campagne {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}")
+    entete_page(t(rub), t(titre), t(description), f"{t('Campagne')} {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}")
+    if st.session_state.get("langue") == "en":
+        st.caption(":material/translate: " + t("Contenu détaillé de cette page en français ; l'anglais couvre le menu, "
+                                               "les en-têtes, la Synthèse et les statuts."))
 
 
 # ================================================================ pages
@@ -283,9 +295,9 @@ def page_donnees() -> None:
         color=alt.Color("sens:N", scale=alt.Scale(domain=["Hausse", "Baisse"], range=["#22744A", "#AD3030"]),
                         legend=None),
         tooltip=[alt.Tooltip("cause:N", title="Cause"), alt.Tooltip("texte:N", title="Effet")])
-    etiquettes = (base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=13, color="#15202A")
+    etiquettes = (base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=13, color=couleur_texte())
                   .encode(x="points:Q", text="texte:N")
-                  + base.transform_filter("datum.points >= 0").mark_text(align="left", dx=6, fontSize=13, color="#15202A")
+                  + base.transform_filter("datum.points >= 0").mark_text(align="left", dx=6, fontSize=13, color=couleur_texte())
                   .encode(x="points:Q", text="texte:N"))
     zero = alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(color="#566370").encode(x="x:Q")
     st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(44)), width="stretch")
@@ -313,9 +325,9 @@ def page_donnees() -> None:
                         legend=alt.Legend(title=None, orient="top")),
         tooltip=[alt.Tooltip("groupe:N", title="Groupe"), alt.Tooltip("note_txt:N", title="Note"),
                  alt.Tooltip("min_txt:N", title="Minimum"), alt.Tooltip("texte:N", title="Écart")])
-    etiquettes = (base.transform_filter("datum.points >= 0").mark_text(align="left", dx=6, fontSize=12, color="#15202A")
+    etiquettes = (base.transform_filter("datum.points >= 0").mark_text(align="left", dx=6, fontSize=12, color=couleur_texte())
                   .encode(x="points:Q", text="texte:N")
-                  + base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=12, color="#15202A")
+                  + base.transform_filter("datum.points < 0").mark_text(align="right", dx=-6, fontSize=12, color=couleur_texte())
                   .encode(x="points:Q", text="texte:N"))
     st.altair_chart((barres + etiquettes + zero).properties(height=alt.Step(40)), width="stretch")
     st.info(lire_axe(a, axe), icon=":material/menu_book:")

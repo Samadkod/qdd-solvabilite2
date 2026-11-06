@@ -1,0 +1,25 @@
+/* Thème sombre : mêmes formes, couleurs adaptées. Chargé seulement si l'utilisateur choisit le thème sombre. */
+:root {
+  --qdd-accent: #3bb3c0; --qdd-accent-fonce: #0b151e; --qdd-accent-doux: #173a42;
+  --qdd-encre: #e3eaf0; --qdd-gris: #9fb0bf; --qdd-ligne: #2a3c4b;
+  --qdd-surface: #142330; --qdd-or: #d9a441; --qdd-or-doux: #3a2e17;
+}
+[data-testid="stAppViewContainer"] {background: #0e1a24;}
+section[data-testid="stSidebar"] {background: #0b151e; border-right-color: var(--qdd-ligne);}
+.st-key-qdd_filtres, [class*="st-key-qdd_card_"], .qdd-summary, .qdd-step, [data-testid="stForm"],
+[data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stExpander"] details,
+.qdd-piste {background: var(--qdd-surface) !important; border-color: var(--qdd-ligne) !important;}
+[class*="st-key-qdd_card_"] {box-shadow: none;}
+section[data-testid="stSidebar"] button[kind="primary"] {background: #173a42; color: #7fd3dc;
+  border-color: #24525b; box-shadow: inset 3px 0 #3bb3c0;}
+section[data-testid="stSidebar"] button[kind="primary"]:hover {background: #1d4952; color: #9fe0e7;}
+section[data-testid="stSidebar"] button[kind="tertiary"]:hover {background: #13212d;}
+.qdd-rubrique, .qdd-footer {color: #8a9cab;}
+.qdd-step b {background: #22323f;}
+.qdd-step.active {background: #173a42; color: #9fe0e7; border-color: #24525b;}
+.qdd-hero {background: #0b151e; border: 1px solid var(--qdd-ligne); border-left: 5px solid #3bb3c0;}
+.qdd-summary strong {color: #e06464;} .qdd-summary {border-left-color: #e06464;}
+.qdd-summary-ok strong {color: #4caf7a;} .qdd-summary-ok {border-left-color: #4caf7a;}
+.qdd-pastille {background: color-mix(in srgb, var(--c) 16%, transparent);}
+[data-testid="stMain"] button[kind="primary"] {background: #3bb3c0; border-color: #3bb3c0; color: #0b151e;}
+[data-testid="stMain"] button[kind="primary"]:disabled {background: #22323f; border-color: #22323f; color: #7d8f9e;}

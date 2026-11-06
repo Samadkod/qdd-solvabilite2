@@ -10,6 +10,7 @@ from .correction import REGLES, candidats, declarer, rejouer, valider
 from .evidence import completude, dossier_zip, json_bytes
 from explications import MODALITES
 from statuts import tableau
+from langue import t as tr
 
 
 
@@ -28,7 +29,7 @@ def scenarios_contexte(c, methode):
 
 
 def afficher_diagnostic(c, prev, lignes, aller):
-    with st.expander('Diagnostic explicable de la campagne', expanded=False):
+    with st.expander(tr('Diagnostic explicable de la campagne'), expanded=False):
         st.caption('Constats déterministes issus du moteur, sans IA. Priorité de revue : criticité hors seuil, '
                    'puis non-réalisation, puis autres écarts ; ce classement n’est pas une nouvelle note de risque.')
         df = diagnostic(c, lignes, prev)

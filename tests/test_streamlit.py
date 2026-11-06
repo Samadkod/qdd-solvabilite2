@@ -92,3 +92,16 @@ def test_statuts_affiches_en_clair():
     at = ouvrir("donnees")
     assert not at.exception
     assert any("correction obligatoire" in m.value for m in at.markdown)
+
+
+def test_anglais_pour_la_navigation_la_synthese_et_les_statuts():
+    from langue import EN, t
+    assert t("Synthèse") == "Synthèse"  # français par défaut, hors application
+    assert EN["Synthèse"] == "Overview" and EN["Bloquant"] == "Blocking"
+    at = AppTest.from_file(str(APP), default_timeout=300)
+    at.session_state["page"] = "synthese"
+    at.session_state["langue"] = "en"
+    at.run()
+    assert not at.exception
+    assert any(b.label == "Overview" for b in at.button)  # menu traduit
+    assert any("Detailed indicators" in e.label for e in at.expander)

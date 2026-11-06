@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from langue import t as tr
+
 VERT, ORANGE, ROUGE, GRIS, BLEU = "#22744A", "#C98A10", "#AD3030", "#8A96A3", "#0E5A69"
 
 LIBELLES = {"vert": "Conforme", "orange": "À corriger", "rouge": "Bloquant"}
@@ -80,11 +82,13 @@ def tableau(df: pd.DataFrame, formats: dict | None = None, column_config: dict |
         traduire = str(col).lower().endswith("statut") or bool(set(out[col].dropna().astype(str)) & set(LIBELLES))
         vals = out[col].map(libelle) if traduire else out[col]
         options = [o for o in COULEURS if o in set(vals.dropna())]
-        out[col] = vals.map(lambda x: [x] if isinstance(x, str) and x else [])
+        couleurs = [COULEURS[o] for o in options]
+        options = [tr(o) for o in options]  # libellé affiché (anglais si l'interface l'est), même couleur
+        out[col] = vals.map(lambda x: [tr(x)] if isinstance(x, str) and x else [])
         nom = config[col] if isinstance(config.get(col), str) else ("Statut" if str(col) == "statut" else
                                                                     "Gravité" if str(col) == "gravite" else str(col))
         config[col] = st.column_config.MultiselectColumn(
-            nom, options=options, color=[COULEURS[o] for o in options], help=AIDE_COLONNES.get(nom))
+            nom, options=options, color=couleurs, help=AIDE_COLONNES.get(nom))
     formats = dict(formats or {})
     for col, f in list(formats.items()):  # une case vide s'afficherait « None » : la colonne passe en texte
         if col in out and out[col].isna().any():
@@ -96,7 +100,7 @@ def tableau(df: pd.DataFrame, formats: dict | None = None, column_config: dict |
 
 def pastille(texte: str) -> str:
     """Pastille HTML (contour et texte de la couleur du statut, fond très clair)."""
-    return f'<span class="qdd-pastille" style="--c:{COULEURS.get(texte, GRIS)}">{texte}</span>'
+    return f'<span class="qdd-pastille" style="--c:{COULEURS.get(texte, GRIS)}">{tr(texte)}</span>'
 
 
 def compteurs(lignes: list[tuple[str, int]], titre: str = "") -> str:

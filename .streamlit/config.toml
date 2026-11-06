@@ -1,22 +1,39 @@
-# Thème du dashboard assurance ; les calculs métier restent inchangés.
+# Thème de l'application : clair par défaut, sombre au choix (menu ⋮ > Settings > Theme).
+# Les calculs métier ne dépendent pas du thème.
 [theme]
-base = "light"
-primaryColor = "#087E8B"
-backgroundColor = "#F5F7FA"
-secondaryBackgroundColor = "#EDF2F6"
-textColor = "#162C41"
-linkColor = "#087E8B"
 font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
 headingFont = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
 codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
 headingFontWeights = [600, 600, 600, 600, 600, 600]
 baseRadius = "0.5rem"
+showWidgetBorder = true
+
+[theme.light]
+primaryColor = "#087E8B"
+backgroundColor = "#F5F7FA"
+secondaryBackgroundColor = "#EDF2F6"
+textColor = "#162C41"
+linkColor = "#087E8B"
 borderColor = "#DCE5EB"
 dataframeBorderColor = "#DCE5EB"
-showWidgetBorder = true
 chartCategoricalColors = ["#0E5A69", "#8E6210", "#22744A", "#AD3030", "#5B7FA6", "#9C6400", "#566370"]
 
-[theme.sidebar]
+[theme.light.sidebar]
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F1F5F8"
 borderColor = "#DCE5EB"
+
+[theme.dark]
+primaryColor = "#3BB3C0"
+backgroundColor = "#0E1A24"
+secondaryBackgroundColor = "#172633"
+textColor = "#E3EAF0"
+linkColor = "#6CCAD4"
+borderColor = "#2A3C4B"
+dataframeBorderColor = "#2A3C4B"
+chartCategoricalColors = ["#4FB3C2", "#D9A441", "#4CAF7A", "#E06464", "#8AA9D6", "#E0A35A", "#9AA8B5"]
+
+[theme.dark.sidebar]
+backgroundColor = "#0B151E"
+secondaryBackgroundColor = "#13212D"
+borderColor = "#2A3C4B"
