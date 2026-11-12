@@ -32,6 +32,7 @@ COULEURS = {
     "Haute": ROUGE, "Moyenne": ORANGE,
     "Normal": VERT, "À expliquer": ORANGE, "Sans référence": GRIS,
     "En retard": ROUGE, "À jour": VERT,
+    "À revoir": BLEU,  # contrôle de niveau 2 : signal à examiner, pas une défaillance
     # dossier de preuves (page Dossier de campagne)
     "Disponible": VERT, "Manquant": ORANGE, "Incomplet": ORANGE, "Non produit": GRIS, "Non acquise": GRIS,
 }

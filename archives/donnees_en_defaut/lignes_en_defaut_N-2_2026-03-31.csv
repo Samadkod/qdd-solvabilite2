@@ -1,0 +1,494 @@
+controle;libelle;maille;objet;montant;poids;valeurs;message;responsable
+C01;Contrats absents de l'entrepôt;AUTO_FLOTTE;AU000137;9859.5;1;prime acquise 9859.5 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;AUTO_FLOTTE;AU000466;10157.74;1;prime acquise 10157.74 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;DOMMAGES_OUVRAGE;DO000159;15857.57;1;prime acquise 15857.57 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;DOMMAGES_OUVRAGE;DO000296;9549.26;1;prime acquise 9549.26 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;DOMMAGES_OUVRAGE;DO000793;9993.92;1;prime acquise 9993.92 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;DOMMAGES_OUVRAGE;DO000803;20056.04;1;prime acquise 20056.04 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;DOMMAGES_OUVRAGE;DO001192;5189.34;1;prime acquise 5189.34 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;DOMMAGES_OUVRAGE;DO001309;15373.51;1;prime acquise 15373.51 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;RC_DECENNALE;RC001127;17107.68;1;prime acquise 17107.68 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;RC_DECENNALE;RC001277;27180.18;1;prime acquise 27180.18 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;RC_DECENNALE;RC001301;20094.93;1;prime acquise 20094.93 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;RC_DECENNALE;RC001375;15865.73;1;prime acquise 15865.73 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C01;Contrats absents de l'entrepôt;RC_DECENNALE;RC001619;3564.36;1;prime acquise 3564.36 €;Contrat présent dans l'outil de gestion mais absent de l'entrepôt de données.;Équipe données
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU000074;8116.55;1;"acquise -8116.55 € ; émise 9082.93 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU000720;8318.62;1;"acquise -8318.62 € ; émise 9734.28 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU000783;4979.13;1;"acquise -4979.13 € ; émise 5012.44 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU000847;2500.27;1;"acquise -2500.27 € ; émise 3384.13 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU001168;19841.1;1;"acquise -19841.1 € ; émise 21395.3 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU001179;2873.2;1;"acquise -2873.2 € ; émise 3725.58 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU001335;7823.19;1;"acquise -7823.19 € ; émise 8742.31 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;AUTO_FLOTTE;AU001409;6672.38;1;"acquise -6672.38 € ; émise 7361.62 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO000256;26395.95;1;"acquise -26395.95 € ; émise 27525.1 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO000481;14440.03;1;"acquise -14440.03 € ; émise 18548.18 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO000682;9542.74;1;"acquise -9542.74 € ; émise 13137.13 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO000969;3770.35;1;"acquise -3770.35 € ; émise 5104.63 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO001002;16136.51;1;"acquise -16136.51 € ; émise 19165.02 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO001131;3204.45;1;"acquise -3204.45 € ; émise 4570.62 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO001293;10051.97;1;"acquise -10051.97 € ; émise 10701.13 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;DOMMAGES_OUVRAGE;DO001366;27437.09;1;"acquise -27437.09 € ; émise 30518.49 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC000567;42991.91;1;"acquise -42991.91 € ; émise 53368.17 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC001366;27469.75;1;"acquise -27469.75 € ; émise 28420.1 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC001437;20880.3;1;"acquise -20880.3 € ; émise 29584.56 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC001730;24616.73;1;"acquise -24616.73 € ; émise 32330.38 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC001860;30255.34;1;"acquise -30255.34 € ; émise 30442.09 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC002105;11791.94;1;"acquise -11791.94 € ; émise 11823.33 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC002184;19722.14;1;"acquise -19722.14 € ; émise 19992.07 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC002796;11522.92;1;"acquise -11522.92 € ; émise 15708.47 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC003029;4408.68;1;"acquise -4408.68 € ; émise 5050.45 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C02;Primes acquises négatives ou > émises;RC_DECENNALE;RC003073;9508.78;1;"acquise -9508.78 € ; émise 10812.94 €";Prime acquise négative ou supérieure à la prime émise.;Direction technique
+C03;Doublons de contrats;AUTO_FLOTTE;AU001361;;1;2 lignes pour ce contrat;Numéro de contrat présent plusieurs fois dans l'outil de gestion.;Équipe données
+C03;Doublons de contrats;DOMMAGES_OUVRAGE;DO001314;;1;2 lignes pour ce contrat;Numéro de contrat présent plusieurs fois dans l'outil de gestion.;Équipe données
+C03;Doublons de contrats;RC_DECENNALE;RC001760;;1;2 lignes pour ce contrat;Numéro de contrat présent plusieurs fois dans l'outil de gestion.;Équipe données
+C03;Doublons de contrats;RC_DECENNALE;RC001936;;1;2 lignes pour ce contrat;Numéro de contrat présent plusieurs fois dans l'outil de gestion.;Équipe données
+C03;Doublons de contrats;RC_DECENNALE;RC001977;;1;2 lignes pour ce contrat;Numéro de contrat présent plusieurs fois dans l'outil de gestion.;Équipe données
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000128;2075.13;1;"contrat INCONNU ; provision 2075.13 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000293;48884.05;1;"contrat INCONNU ; provision 48884.05 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000343;4397.99;1;"contrat INCONNU ; provision 4397.99 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000448;13415.45;1;"contrat INCONNU ; provision 13415.45 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000519;7842.57;1;"contrat INCONNU ; provision 7842.57 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000673;6248.72;1;"contrat INCONNU ; provision 6248.72 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000686;6643.8;1;"contrat INCONNU ; provision 6643.8 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000825;2603.79;1;"contrat INCONNU ; provision 2603.79 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU000832;12912.77;1;"contrat INCONNU ; provision 12912.77 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU001218;2743.86;1;"contrat INCONNU ; provision 2743.86 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;AUTO_FLOTTE;SAU001378;25894.4;1;"contrat INCONNU ; provision 25894.4 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;DOMMAGES_OUVRAGE;SDO000222;191909.48;1;"contrat INCONNU ; provision 191909.48 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;DOMMAGES_OUVRAGE;SDO000789;51507.83;1;"contrat INCONNU ; provision 51507.83 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC000097;116716.07;1;"contrat INCONNU ; provision 116716.07 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC000154;68013.23;1;"contrat INCONNU ; provision 68013.23 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC000808;59267.72;1;"contrat INCONNU ; provision 59267.72 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC000879;96494.01;1;"contrat INCONNU ; provision 96494.01 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC000882;52578.93;1;"contrat INCONNU ; provision 52578.93 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC000988;47126.54;1;"contrat INCONNU ; provision 47126.54 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC001241;162953.08;1;"contrat INCONNU ; provision 162953.08 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC001378;37601.55;1;"contrat INCONNU ; provision 37601.55 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC001463;28387.94;1;"contrat INCONNU ; provision 28387.94 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC002080;17078.94;1;"contrat INCONNU ; provision 17078.94 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC002361;280081.88;1;"contrat INCONNU ; provision 280081.88 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C04;Sinistres orphelins;RC_DECENNALE;SRC002559;85909.46;1;"contrat INCONNU ; provision 85909.46 €";Sinistre rattaché à un contrat inconnu de l'outil de gestion.;Direction sinistres
+C05;Provisions dossier négatives;DOMMAGES_OUVRAGE;SDO000097;73102.15;1;provision -73102.15 €;Provision de dossier négative.;Direction sinistres
+C05;Provisions dossier négatives;RC_DECENNALE;SRC001552;150375.55;1;provision -150375.55 €;Provision de dossier négative.;Direction sinistres
+C05;Provisions dossier négatives;RC_DECENNALE;SRC001793;147228.33;1;provision -147228.33 €;Provision de dossier négative.;Direction sinistres
+C05;Provisions dossier négatives;RC_DECENNALE;SRC002083;85038.14;1;provision -85038.14 €;Provision de dossier négative.;Direction sinistres
+C05;Provisions dossier négatives;RC_DECENNALE;SRC002487;26509.22;1;provision -26509.22 €;Provision de dossier négative.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000016;11179.35;1;"survenance 2019-03-24 ; déclaration 2019-02-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000052;12137.31;1;"survenance 2020-12-31 ; déclaration 2020-12-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000056;33466.87;1;"survenance 2026-01-19 ; déclaration 2025-12-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000059;77937.29;1;"survenance 2021-09-16 ; déclaration 2021-08-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000073;19499.26;1;"survenance 2022-06-18 ; déclaration 2022-05-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000108;3895.18;1;"survenance 2025-10-01 ; déclaration 2025-09-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000142;105817.91;1;"survenance 2021-04-19 ; déclaration 2021-03-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000161;9203.65;1;"survenance 2024-08-18 ; déclaration 2024-07-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000189;8006.29;1;"survenance 2021-09-27 ; déclaration 2021-08-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000201;14622.84;1;"survenance 2020-06-06 ; déclaration 2020-05-07";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000215;4785.19;1;"survenance 2025-11-30 ; déclaration 2025-10-31";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000267;3328.12;1;"survenance 2025-06-03 ; déclaration 2025-05-04";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000304;1966.63;1;"survenance 2025-03-20 ; déclaration 2025-02-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000326;15210.21;1;"survenance 2024-06-21 ; déclaration 2024-05-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000367;10290.56;1;"survenance 2023-07-17 ; déclaration 2023-06-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000392;39318.86;1;"survenance 2018-09-30 ; déclaration 2018-08-31";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000428;12190.0;1;"survenance 2023-03-16 ; déclaration 2023-02-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000436;3466.91;1;"survenance 2025-07-05 ; déclaration 2025-06-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000442;6125.44;1;"survenance 2019-12-26 ; déclaration 2019-11-26";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000445;9138.59;1;"survenance 2026-01-01 ; déclaration 2025-12-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000461;1717.64;1;"survenance 2024-06-16 ; déclaration 2024-05-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000462;3536.4;1;"survenance 2021-07-25 ; déclaration 2021-06-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000472;20959.49;1;"survenance 2025-01-13 ; déclaration 2024-12-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000485;3744.38;1;"survenance 2021-07-10 ; déclaration 2021-06-10";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000507;9411.52;1;"survenance 2019-09-19 ; déclaration 2019-08-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000548;3934.93;1;"survenance 2026-01-05 ; déclaration 2025-12-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000552;1522.5;1;"survenance 2025-06-21 ; déclaration 2025-05-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000554;7672.97;1;"survenance 2022-05-19 ; déclaration 2022-04-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000585;4754.46;1;"survenance 2017-02-11 ; déclaration 2017-01-12";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000591;28527.92;1;"survenance 2023-11-18 ; déclaration 2023-10-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000675;7845.91;1;"survenance 2025-03-09 ; déclaration 2025-02-07";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000677;29579.97;1;"survenance 2024-01-02 ; déclaration 2023-12-03";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000697;3230.59;1;"survenance 2025-05-28 ; déclaration 2025-04-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000709;36482.74;1;"survenance 2024-03-07 ; déclaration 2024-02-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000732;24465.95;1;"survenance 2025-08-28 ; déclaration 2025-07-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000742;4404.51;1;"survenance 2022-01-05 ; déclaration 2021-12-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000803;49068.48;1;"survenance 2021-11-07 ; déclaration 2021-10-08";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000810;1272.4;1;"survenance 2019-11-29 ; déclaration 2019-10-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000814;3535.64;1;"survenance 2024-03-24 ; déclaration 2024-02-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000824;26475.38;1;"survenance 2024-05-29 ; déclaration 2024-04-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000848;4913.34;1;"survenance 2023-12-06 ; déclaration 2023-11-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000866;831.08;1;"survenance 2025-02-21 ; déclaration 2025-01-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000867;1473.11;1;"survenance 2021-05-25 ; déclaration 2021-04-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000901;14207.39;1;"survenance 2022-12-06 ; déclaration 2022-11-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000906;5307.49;1;"survenance 2025-10-21 ; déclaration 2025-09-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000932;9126.94;1;"survenance 2025-07-23 ; déclaration 2025-06-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000944;20026.19;1;"survenance 2026-02-20 ; déclaration 2026-01-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU000988;6295.85;1;"survenance 2019-09-15 ; déclaration 2019-08-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001024;3105.92;1;"survenance 2021-05-18 ; déclaration 2021-04-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001071;9382.36;1;"survenance 2025-12-04 ; déclaration 2025-11-04";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001090;8584.09;1;"survenance 2022-03-22 ; déclaration 2022-02-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001117;3060.84;1;"survenance 2024-09-30 ; déclaration 2024-08-31";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001118;4191.21;1;"survenance 2025-08-31 ; déclaration 2025-08-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001119;16733.74;1;"survenance 2025-09-29 ; déclaration 2025-08-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001132;21088.56;1;"survenance 2025-12-15 ; déclaration 2025-11-15";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001141;12493.36;1;"survenance 2018-04-13 ; déclaration 2018-03-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001151;7088.47;1;"survenance 2022-10-26 ; déclaration 2022-09-26";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001166;5671.6;1;"survenance 2018-12-15 ; déclaration 2018-11-15";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001181;1527.68;1;"survenance 2024-12-12 ; déclaration 2024-11-12";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001218;2743.86;1;"survenance 2021-08-29 ; déclaration 2021-07-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001249;56873.44;1;"survenance 2023-11-09 ; déclaration 2023-10-10";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001261;1514.35;1;"survenance 2019-07-14 ; déclaration 2019-06-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001263;5628.95;1;"survenance 2022-05-16 ; déclaration 2022-04-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001274;15595.93;1;"survenance 2019-11-16 ; déclaration 2019-10-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001310;8209.32;1;"survenance 2025-03-15 ; déclaration 2025-02-13";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SAU001346;10517.54;1;"survenance 2024-10-20 ; déclaration 2024-09-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000008;78540.5;1;"survenance 2022-11-24 ; déclaration 2022-10-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000058;181375.54;1;"survenance 2017-12-29 ; déclaration 2017-11-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000063;88344.09;1;"survenance 2023-09-15 ; déclaration 2023-08-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000130;109131.27;1;"survenance 2025-12-14 ; déclaration 2025-11-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000156;237145.48;1;"survenance 2025-05-01 ; déclaration 2025-04-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000197;34836.84;1;"survenance 2018-02-22 ; déclaration 2018-01-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000201;54007.7;1;"survenance 2025-12-30 ; déclaration 2025-11-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000209;43429.45;1;"survenance 2024-03-04 ; déclaration 2024-02-03";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000231;34118.81;1;"survenance 2024-02-28 ; déclaration 2024-01-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000232;224332.38;1;"survenance 2025-09-20 ; déclaration 2025-08-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000246;351199.8;1;"survenance 2024-06-16 ; déclaration 2024-05-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000266;372997.05;1;"survenance 2025-08-21 ; déclaration 2025-07-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000340;96528.57;1;"survenance 2023-12-25 ; déclaration 2023-11-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000357;70328.99;1;"survenance 2025-02-04 ; déclaration 2025-01-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000359;37838.7;1;"survenance 2024-05-13 ; déclaration 2024-04-13";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000371;79768.27;1;"survenance 2026-01-15 ; déclaration 2025-12-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000373;112253.3;1;"survenance 2026-02-19 ; déclaration 2026-01-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000397;204204.57;1;"survenance 2020-09-20 ; déclaration 2020-08-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000472;556497.78;1;"survenance 2025-12-09 ; déclaration 2025-11-09";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000475;26680.32;1;"survenance 2025-02-17 ; déclaration 2025-01-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000503;122130.22;1;"survenance 2020-05-13 ; déclaration 2020-04-13";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000510;326436.58;1;"survenance 2022-05-29 ; déclaration 2022-04-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000566;584986.11;1;"survenance 2019-10-24 ; déclaration 2019-09-24";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000570;212963.25;1;"survenance 2025-09-20 ; déclaration 2025-08-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000576;4438.35;1;"survenance 2024-09-28 ; déclaration 2024-08-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000583;109373.67;1;"survenance 2018-07-08 ; déclaration 2018-06-08";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000591;224676.79;1;"survenance 2022-11-29 ; déclaration 2022-10-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000631;171464.71;1;"survenance 2019-07-21 ; déclaration 2019-06-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000635;28572.61;1;"survenance 2024-09-26 ; déclaration 2024-08-27";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000638;84621.53;1;"survenance 2026-01-03 ; déclaration 2025-12-04";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000671;49191.99;1;"survenance 2025-11-12 ; déclaration 2025-10-13";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000678;72520.1;1;"survenance 2021-09-19 ; déclaration 2021-08-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000688;25030.62;1;"survenance 2026-02-03 ; déclaration 2026-01-04";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000722;94285.06;1;"survenance 2018-10-05 ; déclaration 2018-09-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000738;50206.4;1;"survenance 2023-10-01 ; déclaration 2023-09-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000749;56933.83;1;"survenance 2024-02-22 ; déclaration 2024-01-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000767;42572.17;1;"survenance 2024-11-29 ; déclaration 2024-10-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000781;36452.16;1;"survenance 2020-04-11 ; déclaration 2020-03-12";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000801;68789.05;1;"survenance 2019-04-27 ; déclaration 2019-03-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000827;162297.9;1;"survenance 2021-02-27 ; déclaration 2021-01-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000835;30192.57;1;"survenance 2025-12-10 ; déclaration 2025-11-10";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000844;308536.1;1;"survenance 2025-08-22 ; déclaration 2025-07-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000883;89125.81;1;"survenance 2024-10-03 ; déclaration 2024-09-03";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SDO000888;60529.27;1;"survenance 2024-01-20 ; déclaration 2023-12-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000026;64388.24;1;"survenance 2026-01-24 ; déclaration 2025-12-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000070;29547.86;1;"survenance 2023-07-05 ; déclaration 2023-06-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000087;70036.46;1;"survenance 2021-11-19 ; déclaration 2021-10-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000090;330071.6;1;"survenance 2024-12-20 ; déclaration 2024-11-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000100;221078.85;1;"survenance 2017-09-15 ; déclaration 2017-08-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000114;79073.96;1;"survenance 2024-11-17 ; déclaration 2024-10-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000145;278251.45;1;"survenance 2020-10-12 ; déclaration 2020-09-12";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000147;23396.67;1;"survenance 2020-02-03 ; déclaration 2020-01-04";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000193;63755.81;1;"survenance 2025-06-18 ; déclaration 2025-05-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000202;16691.65;1;"survenance 2025-08-25 ; déclaration 2025-07-26";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000203;222866.4;1;"survenance 2025-07-02 ; déclaration 2025-06-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000225;187611.6;1;"survenance 2022-10-10 ; déclaration 2022-09-10";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000228;138908.09;1;"survenance 2022-04-23 ; déclaration 2022-03-24";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000230;15674.45;1;"survenance 2023-12-23 ; déclaration 2023-11-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000235;64852.06;1;"survenance 2025-07-29 ; déclaration 2025-06-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000242;87908.18;1;"survenance 2017-02-21 ; déclaration 2017-01-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000250;174262.56;1;"survenance 2023-11-17 ; déclaration 2023-10-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000267;19971.09;1;"survenance 2025-11-26 ; déclaration 2025-10-27";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000296;42907.74;1;"survenance 2020-03-07 ; déclaration 2020-02-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000315;82224.23;1;"survenance 2025-12-30 ; déclaration 2025-11-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000335;80249.47;1;"survenance 2017-08-21 ; déclaration 2017-07-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000380;207967.78;1;"survenance 2021-04-27 ; déclaration 2021-03-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000389;111274.95;1;"survenance 2024-12-16 ; déclaration 2024-11-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000403;47256.32;1;"survenance 2024-10-28 ; déclaration 2024-09-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000406;41187.28;1;"survenance 2022-06-28 ; déclaration 2022-05-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000407;76880.56;1;"survenance 2026-01-22 ; déclaration 2025-12-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000412;80385.99;1;"survenance 2018-11-09 ; déclaration 2018-10-10";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000424;232279.66;1;"survenance 2023-03-22 ; déclaration 2023-02-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000427;228475.71;1;"survenance 2024-09-18 ; déclaration 2024-08-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000428;172078.05;1;"survenance 2023-10-28 ; déclaration 2023-09-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000445;374287.23;1;"survenance 2024-02-27 ; déclaration 2024-01-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000451;98441.66;1;"survenance 2022-11-03 ; déclaration 2022-10-04";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000478;53135.1;1;"survenance 2024-06-19 ; déclaration 2024-05-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000510;171089.04;1;"survenance 2021-09-15 ; déclaration 2021-08-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000526;447512.71;1;"survenance 2026-02-08 ; déclaration 2026-01-09";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000542;234568.11;1;"survenance 2024-05-14 ; déclaration 2024-04-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000549;85506.94;1;"survenance 2019-11-19 ; déclaration 2019-10-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000590;208563.41;1;"survenance 2025-11-14 ; déclaration 2025-10-15";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000596;108989.28;1;"survenance 2020-12-09 ; déclaration 2020-11-09";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000603;23330.29;1;"survenance 2021-03-31 ; déclaration 2021-03-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000621;531357.26;1;"survenance 2022-12-02 ; déclaration 2022-11-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000624;144040.79;1;"survenance 2023-03-21 ; déclaration 2023-02-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000672;29385.39;1;"survenance 2017-05-05 ; déclaration 2017-04-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000685;265119.14;1;"survenance 2024-09-18 ; déclaration 2024-08-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000687;105206.23;1;"survenance 2024-03-30 ; déclaration 2024-02-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000704;441769.47;1;"survenance 2022-03-16 ; déclaration 2022-02-14";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000721;27442.29;1;"survenance 2023-01-19 ; déclaration 2022-12-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000776;33242.72;1;"survenance 2025-03-12 ; déclaration 2025-02-10";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000782;30969.59;1;"survenance 2020-09-26 ; déclaration 2020-08-27";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000794;102756.74;1;"survenance 2025-12-24 ; déclaration 2025-11-24";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000796;173510.59;1;"survenance 2024-04-19 ; déclaration 2024-03-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000813;188254.11;1;"survenance 2025-10-05 ; déclaration 2025-09-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000825;108704.73;1;"survenance 2025-10-19 ; déclaration 2025-09-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000829;89574.16;1;"survenance 2021-07-18 ; déclaration 2021-06-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000834;207378.98;1;"survenance 2022-10-30 ; déclaration 2022-09-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000904;9444.8;1;"survenance 2019-10-31 ; déclaration 2019-10-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000927;48233.62;1;"survenance 2024-12-16 ; déclaration 2024-11-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000950;19816.34;1;"survenance 2022-11-30 ; déclaration 2022-10-31";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000988;47126.54;1;"survenance 2026-02-11 ; déclaration 2026-01-12";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC000996;42998.68;1;"survenance 2025-11-14 ; déclaration 2025-10-15";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001003;108630.58;1;"survenance 2024-01-24 ; déclaration 2023-12-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001013;412762.07;1;"survenance 2023-04-15 ; déclaration 2023-03-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001037;501709.61;1;"survenance 2024-04-24 ; déclaration 2024-03-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001054;248913.3;1;"survenance 2024-10-31 ; déclaration 2024-10-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001066;141075.29;1;"survenance 2024-11-30 ; déclaration 2024-10-31";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001074;12838.91;1;"survenance 2025-06-05 ; déclaration 2025-05-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001096;103803.24;1;"survenance 2020-10-30 ; déclaration 2020-09-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001128;510939.8;1;"survenance 2025-03-29 ; déclaration 2025-02-27";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001165;59210.28;1;"survenance 2024-01-28 ; déclaration 2023-12-29";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001174;4555.46;1;"survenance 2020-11-27 ; déclaration 2020-10-28";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001190;62181.51;1;"survenance 2023-11-01 ; déclaration 2023-10-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001224;21080.38;1;"survenance 2023-05-05 ; déclaration 2023-04-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001236;677134.43;1;"survenance 2020-12-02 ; déclaration 2020-11-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001305;114859.16;1;"survenance 2025-08-29 ; déclaration 2025-07-30";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001388;275128.17;1;"survenance 2022-06-12 ; déclaration 2022-05-13";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001394;162420.81;1;"survenance 2023-03-11 ; déclaration 2023-02-09";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001401;227749.96;1;"survenance 2025-06-15 ; déclaration 2025-05-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001503;177918.44;1;"survenance 2025-08-02 ; déclaration 2025-07-03";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001506;228554.33;1;"survenance 2021-06-11 ; déclaration 2021-05-12";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001573;296229.34;1;"survenance 2023-11-17 ; déclaration 2023-10-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001649;33001.22;1;"survenance 2025-10-02 ; déclaration 2025-09-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001655;54855.34;1;"survenance 2022-11-24 ; déclaration 2022-10-25";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001659;28475.25;1;"survenance 2019-11-05 ; déclaration 2019-10-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001671;91414.44;1;"survenance 2020-10-02 ; déclaration 2020-09-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001699;53488.63;1;"survenance 2020-09-15 ; déclaration 2020-08-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001719;134165.02;1;"survenance 2021-07-27 ; déclaration 2021-06-27";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001748;75182.1;1;"survenance 2025-09-16 ; déclaration 2025-08-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001750;134661.18;1;"survenance 2025-12-15 ; déclaration 2025-11-15";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001756;32391.45;1;"survenance 2026-02-23 ; déclaration 2026-01-24";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001762;132928.66;1;"survenance 2022-09-15 ; déclaration 2022-08-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001780;117771.61;1;"survenance 2026-02-21 ; déclaration 2026-01-22";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001820;233799.85;1;"survenance 2021-08-31 ; déclaration 2021-08-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001880;162251.83;1;"survenance 2021-08-04 ; déclaration 2021-07-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001912;29891.25;1;"survenance 2023-09-16 ; déclaration 2023-08-17";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001941;12694.23;1;"survenance 2025-10-07 ; déclaration 2025-09-07";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC001965;24847.21;1;"survenance 2025-05-18 ; déclaration 2025-04-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002035;512884.95;1;"survenance 2026-02-25 ; déclaration 2026-01-26";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002058;87033.56;1;"survenance 2025-05-06 ; déclaration 2025-04-06";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002082;39034.32;1;"survenance 2022-11-22 ; déclaration 2022-10-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002084;265992.65;1;"survenance 2025-10-11 ; déclaration 2025-09-11";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002085;33070.17;1;"survenance 2025-02-06 ; déclaration 2025-01-07";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002125;152643.85;1;"survenance 2019-12-11 ; déclaration 2019-11-11";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002131;71012.79;1;"survenance 2025-11-30 ; déclaration 2025-10-31";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002141;165145.95;1;"survenance 2025-07-31 ; déclaration 2025-07-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002151;159913.3;1;"survenance 2026-02-14 ; déclaration 2026-01-15";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002192;27823.24;1;"survenance 2025-11-19 ; déclaration 2025-10-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002202;44240.16;1;"survenance 2020-10-19 ; déclaration 2020-09-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002234;81433.47;1;"survenance 2019-07-19 ; déclaration 2019-06-19";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002279;131198.54;1;"survenance 2020-05-26 ; déclaration 2020-04-26";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002287;44575.66;1;"survenance 2021-05-02 ; déclaration 2021-04-02";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002326;56603.0;1;"survenance 2021-12-11 ; déclaration 2021-11-11";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002348;150122.81;1;"survenance 2024-02-23 ; déclaration 2024-01-24";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002384;172323.92;1;"survenance 2023-03-23 ; déclaration 2023-02-21";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002409;26134.2;1;"survenance 2025-12-05 ; déclaration 2025-11-05";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002438;80758.41;1;"survenance 2025-01-17 ; déclaration 2024-12-18";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002488;42670.86;1;"survenance 2025-10-24 ; déclaration 2025-09-24";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002509;75715.47;1;"survenance 2020-10-20 ; déclaration 2020-09-20";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002526;285609.98;1;"survenance 2023-06-22 ; déclaration 2023-05-23";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002534;24421.95;1;"survenance 2023-08-15 ; déclaration 2023-07-16";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C06;Survenance postérieure à la déclaration;TOUS;SRC002557;585430.75;1;"survenance 2024-03-02 ; déclaration 2024-02-01";Date de survenance postérieure à la date de déclaration.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000097;4929.07;1;"survenance 2025-05-12 ; effet du contrat 2025-07-11";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000131;3863.94;1;"survenance 2025-08-24 ; effet du contrat 2025-10-23";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000184;6435.86;1;"survenance 2020-03-28 ; effet du contrat 2020-05-27";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000321;7601.48;1;"survenance 2023-08-21 ; effet du contrat 2023-10-20";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000356;16093.67;1;"survenance 2019-02-17 ; effet du contrat 2019-04-18";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000390;5332.06;1;"survenance 2020-09-27 ; effet du contrat 2020-11-26";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000403;42142.92;1;"survenance 2023-05-24 ; effet du contrat 2023-07-23";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000456;14762.3;1;"survenance 2015-12-18 ; effet du contrat 2016-02-16";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000758;5931.97;1;"survenance 2021-04-28 ; effet du contrat 2021-06-27";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000827;13583.09;1;"survenance 2019-09-21 ; effet du contrat 2019-11-20";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000924;18028.21;1;"survenance 2016-08-01 ; effet du contrat 2016-09-30";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU000941;6828.36;1;"survenance 2022-02-25 ; effet du contrat 2022-04-26";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU001106;24181.08;1;"survenance 2019-07-10 ; effet du contrat 2019-09-08";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU001154;4409.49;1;"survenance 2024-07-18 ; effet du contrat 2024-09-16";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU001215;8092.94;1;"survenance 2018-03-15 ; effet du contrat 2018-05-14";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU001285;3324.34;1;"survenance 2023-05-30 ; effet du contrat 2023-07-29";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU001295;4963.6;1;"survenance 2021-09-25 ; effet du contrat 2021-11-24";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SAU001357;4336.45;1;"survenance 2022-07-16 ; effet du contrat 2022-09-14";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SDO000244;8634.6;1;"survenance 2017-05-08 ; effet du contrat 2017-07-07";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SDO000245;156065.84;1;"survenance 2015-11-11 ; effet du contrat 2016-01-10";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SDO000378;58035.08;1;"survenance 2022-07-10 ; effet du contrat 2022-09-08";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SDO000482;56001.34;1;"survenance 2022-08-05 ; effet du contrat 2022-10-04";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SDO000622;45926.28;1;"survenance 2025-03-06 ; effet du contrat 2025-05-05";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SDO000866;86598.91;1;"survenance 2019-05-06 ; effet du contrat 2019-07-05";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000020;145609.07;1;"survenance 2024-02-01 ; effet du contrat 2024-04-01";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000063;193285.81;1;"survenance 2019-01-21 ; effet du contrat 2019-03-22";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000191;181555.38;1;"survenance 2017-10-26 ; effet du contrat 2017-12-25";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000253;79332.69;1;"survenance 2020-05-07 ; effet du contrat 2020-07-06";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000479;1264531.86;1;"survenance 2020-11-11 ; effet du contrat 2021-01-10";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000559;54198.45;1;"survenance 2022-03-02 ; effet du contrat 2022-05-01";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000584;1619585.19;1;"survenance 2016-06-30 ; effet du contrat 2016-08-29";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000725;11344.85;1;"survenance 2018-12-24 ; effet du contrat 2019-02-22";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000750;109608.63;1;"survenance 2024-04-27 ; effet du contrat 2024-06-26";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000771;363677.97;1;"survenance 2021-09-12 ; effet du contrat 2021-11-11";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000849;69057.0;1;"survenance 2017-10-23 ; effet du contrat 2017-12-22";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000873;197134.99;1;"survenance 2019-02-24 ; effet du contrat 2019-04-25";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000899;106391.48;1;"survenance 2025-04-17 ; effet du contrat 2025-06-16";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC000928;6041.2;1;"survenance 2020-07-05 ; effet du contrat 2020-09-03";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001166;65039.22;1;"survenance 2019-12-13 ; effet du contrat 2020-02-11";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001211;83259.78;1;"survenance 2025-06-13 ; effet du contrat 2025-08-12";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001531;409154.58;1;"survenance 2024-06-10 ; effet du contrat 2024-08-09";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001552;150375.55;1;"survenance 2017-05-20 ; effet du contrat 2017-07-19";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001557;192720.08;1;"survenance 2018-11-03 ; effet du contrat 2019-01-02";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001616;66979.07;1;"survenance 2022-02-06 ; effet du contrat 2022-04-07";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001638;60423.83;1;"survenance 2019-05-01 ; effet du contrat 2019-06-30";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001662;185408.82;1;"survenance 2025-08-31 ; effet du contrat 2025-10-30";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001816;121736.9;1;"survenance 2020-11-23 ; effet du contrat 2021-01-22";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC001867;75497.2;1;"survenance 2015-11-05 ; effet du contrat 2016-01-04";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC002117;187968.01;1;"survenance 2024-01-07 ; effet du contrat 2024-03-07";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC002182;30452.97;1;"survenance 2019-03-11 ; effet du contrat 2019-05-10";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C07;Survenance avant date d'effet;TOUS;SRC002208;17140.75;1;"survenance 2019-08-22 ; effet du contrat 2019-10-21";Sinistre survenu avant la date d'effet du contrat.;Direction sinistres
+C08;ISIN absent ou mal formé;OBLIGATIONS;A00099;744601.6809;1;ISIN « N/A »;Code ISIN absent ou mal formé (12 caractères attendus).;Direction financière
+C08;ISIN absent ou mal formé;OBLIGATIONS;A00151;1312096.104;1;ISIN «  »;Code ISIN absent ou mal formé (12 caractères attendus).;Direction financière
+C08;ISIN absent ou mal formé;OBLIGATIONS;A00180;970233.5511;1;ISIN «  »;Code ISIN absent ou mal formé (12 caractères attendus).;Direction financière
+C08;ISIN absent ou mal formé;OBLIGATIONS;A00201;1997595.8838000002;1;ISIN «  »;Code ISIN absent ou mal formé (12 caractères attendus).;Direction financière
+C08;ISIN absent ou mal formé;OBLIGATIONS;A00261;746887.2444000001;1;ISIN « FR12 »;Code ISIN absent ou mal formé (12 caractères attendus).;Direction financière
+C08;ISIN absent ou mal formé;OBLIGATIONS;A00366;660618.0405;1;ISIN «  »;Code ISIN absent ou mal formé (12 caractères attendus).;Direction financière
+C09;CIC incohérent avec la classe d'actif;ACTIONS;A00022;544240.6695000001;1;CIC FR12;Code CIC incohérent avec la classe d'actif.;Direction financière
+C09;CIC incohérent avec la classe d'actif;ACTIONS;A00034;664574.8923000001;1;CIC FR12;Code CIC incohérent avec la classe d'actif.;Direction financière
+C09;CIC incohérent avec la classe d'actif;OBLIGATIONS;A00068;1367966.4669;1;CIC FR31;Code CIC incohérent avec la classe d'actif.;Direction financière
+C09;CIC incohérent avec la classe d'actif;OBLIGATIONS;A00125;1229854.5765;1;CIC FR31;Code CIC incohérent avec la classe d'actif.;Direction financière
+C09;CIC incohérent avec la classe d'actif;OBLIGATIONS;A00314;830342.9177999999;1;CIC FR31;Code CIC incohérent avec la classe d'actif.;Direction financière
+C09;CIC incohérent avec la classe d'actif;OBLIGATIONS;A00363;735024.4308000001;1;CIC FR31;Code CIC incohérent avec la classe d'actif.;Direction financière
+C10;Code activité hors nomenclature;TOUS;AU000016;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000075;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000089;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000159;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000165;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000183;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000231;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000402;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000550;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000561;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000577;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000696;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000881;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000954;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU000989;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001042;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001045;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001067;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001107;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001110;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001122;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001125;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001197;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001258;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001289;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001341;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001355;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001464;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;AU001470;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000046;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000050;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000101;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000113;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000116;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000118;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000137;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000171;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000179;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000243;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000276;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000286;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000393;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000417;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000442;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000471;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000475;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000492;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000536;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000591;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000667;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000784;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000824;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000829;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000841;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000855;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000891;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000924;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000932;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO000945;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001102;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001103;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001119;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001148;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001150;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001219;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001229;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001244;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;DO001258;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000074;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000140;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000166;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000190;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000223;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000231;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000273;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000307;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000314;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000350;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000398;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000506;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000599;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000654;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000757;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000808;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000928;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC000990;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001032;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001071;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001085;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001104;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001116;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001130;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001177;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001183;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001233;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001345;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001370;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001489;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001588;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001617;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001666;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001698;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001714;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001748;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001800;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001828;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001963;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC001974;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002039;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002080;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002085;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002098;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002197;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002441;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002458;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002657;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002672;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002787;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002793;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002880;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002889;;1;code activité « 9999Z »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC002933;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC003013;;1;code activité « BTP »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC003045;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC003068;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique
+C10;Code activité hors nomenclature;TOUS;RC003133;;1;code activité «  »;Code activité absent de la nomenclature BTP.;Direction technique

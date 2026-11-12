@@ -26,7 +26,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 | | Rôle | Vérification |
 |---|---|---|
 | **SAS / PROC SQL** (`sas/`) | Version **production** | Vérification statique (`scripts/lint_sas.py`) ; comparaison automatique de 59 valeurs à la référence Python (`sas/98_verifier.sas`) |
-| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 106 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
+| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 135 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
 | JavaScript (`app/moteur.js`) | Calculs de l'atelier HTML | Parité avec le Python testée sur toutes les valeurs |
 | Excel (rapport) | Restitution | Les 11 indicateurs calculés par formules sont égaux à ceux du moteur |
 
@@ -37,7 +37,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py     # SI fictif (DuckDB)
 python -m qdd_s2                          # campagnes N-2, N-1 et N -> output/
-python -m pytest -q                       # 106 tests
+python -m pytest -q                       # 135 tests
 python scripts/lint_sas.py                # vérification statique du SAS
 streamlit run streamlit_app.py            # application
 ```
@@ -54,12 +54,15 @@ streamlit run streamlit_app.py            # application
 ## Arborescence
 | Chemin | Rôle |
 |---|---|
-| `referentiels/` | Dictionnaire, référentiel des contrôles (flux, seuil fixe, inclusion dans la note), lignage (flux et chemins), plan de campagne, historique |
+| `referentiels/` | Dictionnaire (origine interne ou externe), référentiel des contrôles (risque couvert, périodicité, critères, seuil, réalisation, mode opératoire, responsable, flux, inclusion dans la note), lignage (flux et chemins), plan de campagne, historique |
 | `sql/controles/` | 20 contrôles SQL ANSI sans CTE |
 | `sas/00`–`07` | Configuration (avec gabarit ODBC), import démo, contrôles, campagne, variation, rapport, gouvernance, export Qlik |
 | `sas/98_verifier.sas`, `sas/99_executer.sas` | Vérification contre la référence ; exécution complète |
 | `qdd_s2/moteur.py` | Méthode du mémoire, corrigée |
 | `qdd_s2/gouvernance.py` | Couverture du lignage, registre des anomalies, journal |
+| `qdd_s2/niveau2.py` | Contrôle de niveau 2 : 7 constats à règle écrite sur les contrôles de niveau 1 |
+| `archives/donnees_en_defaut/` | Lignes en anomalie figées par campagne avant tout ajustement, manifeste SHA-256 (`archives_defaut.py`) |
+| `qdd_s2/document_cadre.py` | Document cadre généré depuis les référentiels et les paramètres du moteur |
 | `qdd_s2/export_qlik.py`, `app/chargement_qdd.qvs` | Modèle en étoile et script de chargement Qlik |
 | `app/` | Atelier HTML : fiches, QCM, vrai/faux, simulateur, campagne, avis, plan 90 jours |
 
@@ -82,6 +85,18 @@ Erreurs relevées dans le texte du mémoire :
 - Les tableaux 3 à 9 utilisent tantôt 4,57 %, tantôt 5,74 % pour les provisions mathématiques.
 - Le tableau 4 reprend les pondérations du tableau 2.
 - Le tableau 19 a des colonnes décalées.
+
+## Rapprochement avec la notice ACPR QDD
+| Exigence | Ce que fait le dispositif |
+|---|---|
+| Référentiel des contrôles : risques, périodicité, critères, données, seuils, réalisation, mode opératoire, responsable (points 67-70) | Colonnes renseignées pour les 20 contrôles ; complétude vérifiée par le niveau 2 |
+| Contrôles de 2nd niveau sur l'adéquation et l'efficacité du 1er niveau (points 67-70, point 19) | `qdd_s2/niveau2.py`, page Contrôles : constats objectifs, aucun score inventé |
+| Données en défaut stockées avant ajustement, ajustements documentés (points 36-37) | Archive figée et empreinte par campagne ; fiche d'ajustement issue de l'Atelier de résolution |
+| Données externes : origine et traitement connus (directive art. 126, règlement délégué art. 274) | Origine, fournisseur et traitement au dictionnaire et au lignage ; flux externe sans contrôle signalé |
+| Document cadre (points 16-17) | Généré pour ce qui se calcule ; rôles, comitologie et validation laissés à l'organisme |
+| Profondeur d'historique justifiée par une sensibilité (point 34) | **Non traitée** : la base fictive n'a pas d'années de développement |
+
+Prototype sur données fictives : ce rapprochement ne vaut pas attestation de conformité.
 
 ## Limites connues
 - Le SCR est un jouet ; les corrélations entre segments sont illustratives.

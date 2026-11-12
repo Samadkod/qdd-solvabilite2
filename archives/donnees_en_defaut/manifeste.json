@@ -1,0 +1,28 @@
+{
+  "archives": [
+    {
+      "campagne": "N-2",
+      "arrete": "2026-03-31",
+      "fichier": "lignes_en_defaut_N-2_2026-03-31.csv",
+      "nb_lignes": 493,
+      "sha256": "d1a6b1a3fe9dba234a30e5ba11da8300345da18bfffbf5e06402db0becc6542f",
+      "archive_le": "2026-11-11T23:11:41Z"
+    },
+    {
+      "campagne": "N-1",
+      "arrete": "2026-06-30",
+      "fichier": "lignes_en_defaut_N-1_2026-06-30.csv",
+      "nb_lignes": 300,
+      "sha256": "8c79d665b541a1797d3b32eaab8b21fbe4ece79a4cdb4376962df007a355e5d1",
+      "archive_le": "2026-11-11T23:11:41Z"
+    },
+    {
+      "campagne": "N",
+      "arrete": "2026-09-30",
+      "fichier": "lignes_en_defaut_N_2026-09-30.csv",
+      "nb_lignes": 276,
+      "sha256": "ed54c16f76e0cb89ab3e0472f558113920c867b933d7fd95507c850e94c028bd",
+      "archive_le": "2026-11-11T23:11:41Z"
+    }
+  ]
+}

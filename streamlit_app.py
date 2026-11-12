@@ -19,6 +19,8 @@ import pandas as pd
 import streamlit as st
 
 from qdd_s2.campagne import Config, lancer_campagnes
+from qdd_s2.document_cadre import document_cadre
+from qdd_s2.niveau2 import niveau2_par_campagne
 from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
@@ -62,11 +64,12 @@ def campagnes(seuil, dscr, coef, degradation, ecart, montant):
                    methode_degradation=degradation)
     cfg = Config(base=base_fictive(), methode_ecart=ecart, ponderation_montant=montant, params=p)
     camps, var = lancer_campagnes(cfg)
+    n2 = niveau2_par_campagne(camps, cfg.referentiels)
     with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as f:
         ecrire_rapport(camps, var, f.name)
         xlsx = Path(f.name).read_bytes()
     out = []
-    for c in camps:
+    for c, niv2 in zip(camps, n2):
         ev = c.evaluation
         out.append({"campagne": c.campagne, "date": c.date_arrete, "scr": c.scr_ref, "ind": ev.indicateurs,
                     "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"}),
@@ -74,7 +77,8 @@ def campagnes(seuil, dscr, coef, degradation, ecart, montant):
                     "axes": {a: ev.par_axe(a).reset_index() for a in ("maille", "etape", "criteres", "responsable")},
                     "sens": c.sensibilites.reset_index(), "gouv": c.gouvernance,
                     "couverture": c.couverture, "registre": c.registre, "journal": c.journal,
-                    "params": ev.params})
+                    "params": ev.params, "niveau2": niv2,
+                    "document_cadre": document_cadre(c, cfg.referentiels, cfg.choc_sensibilite)})
     return out, var, xlsx
 
 
@@ -349,8 +353,24 @@ def page_donnees() -> None:
 
 def page_controles() -> None:
     afficher_suivi(c, execution_cache(str(base_fictive()), c["date"]), aller, COULEUR, camps[:k + 1])
+    _niveau2()
     with st.expander("Tableau technique (toutes les colonnes du moteur)"):
         _tableau_technique()
+
+
+def _niveau2() -> None:
+    """Contrôle de niveau 2 : constats calculés sur le dispositif lui-même (qdd_s2/niveau2.py)."""
+    n2 = c["niveau2"]
+    st.markdown(f"#### {t('Contrôle de niveau 2')}")
+    st.caption("Les contrôles de niveau 1 sont-ils complets, à jour et bien placés ? Chaque ligne applique une règle "
+               "écrite aux référentiels et aux résultats des campagnes ; aucune note d'« efficacité » n'est inventée. "
+               "« À revoir » signale un contrôle à réexaminer, pas une défaillance.")
+    vue = n2.rename(columns={"indicateur": "Indicateur", "valeur": "Valeur", "nb_ecarts": "Écarts",
+                             "statut": "Statut", "regle": "Règle", "detail": "Détail"})
+    tableau(vue[["Indicateur", "Valeur", "Écarts", "Statut", "Règle", "Détail"]], hide_index=True, width="stretch")
+    st.download_button("Exporter le contrôle de niveau 2 (CSV)", icon=":material/download:",
+                       data=n2.to_csv(index=False, sep=";").encode("utf-8-sig"),
+                       file_name=f"controle_niveau2_{c['campagne']}.csv", mime="text/csv", key="niveau2_csv")
 
 
 def _tableau_technique() -> None:

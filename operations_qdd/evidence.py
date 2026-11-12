@@ -12,7 +12,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 import pandas as pd
 from .diagnostic import diagnostic
-from .correction import empreinte, maintenant
+from .correction import empreinte, fiches_ajustement, maintenant
 
 RACINE = Path(__file__).resolve().parents[1]
 
@@ -52,15 +52,20 @@ def dossier_zip(c: dict, prev: dict | None, lignes: pd.DataFrame, volumes: pd.Da
     tableaux = {'donnees': c['donnees'], 'controles': c['controles'], 'anomalies': c['registre'],
                 'lignes_detectees': lignes, 'lignage_couverture': c['couverture'],
                 'diagnostic': diagnostic(c, lignes, prev), 'volumetries': volumes,
-                'execution_technique_SQL': executions, 'completude': completude(scenarios)}
+                'execution_technique_SQL': executions, 'completude': completude(scenarios),
+                'fiches_ajustement': fiches_ajustement(scenarios)}
     for nom, df in tableaux.items():
         payload[f'{nom}.csv'] = df.to_csv(index=False, sep=';').encode('utf-8-sig')
+    if c.get('niveau2') is not None:
+        payload['controle_niveau2.csv'] = c['niveau2'].to_csv(index=False, sep=';').encode('utf-8-sig')
+    if c.get('document_cadre'):
+        payload['document_cadre.md'] = c['document_cadre'].encode('utf-8')
     payload['journal_reference.json'] = json_bytes(c['journal'])
     payload['scenarios_et_evenements.json'] = json_bytes(scenarios)
     payload['rapport_reference_3_campagnes.xlsx'] = xlsx
-    for folder in ('referentiels', 'sql/controles', 'sql/lignes'):
+    for folder in ('referentiels', 'sql/controles', 'sql/lignes', 'archives/donnees_en_defaut'):
         for p in sorted((RACINE / folder).rglob('*')):
-            if p.suffix in ('.sql', '.csv'):
+            if p.suffix in ('.sql', '.csv', '.json'):
                 payload[str(p.relative_to(RACINE))] = p.read_bytes()
     payload['LIRE-MOI.md'] = (
         f'# Dossier QDD fictif — {c["campagne"]} / {c["date"]}\n\n'

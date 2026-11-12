@@ -105,3 +105,14 @@ def test_anglais_pour_la_navigation_la_synthese_et_les_statuts():
     assert not at.exception
     assert any(b.label == "Overview" for b in at.button)  # menu traduit
     assert any("Detailed indicators" in e.label for e in at.expander)
+
+
+def test_controle_de_niveau2_et_referentiel_affiches():
+    """Page Contrôles : tableau du contrôle de niveau 2 ; page Règles : risque couvert et réalisation."""
+    at = ouvrir("controles")
+    assert any("Contrôle de niveau 2" in m.value for m in at.markdown)
+    n2 = next(d.value for d in at.dataframe if "Indicateur" in d.value.columns)
+    assert len(n2) == 7 and n2["Valeur"].tolist()[:2] == ["20 sur 20", "17 sur 20"]
+    at = ouvrir("regles")
+    cat = next(d.value for d in at.dataframe if "Risque couvert" in d.value.columns)
+    assert len(cat) == 20 and set(cat["Réalisation"]) == {"Automatique"} and "Mode opératoire" not in cat.columns

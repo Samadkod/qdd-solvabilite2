@@ -126,12 +126,15 @@ def catalogue(ctrl: pd.DataFrame, df_lignes: pd.DataFrame) -> pd.DataFrame:
         out.append({
             "ID": r.controle_id, "Famille": FAMILLES.get(r.famille, r.famille), "Message": MESSAGES.get(r.controle_id, r.libelle),
             "Critères": ", ".join(CRITERES.get(k.strip(), k) for k in r.criteres.split(",") if k.strip()),
-            "Fréquence": FREQUENCES.get(r.frequence, r.frequence), "Responsable": r.responsable,
+            "Risque couvert": r.risque_couvert,
+            "Fréquence": FREQUENCES.get(r.frequence, r.frequence), "Réalisation": r.mode_realisation,
+            "Responsable": r.responsable,
             "Seuil": "Fixe 99,90 % (restitution)" if r.seuil_fixe else "Selon le poids de la donnée",
             "Points de contrôle": int(len(pts)),
             "Réalisé ce trimestre": "oui" if len(pts) and bool(pts["realise_campagne"].all()) else "non",
             "Lignes en anomalie": int(lignes_par.get(r.controle_id, 0)) if (SQL_LIGNES / r.fichier_sql).exists() else None,
             "Pire statut": pire,
+            "Mode opératoire": r.mode_operatoire,
         })
     return pd.DataFrame(out)
 
@@ -185,6 +188,16 @@ def afficher_lignes(c: dict, base: Path) -> None:
                                                                                 max_value=100)})
     st.caption("Les contrôles de rapprochement (R) et de restitution QRT (Q) comparent des totaux entre outils : ils "
                "n'ont pas de ligne individuelle. Leur détail est dans la page Contrôles.")
+    from archives_defaut import archive, verifier
+    arch = archive(c["campagne"], c["date"])
+    if arch:
+        intacte = bool(verifier().set_index("fichier").loc[arch["fichier"], "intacte"])
+        st.caption(f"Données en défaut conservées avant tout ajustement : {arch['nb_lignes']} lignes figées le "
+                   f"{arch['archive_le'][:10]} dans archives/donnees_en_defaut/{arch['fichier']} · empreinte SHA-256 "
+                   f"{arch['sha256'][:12]}… · " + ("archive intacte." if intacte else "**archive modifiée depuis son "
+                                                   "enregistrement.**"))
+    else:
+        st.caption("Données en défaut de cette campagne non archivées (scripts/archiver_donnees_en_defaut.py).")
 
 
 def afficher_regles(c: dict, base: Path) -> None:
@@ -195,7 +208,7 @@ def afficher_regles(c: dict, base: Path) -> None:
     filtres, contenu = st.columns([1, 3.2], gap="medium")
     with filtres, st.container(border=True):
         st.markdown("**Filtres**")
-        recherche = st.text_input("Recherche", placeholder="Mot du message…", label_visibility="collapsed",
+        recherche = st.text_input("Recherche", placeholder="Mot du message ou du risque…", label_visibility="collapsed",
                                   key="regles_recherche")
         familles = st.multiselect("Familles", list(FAMILLES.values()), placeholder="Toutes")
         statuts = st.multiselect("Pire statut", ["rouge", "orange", "vert"], placeholder="Tous",
@@ -209,11 +222,12 @@ def afficher_regles(c: dict, base: Path) -> None:
     if resp:
         vue = vue[vue["Responsable"].isin(resp)]
     if recherche:
-        vue = vue[vue["Message"].str.lower().str.contains(recherche.lower(), regex=False)]
+        texte = (vue["Message"] + " " + vue["Risque couvert"]).str.lower()
+        vue = vue[texte.str.contains(recherche.lower(), regex=False)]
     with contenu:
         st.caption(f"**{len(vue)} règle(s)** sur {len(cat)} · source : referentiels/referentiel_controles.csv")
         from statuts import tableau
-        tableau(vue, hide_index=True, width="stretch",
+        tableau(vue.drop(columns=["Mode opératoire"]), hide_index=True, width="stretch",
                 column_config={"Lignes en anomalie": st.column_config.NumberColumn(format="%d")})
         st.download_button("Télécharger les règles de contrôle (CSV)", icon=":material/download:", data=
                            vue.to_csv(index=False, sep=";").encode("utf-8-sig"), file_name="regles_de_controle.csv",
@@ -224,6 +238,9 @@ def afficher_regles(c: dict, base: Path) -> None:
             if choix in DEFAUTS_CONNUS:
                 st.warning(DEFAUTS_CONNUS[choix], icon=":material/warning:")
             ref = referentiel().set_index("controle_id").loc[choix]
+            st.markdown(f"**Risque couvert** : {ref['risque_couvert']}  \n"
+                        f"**Réalisation** : {ref['mode_realisation']}  \n"
+                        f"**Mode opératoire** : {ref['mode_operatoire']}")
             pts = c["controles"][c["controles"]["controle_id"].str.split("|").str[0] == choix]
             from explications import p as pct
             tableau(pd.DataFrame({"Point de contrôle": pts["controle_id"], "Résultat": pts["resultat"].map(pct),

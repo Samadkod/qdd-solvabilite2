@@ -202,3 +202,49 @@ def valider(dossier: dict, acteur: str, role: str, commentaire: str) -> dict:
     dossier['evenements'].append({'date': maintenant(), 'action': 'Validation déclarative', 'acteur': acteur.strip(),
                                  'role': role, 'commentaire': commentaire.strip()})
     return dossier
+
+
+COLONNES_FICHE = ['Campagne', 'Arrêté', 'Donnée', 'Contrôle', 'Segment', 'Limite constatée', 'Risque couvert',
+                  'Données en défaut conservées', 'Empreinte SHA-256 de l’archive', 'Méthode d’ajustement',
+                  'Valeurs ajustées', 'Justification', 'Responsable de la correction', 'Responsable de la validation',
+                  'Déclaré le (UTC)', 'Validé le (UTC)', 'Statut', 'Blocages au recontrôle']
+
+
+def fiche_ajustement(dossier: dict) -> dict:
+    """Fiche d'ajustement d'un scénario (notice QDD, points 36 et 37) : limite, méthode, responsables.
+
+    Tout vient du scénario, du référentiel des contrôles et du manifeste des données en défaut : rien n'est saisi
+    à part. Une fiche de scénario non validé le dit ; elle ne vaut pas ajustement réel des données de production.
+    """
+    from archives_defaut import archive
+    from lignes_anomalie import MESSAGES
+
+    ref = pd.read_csv(RACINE / 'referentiels' / 'referentiel_controles.csv', dtype=str,
+                      keep_default_na=False).set_index('controle_id').loc[dossier['code']]
+    arch = archive(dossier['campagne'], dossier['date'])
+    val = next((e for e in reversed(dossier['evenements']) if e.get('action') == 'Validation déclarative'), None)
+    conf = dossier['configuration']
+    blocages = (dossier.get('preuve') or {}).get('blocages', [])
+    n = len(dossier['edits'])
+    return dict(zip(COLONNES_FICHE, [
+        dossier['campagne'], dossier['date'], ref['donnee_id'].format(maille=dossier['maille']), dossier['code'],
+        dossier['maille'],
+        f"{MESSAGES.get(dossier['code'], ref['libelle'])} {n} objet(s) en défaut ajusté(s) par ce scénario.",
+        ref['risque_couvert'],
+        arch['fichier'] if arch else 'Non archivées',
+        arch['sha256'] if arch else '',
+        'Correction de valeur objet par objet sur une copie de la base, puis recontrôle des 20 règles ; la base de '
+        'référence et l’archive des données en défaut ne sont pas modifiées.',
+        ' ; '.join(f"{e['objet']} : {e['ancienne']:.2f} → {e['nouvelle']:.2f}" for e in dossier['edits']),
+        dossier['justification'],
+        f"{dossier['auteur']} ({conf.get('role_correction', '')})",
+        f"{val['acteur']} ({val.get('role', '')})" if val else 'Non validé',
+        dossier['evenements'][0]['date'],
+        val['date'] if val else '',
+        dossier['statut'],
+        ' ; '.join(blocages),
+    ]))
+
+
+def fiches_ajustement(scenarios: list[dict]) -> pd.DataFrame:
+    return pd.DataFrame([fiche_ajustement(s) for s in scenarios], columns=COLONNES_FICHE)

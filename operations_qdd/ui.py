@@ -6,7 +6,7 @@ from html import escape
 import pandas as pd
 import streamlit as st
 from .diagnostic import diagnostic, impact
-from .correction import ESSAIS_VALIDABLES, REGLES, candidats, declarer, rejouer, valider
+from .correction import ESSAIS_VALIDABLES, REGLES, candidats, declarer, fiches_ajustement, rejouer, valider
 from .evidence import completude, dossier_zip, json_bytes
 from explications import MODALITES
 from statuts import tableau
@@ -292,6 +292,13 @@ def afficher_resolution(c, base, methode):
         st.dataframe(ev, hide_index=True, width='stretch',
                      column_config={'date': 'Date (UTC)', 'action': 'Action', 'acteur': 'Acteur', 'blocages': 'Blocages',
                                     'role': 'Rôle', 'commentaire': 'Commentaire', 'erreur': 'Erreur'})
+    fiche = fiches_ajustement([record])
+    with st.expander('Fiche d’ajustement', expanded=record['statut'] == 'Validée dans le bac à sable'):
+        st.caption('Limite constatée, données en défaut conservées (archive figée et son empreinte), méthode et '
+                   'responsables : tout est repris du scénario, rien n’est ressaisi.')
+        st.dataframe(fiche.T.rename(columns={0: 'Valeur'}), width='stretch')
+    st.download_button('Exporter la fiche d’ajustement · CSV', fiche.to_csv(index=False, sep=';').encode('utf-8-sig'),
+                       file_name=f'fiche_ajustement_{sid[:8]}.csv', mime='text/csv')
     st.download_button('Exporter le scénario et ses preuves · JSON', json_bytes(record),
                        file_name=f'scenario_qdd_{sid[:8]}.json', mime='application/json')
 
@@ -302,6 +309,12 @@ def afficher_dossier(c, prev, lignes, volumes, executions, xlsx, base, methode, 
         st.caption('Résultats historiques + référentiels + règles SQL + scénarios séparés + manifeste SHA-256. '
                    'Conserver le ZIP : aucun archivage durable n’est fourni par la session publique.')
         tableau(completude(scenarios), hide_index=True, width='stretch')
+        if c.get('document_cadre'):
+            st.download_button('Document cadre généré · Markdown', c['document_cadre'].encode('utf-8'),
+                               file_name=f"document_cadre_{c['campagne']}.md", mime='text/markdown',
+                               icon=':material/description:', key='document_cadre_md')
+            st.caption('Généré depuis les référentiels et les paramètres du moteur ; les rôles, la comitologie et la '
+                       'validation par la direction générale restent à compléter par l’organisme.')
         st.warning('Dossier pédagogique, pas une attestation de conformité. Les pièces manquantes restent visibles ; '
                    'les noms et les validations sont déclaratifs.')
         key = f'qdd_zip_{c["campagne"]}'

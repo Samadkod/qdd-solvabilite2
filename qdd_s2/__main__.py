@@ -14,7 +14,9 @@ import numpy as np
 import pandas as pd
 
 from .campagne import RACINE, Config, charger_lignage, lancer_campagnes
+from .document_cadre import document_cadre
 from .export_qlik import SCRIPT_QLIK, exporter_qlik
+from .niveau2 import niveau2_par_campagne
 from .rapport_excel import ecrire_rapport
 
 
@@ -66,6 +68,10 @@ def main(argv=None):
     camps[-1].couverture.to_csv(sortie / "lignage_couverture.csv", sep=";", index=False)
     jrn = sortie / "journal_executions.csv"
     pd.DataFrame([c.journal for c in camps]).to_csv(jrn, sep=";", index=False, mode="a", header=not jrn.exists())
+    # Contrôle de niveau 2 et document cadre de la dernière campagne
+    niveau2_par_campagne(camps, cfg.referentiels)[-1].to_csv(sortie / "controle_niveau2.csv", sep=";", index=False)
+    (sortie / "document_cadre.md").write_text(document_cadre(camps[-1], cfg.referentiels, cfg.choc_sensibilite),
+                                              encoding="utf-8")
     ref = pd.read_csv(cfg.referentiels / "referentiel_controles.csv")
     _, flux = charger_lignage(cfg)
     exporter_qlik(camps, variation, ref, flux, sortie / "qlik")

@@ -112,7 +112,7 @@ EN = {
     "Ouverte": "Open", "Récurrente": "Recurring", "Clôturée": "Closed", "Haute": "High", "Moyenne": "Medium",
     "Normal": "Normal", "À expliquer": "To explain", "Sans référence": "No baseline", "En retard": "Overdue",
     "Disponible": "Available", "Manquant": "Missing", "Incomplet": "Incomplete", "Non produit": "Not produced",
-    "Non acquise": "Not obtained",
+    "Non acquise": "Not obtained", "À revoir": "To review", "Contrôle de niveau 2": "Second-level control",
     "Filtres": "Filters", "Réalisé": "Done", "Exécution": "Execution", "Résultat": "Result",
     "Points de contrôle": "Control points", "Diagnostic explicable de la campagne": "Explainable campaign diagnosis",
     "Solvabilité 2 · données fictives": "Solvency II · fictitious data",
