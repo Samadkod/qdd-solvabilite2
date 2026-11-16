@@ -204,3 +204,16 @@ button:focus-visible, a:focus-visible {outline: 2px solid #5ea2ef !important; ou
   [class*="st-key-qdd_vig_"] {padding: 0;}
   .qdd-vig b {font-size: 1.4rem;}
 }
+
+/* Revue : expander du menu sur fond marine (Paramètres de la méthode) */
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary {background: #15314f !important;}
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary p,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary svg {color: #d5dfea !important; fill: #d5dfea;}
+section[data-testid="stSidebar"] [data-testid="stExpander"] details {background: #15314f !important;}
+section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {color: #d5dfea !important;}
+/* Revue : en-tête empilé dès que la largeur utile se réduit */
+@media (max-width: 1280px) {
+  .qdd-hero, .qdd-entete {grid-template-columns: 1fr;}
+  .qdd-contexte {grid-column: 1; grid-row: auto; align-items: flex-start; text-align: left; margin-top: .6rem;}
+  .qdd-badges {justify-content: flex-start;}
+}

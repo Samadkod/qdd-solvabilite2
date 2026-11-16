@@ -2,7 +2,7 @@
 from __future__ import annotations
 from html import escape
 import pandas as pd
-from langue import t as tr
+from langue import langue, t as tr
 from synthese import Tuile, tuiles, evolutions, COULEURS, BLOCS, CHARGEMENT, _liste_anomalies, _liste_controles
 
 def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes: pd.DataFrame | None = None,
@@ -101,7 +101,8 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
          {"filtre_controles": ["en retard"]}),
     ]
     nb_points = sum(1 for k, *_ in vigilance if (par_cle[k].nombre or 0) > 0)
-    section("Points de vigilance", f"{nb_points} sur {len(vigilance)} à traiter")
+    section("Points de vigilance", f"{nb_points} of {len(vigilance)} to handle" if langue() == "en" else
+            f"{nb_points} sur {len(vigilance)} à traiter")
     for col, (cle, libelle, action, page, etat) in zip(st.columns(4, gap="small"), vigilance):
         n = par_cle[cle].nombre or 0
         ton = par_cle[cle].ton if n else "vert"
@@ -148,7 +149,8 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         ecart_txt = lambda e: f"{e:+.2f}".replace(".", ",").replace("-", "−")
         x = lambda v: max(0.0, min(100.0, (v - bas_ko) / (1 - bas_ko) * 100))
         section("Points critiques hors seuil",
-                f"{len(ko)} point(s) · résultat retenu (●) face au seuil (|), échelle {pct(bas_ko, 0)}–100 %")
+                f"{len(ko)} point(s) · result (●) against threshold (|), scale {pct(bas_ko, 0)}–100 %" if langue() == "en"
+                else f"{len(ko)} point(s) · résultat retenu (●) face au seuil (|), échelle {pct(bas_ko, 0)}–100 %")
         lignes_html = "".join(
             f'<div class="qdd-crit"><div class="qdd-crit-id"><b>{escape(r.controle)}</b> · {escape(str(r.maille))}'
             f'<span>{escape(str(r.libelle))}</span></div>'
@@ -168,8 +170,9 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
         top = reg_l.head(5)
         n3 = reg_l["Part"].head(3).sum()
         section("Où concentrer les corrections ?",
-                f"Top 5 messages · {int(reg_l['Lignes en anomalie'].sum())} lignes · "
-                f"3 messages couvrent {n3:.1f} %".replace(".", ","))
+                (f"Top 5 messages · {int(reg_l['Lignes en anomalie'].sum())} rows · 3 messages cover {n3:.1f} %"
+                 if langue() == "en" else f"Top 5 messages · {int(reg_l['Lignes en anomalie'].sum())} lignes · "
+                 f"3 messages couvrent {n3:.1f} %".replace(".", ",")))
         st.dataframe(top[["Contrôle", "Message", "Lignes en anomalie", "Part", "Cumul"]], hide_index=True, width="stretch",
                      column_config={"Contrôle": st.column_config.TextColumn(width="small"),
                                     "Message": st.column_config.TextColumn(width="large"),

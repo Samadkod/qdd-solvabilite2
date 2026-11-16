@@ -37,3 +37,7 @@ section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff;}
 .qdd-regle, .qdd-crit-barre {background: #22323f;} .qdd-regle-zone {background: #1e3d2c;}
 .qdd-regle-n1 {background: var(--qdd-surface);} .qdd-regle-note, .qdd-crit-point {border-color: var(--qdd-surface);}
 [class*="st-key-qdd_ligne_"], .qdd-crit {border-bottom-color: #22323f;}
+.qdd-verdict-etat {color: #4caf7a;} .qdd-verdict.ko .qdd-verdict-etat {color: #e06464;}
+.qdd-verdict {border-left-color: #4caf7a;} .qdd-verdict.ko {border-left-color: #e06464;}
+.qdd-vig[data-ton="rouge"] b {color: #e06464;} .qdd-vig[data-ton="orange"] b {color: #e0a35a;}
+.qdd-vig[data-ton="vert"] b {color: #4caf7a;}
