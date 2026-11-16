@@ -104,7 +104,8 @@ def test_anglais_pour_la_navigation_la_synthese_et_les_statuts():
     at.run()
     assert not at.exception
     assert any(b.label == "Overview" for b in at.button)  # menu traduit
-    assert any("Detailed indicators" in e.label for e in at.expander)
+    texte = " ".join(m.value for m in at.markdown)
+    assert "Campaign indicators" in texte and "Attention points" in texte and "Overall target met" in texte
 
 
 def test_controle_de_niveau2_et_referentiel_affiches():

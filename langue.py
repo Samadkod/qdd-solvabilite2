@@ -94,6 +94,12 @@ EN = {
     "Des livrables pour documenter et partager la revue": "Deliverables to document and share the review",
     "Registre des anomalies · CSV": "Issue log · CSV", "Contrôles en anomalie · CSV": "Failing controls · CSV",
     "Rapport complet · Excel": "Full report · Excel",
+    "Points de vigilance": "Attention points", "Indicateurs de la campagne": "Campaign indicators",
+    "Points critiques hors seuil": "Critical points below threshold", "Note": "Score", "Objectif": "Target",
+    "au-dessus de l'objectif": "above target", "sous l'objectif": "below target",
+    "contrôle(s) bloquant(s)": "blocking control(s)", "contrôle(s) en retard": "overdue control(s)",
+    "Voir les contrôles en retard": "See overdue controls",
+    "Évolution depuis la campagne précédente, colorée selon son sens": "Change since the previous campaign, coloured by direction",
     # titres des tuiles
     "Note QDD agrégée": "Overall DQ score", "Objectif (note minimum)": "Target (minimum score)",
     "Écart à l'objectif": "Gap to target", "Données critiques hors tolérance": "Critical data out of tolerance",
