@@ -217,3 +217,10 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
   .qdd-contexte {grid-column: 1; grid-row: auto; align-items: flex-start; text-align: left; margin-top: .6rem;}
   .qdd-badges {justify-content: flex-start;}
 }
+/* Revue : page Contrôles sur écran moyen, les trois colonnes passent à la ligne au lieu de s'écraser */
+@media (max-width: 1280px) {
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] .st-key-qdd_filtres) {flex-wrap: wrap !important;}
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] .st-key-qdd_filtres) > [data-testid="stColumn"] {
+    flex: 1 1 100% !important; width: 100% !important; min-width: 100% !important;}
+  .st-key-qdd_filtres [data-testid="stVerticalBlock"] {gap: .5rem;}
+}
