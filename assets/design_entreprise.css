@@ -1,0 +1,114 @@
+/* Atelier QDD — habillage « entreprise ».
+   Chargé après design.css : console de pilotage sobre, dense et lisible, comme un outil interne d'assureur.
+   Principes : bleu marine institutionnel, un seul bleu d'action, couleurs réservées aux statuts,
+   angles de 4 px, aucune ombre ni dégradé, chiffres tabulaires. Le moteur n'est pas concerné. */
+:root {
+  --qdd-accent: #1f5fad; --qdd-accent-fonce: #0f2740; --qdd-accent-doux: #e8f0fa;
+  --qdd-encre: #14202e; --qdd-gris: #5a6878; --qdd-ligne: #d9dee5; --qdd-surface: #ffffff;
+  --qdd-fond: #f3f5f8; --qdd-marine: #0f2740;
+}
+[data-testid="stAppViewContainer"] {background: var(--qdd-fond);}
+.block-container {max-width: 1480px; padding: 1.6rem 2.2rem 3.5rem;}
+h4 {font-size: 1rem !important;}
+
+/* ---------- En-tête de page (Synthèse et autres pages) : une bande compacte, pas de bannière ---------- */
+.qdd-hero, .qdd-entete {
+  background: var(--qdd-surface); color: var(--qdd-encre); border: 1px solid var(--qdd-ligne);
+  border-top: 3px solid var(--qdd-marine); border-left: 1px solid var(--qdd-ligne); border-radius: 4px;
+  padding: 1rem 1.3rem; margin: 0 0 1rem; box-shadow: none;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 1.5rem; align-items: end;
+}
+.qdd-hero:after {display: none;}
+.qdd-hero .qdd-surtitre, .qdd-entete .qdd-surtitre {
+  grid-column: 1; color: var(--qdd-gris); font-size: .68rem; font-weight: 600; letter-spacing: .09em;
+  text-transform: uppercase; opacity: 1;}
+.qdd-hero h1, .qdd-entete h1 {
+  grid-column: 1; font-size: 1.45rem !important; font-weight: 600; color: var(--qdd-encre) !important;
+  margin: .2rem 0 .15rem; padding: 0; letter-spacing: -.02em; line-height: 1.25; max-width: none;}
+.qdd-hero p, .qdd-entete p {grid-column: 1; color: var(--qdd-gris); opacity: 1; font-size: .86rem;
+  line-height: 1.5; margin: 0; max-width: 980px;}
+.qdd-contexte {grid-column: 2; grid-row: 1 / span 3; display: flex; flex-direction: column; align-items: flex-end;
+  gap: .35rem; text-align: right;}
+.qdd-contexte-ligne {font-size: .8rem; color: var(--qdd-encre); font-variant-numeric: tabular-nums; white-space: nowrap;}
+.qdd-contexte-ligne b {font-weight: 600;}
+.qdd-badges {display: flex; gap: .4rem; margin: 0; flex-wrap: wrap; justify-content: flex-end;}
+.qdd-badge, .qdd-badge:first-child {
+  font-size: .68rem; font-weight: 600; letter-spacing: .02em; padding: .15rem .5rem; border-radius: 3px;
+  background: #fff4df; color: #8a5a00; border: 1px solid #f0d9a8;}
+.qdd-badge + .qdd-badge {background: var(--qdd-fond); color: var(--qdd-gris); border-color: var(--qdd-ligne);}
+
+/* ---------- Barre latérale marine ---------- */
+section[data-testid="stSidebar"] {background: var(--qdd-marine) !important; border-right: 0;}
+section[data-testid="stSidebar"] * {color: #d5dfea;}
+.qdd-marque {color: #ffffff !important; font-size: 1.1rem; letter-spacing: -.01em;}
+.qdd-marque span {color: #8fa3b8 !important; font-size: .7rem;}
+.qdd-marque svg, .qdd-marque svg * {color: #7fb0e8 !important; fill: currentColor;}
+.qdd-rubrique {color: #7f93a8 !important; font-size: .62rem; letter-spacing: .12em;}
+section[data-testid="stSidebar"] [data-testid="stButton"] button {border-radius: 4px; min-height: 2.35rem;
+  padding: .42rem .7rem; border: 0;}
+section[data-testid="stSidebar"] [data-testid="stButton"] button p {font-size: .84rem; color: #d5dfea;}
+section[data-testid="stSidebar"] button[kind="tertiary"]:hover {background: #1a3654;}
+section[data-testid="stSidebar"] button[kind="primary"],
+section[data-testid="stSidebar"] button[kind="primary"]:hover {
+  background: #1d3b5c; border: 0; box-shadow: inset 3px 0 #5ea2ef;}
+section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff; font-weight: 600;}
+section[data-testid="stSidebar"] button[kind="secondary"] {background: transparent; border: 1px solid #2f4d6d;}
+section[data-testid="stSidebar"] button[kind="secondary"]:hover {background: #1a3654; border-color: #42658a;}
+section[data-testid="stSidebar"] hr {border-color: #22405f;}
+section[data-testid="stSidebar"] [data-baseweb="select"] > div,
+section[data-testid="stSidebar"] [data-testid="stExpander"] details,
+section[data-testid="stSidebar"] [data-testid="stNumberInput"] input {
+  background: #15314f !important; border-color: #2a4868 !important; border-radius: 4px;}
+section[data-testid="stSidebar"] [data-baseweb="select"] svg {fill: #8fa3b8;}
+section[data-testid="stSidebar"] [data-testid="stButtonGroup"] button {background: #15314f; border-color: #2a4868;}
+section[data-testid="stSidebar"] [data-testid="stButtonGroup"] button[aria-checked="true"],
+section[data-testid="stSidebar"] [data-testid="stButtonGroup"] button[kind*="Active"] {background: #1f5fad;
+  border-color: #1f5fad;}
+section[data-testid="stSidebar"] [data-testid="stButtonGroup"] button p {color: #ffffff;}
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] * {color: #8fa3b8 !important;}
+
+/* ---------- Tuiles : bord supérieur à la couleur du statut, valeur en chiffres tabulaires ---------- */
+[class*="st-key-qdd_card_"] {border-radius: 4px !important; box-shadow: none !important; min-height: 168px;
+  border-top: 3px solid var(--qdd-ligne) !important;}
+[class*="st-key-qdd_card_"]:has(.qdd-card-meta[data-ton="rouge"]) {border-top-color: #ad3030 !important;}
+[class*="st-key-qdd_card_"]:has(.qdd-card-meta[data-ton="orange"]) {border-top-color: #c98a10 !important;}
+[class*="st-key-qdd_card_"]:has(.qdd-card-meta[data-ton="vert"]) {border-top-color: #22744a !important;}
+[class*="st-key-qdd_card_"]:has(.qdd-card-meta[data-ton="bleu"]) {border-top-color: #1f5fad !important;}
+.qdd-card-meta {font-size: .64rem; letter-spacing: .08em;}
+.qdd-tuile-titre {font-size: .8rem; color: var(--qdd-gris); min-height: 2.3em;}
+.qdd-tuile-valeur {font-size: 1.9rem; font-weight: 600; letter-spacing: -.03em; color: var(--qdd-encre) !important;}
+.qdd-tuile-delta {font-size: .72rem;}
+[class*="st-key-qdd_card_"] button[kind="tertiary"], [class*="st-key-qdd_card_"] button[kind="tertiary"] p {
+  color: var(--qdd-accent) !important;}
+
+/* ---------- Sections, encadrés, tableaux, formulaires ---------- */
+.qdd-section {margin-top: 1.4rem; border-bottom: 1px solid var(--qdd-ligne);}
+.qdd-section h2 {font-size: .95rem; text-transform: none; color: var(--qdd-encre);}
+.qdd-summary {border-radius: 4px; font-size: .82rem;}
+.st-key-qdd_filtres, [data-testid="stForm"], [data-testid="stVerticalBlockBorderWrapper"] {border-radius: 4px;}
+[data-testid="stExpander"] details {border-radius: 4px; background: var(--qdd-surface);}
+[data-testid="stExpander"] summary {background: #f8f9fb;}
+[data-testid="stDataFrame"] {border-radius: 4px;}
+[data-testid="stMetric"] {border-radius: 4px;}
+.qdd-step, .qdd-piste, .qdd-pastille {border-radius: 4px !important;}
+[data-testid="stMain"] button {border-radius: 4px !important;}
+[data-testid="stMain"] button[kind="primary"] {background: var(--qdd-accent); border-color: var(--qdd-accent);}
+[data-testid="stMain"] button[kind="primary"]:hover {background: #184d8f; border-color: #184d8f;}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {color: var(--qdd-accent);}
+.stTabs [data-baseweb="tab-highlight"] {background-color: var(--qdd-accent);}
+button:focus-visible, a:focus-visible {outline: 2px solid #5ea2ef !important; outline-offset: 2px;}
+.qdd-footer {color: var(--qdd-gris);}
+
+@media (max-width: 900px) {
+  .qdd-hero, .qdd-entete {grid-template-columns: 1fr;}
+  .qdd-contexte {grid-column: 1; grid-row: auto; align-items: flex-start; text-align: left; margin-top: .6rem;}
+  .qdd-badges {justify-content: flex-start;}
+}
+@media (max-width: 640px) {
+  .block-container {padding: 1rem 1rem 2rem;}
+  .qdd-hero, .qdd-entete {padding: .85rem 1rem;}
+  .qdd-hero h1, .qdd-entete h1 {font-size: 1.25rem !important;}
+  .qdd-hero p {display: none;}
+  .qdd-badges {display: flex;}
+  .qdd-badge:not(:first-child) {display: inline-block;}
+}

@@ -216,7 +216,8 @@ rub, titre, icone, description = PAGES[page]
 if page == "synthese":
     bandeau(c["campagne"], pd.Timestamp(c["date"]))
 else:
-    entete_page(t(rub), t(titre), t(description), f"{t('Campagne')} {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}")
+    entete_page(t(rub), t(titre), t(description), f"{t('Campagne')} {c['campagne']} · {pd.Timestamp(c['date']):%d/%m/%Y}",
+                c["campagne"], pd.Timestamp(c["date"]))
     if st.session_state.get("langue") == "en":
         st.caption(":material/translate: " + t("Contenu détaillé de cette page en français ; l'anglais couvre le menu, "
                                                "les en-têtes, la Synthèse et les statuts."))

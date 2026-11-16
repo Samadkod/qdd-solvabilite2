@@ -39,7 +39,7 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
             cols = st.columns(3, gap="medium")
             for col, t in zip(cols, groupe[i:i + 3]):
                 with col, st.container(border=True, key=f"qdd_card_{t.cle}"):
-                    st.markdown(f'<div class="qdd-card-meta" style="--status:{COULEURS[t.ton]}">'
+                    st.markdown(f'<div class="qdd-card-meta" data-ton="{t.ton}" style="--status:{COULEURS[t.ton]}">'
                                 f'{tr(statuts[t.ton])}</div>', unsafe_allow_html=True)
                     st.markdown(f'<div class="qdd-tuile-titre">{escape(tr(t.titre))}</div>',
                                 unsafe_allow_html=True, help=t.aide)

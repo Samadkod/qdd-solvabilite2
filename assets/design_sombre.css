@@ -1,6 +1,6 @@
 /* Thème sombre : mêmes formes, couleurs adaptées. Chargé seulement si l'utilisateur choisit le thème sombre. */
 :root {
-  --qdd-accent: #3bb3c0; --qdd-accent-fonce: #0b151e; --qdd-accent-doux: #173a42;
+  --qdd-accent: #5ea2ef; --qdd-accent-fonce: #0b151e; --qdd-accent-doux: #173a42;
   --qdd-encre: #e3eaf0; --qdd-gris: #9fb0bf; --qdd-ligne: #2a3c4b;
   --qdd-surface: #142330; --qdd-or: #d9a441; --qdd-or-doux: #3a2e17;
 }
@@ -23,3 +23,13 @@ section[data-testid="stSidebar"] button[kind="tertiary"]:hover {background: #132
 .qdd-pastille {background: color-mix(in srgb, var(--c) 16%, transparent);}
 [data-testid="stMain"] button[kind="primary"] {background: #3bb3c0; border-color: #3bb3c0; color: #0b151e;}
 [data-testid="stMain"] button[kind="primary"]:disabled {background: #22323f; border-color: #22323f; color: #7d8f9e;}
+/* Habillage entreprise en thème sombre : en-tête et tuiles sur la surface sombre. */
+.qdd-hero, .qdd-entete {background: var(--qdd-surface) !important; border-color: var(--qdd-ligne) !important;
+  border-top: 3px solid #5ea2ef !important;}
+.qdd-hero h1, .qdd-entete h1, .qdd-contexte-ligne {color: var(--qdd-encre) !important;}
+.qdd-badge + .qdd-badge {background: #1c2b38; color: var(--qdd-gris); border-color: var(--qdd-ligne);}
+.qdd-badge:first-child {background: #3a2e17; color: #e8c27a; border-color: #5a4622;}
+[data-testid="stExpander"] summary {background: transparent;}
+section[data-testid="stSidebar"] button[kind="primary"] {background: #17304a; box-shadow: inset 3px 0 #5ea2ef;}
+section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff;}
+[data-testid="stMain"] button[kind="primary"] {background: #5ea2ef; border-color: #5ea2ef; color: #0b151e;}

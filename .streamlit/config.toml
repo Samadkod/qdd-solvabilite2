@@ -5,30 +5,31 @@ font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wgh
 headingFont = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
 codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
 headingFontWeights = [600, 600, 600, 600, 600, 600]
-baseRadius = "0.5rem"
+baseRadius = "0.25rem"
 showWidgetBorder = true
 
 [theme.light]
-primaryColor = "#087E8B"
-backgroundColor = "#F5F7FA"
-secondaryBackgroundColor = "#EDF2F6"
-textColor = "#162C41"
-linkColor = "#087E8B"
-borderColor = "#DCE5EB"
-dataframeBorderColor = "#DCE5EB"
-chartCategoricalColors = ["#0E5A69", "#8E6210", "#22744A", "#AD3030", "#5B7FA6", "#9C6400", "#566370"]
+primaryColor = "#1F5FAD"
+backgroundColor = "#F3F5F8"
+secondaryBackgroundColor = "#EEF1F5"
+textColor = "#14202E"
+linkColor = "#1F5FAD"
+borderColor = "#D9DEE5"
+dataframeBorderColor = "#D9DEE5"
+chartCategoricalColors = ["#1F5FAD", "#8E6210", "#22744A", "#AD3030", "#5B7FA6", "#9C6400", "#566370"]
 
 [theme.light.sidebar]
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F1F5F8"
-borderColor = "#DCE5EB"
+backgroundColor = "#0F2740"
+secondaryBackgroundColor = "#15314F"
+textColor = "#D5DFEA"
+borderColor = "#2A4868"
 
 [theme.dark]
-primaryColor = "#3BB3C0"
+primaryColor = "#5EA2EF"
 backgroundColor = "#0E1A24"
 secondaryBackgroundColor = "#172633"
 textColor = "#E3EAF0"
-linkColor = "#6CCAD4"
+linkColor = "#7FB6F2"
 borderColor = "#2A3C4B"
 dataframeBorderColor = "#2A3C4B"
 chartCategoricalColors = ["#4FB3C2", "#D9A441", "#4CAF7A", "#E06464", "#8AA9D6", "#E0A35A", "#9AA8B5"]
