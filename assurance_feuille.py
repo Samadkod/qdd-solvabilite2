@@ -4,14 +4,41 @@ from feuille_de_route import ELEMENTS, ORDRE, ICONES
 
 
 EXTENSIONS = [
-    dict(id='E12', statut='Plus tard', titre='Copilote QDD fondé sur les preuves — Claude envisagé',
-         pourquoi='Expliquer les résultats, retrouver les règles et pièces, préparer une synthèse citée. '
-                  'Ne remplace pas les calculs et ne valide ni ne clôture seul une anomalie.',
-         prerequis='Aucun service IA branché. Choisir et approuver le fournisseur/modèle ; hébergement et données '
-                   'autorisés, confidentialité/rétention, authentification et droits, clé via secret sécurisé, budget '
-                   'et quotas. Sources versionnées (résultats, SQL, dictionnaire, lignage, dossiers), citations vérifiables, '
-                   'évaluation des réponses et des refus, défense contre les instructions contenues dans les documents. '
-                   'Pas de données réelles sur l’application publique.', effort='Moyen à élevé'),
+    dict(id='F16', statut='Fait', titre='Assistant QDD (Claude) construit et publié',
+         pourquoi='Page « Assistant QDD » : l’utilisateur pose sa question avec ses mots ; Claude (API Anthropic, '
+                  'Opus 5.5) interroge le moteur par 9 outils en lecture seule et répond avec les chiffres de la '
+                  'campagne affichée, sources visibles sous chaque réponse. Historique de la visite, dates, export, '
+                  'coût de la session, plafond par visite ; refus hors sujet et consignes non contournables.',
+         prerequis='Outils comparés au moteur, boucle testée avec un faux client, aucune clé dans le dépôt '
+                   '(tests/test_assistant_qdd.py). Principes d’interface repris d’un outil d’entreprise, sans son contenu.',
+         effort='—'),
+    dict(id='V4', statut='À vérifier', titre='Activer l’assistant et évaluer ses réponses',
+         pourquoi='Tant qu’aucune clé n’est enregistrée, la page indique que l’assistant n’est pas activé et aucune '
+                  'réponse réelle n’a été vérifiée.',
+         prerequis='Clé d’API Anthropic dans les secrets Streamlit (ANTHROPIC_API_KEY), crédit et limite de dépense '
+                   'dans la console. Passer les questions de référence des tests, une question floue, une hors sujet '
+                   'et une tentative de contournement ; vérifier chaque chiffre contre l’application ; mesurer le coût '
+                   'réel par réponse.', effort='Faible'),
+    dict(id='E12', statut='Plus tard', titre='Assistant : fichier joint et jauge de consommation',
+         pourquoi='Joindre un export de l’atelier (CSV, Excel, PDF) pour se le faire expliquer ; anneau qui se '
+                  'remplit selon un budget par visite (à la place du plafond de 15 réponses), avec la part de contexte.',
+         prerequis='Taille limitée et annoncée (coût) ; en entreprise, accord de la DSI avant d’envoyer un fichier réel '
+                   'à un service externe.', effort='Faible à moyen'),
+    dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
+         pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
+         prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '
+                   '(compte Google ou Microsoft) ; information des utilisateurs et durée de conservation des questions. '
+                   'Deux comptes à créer par le propriétaire ; à décider selon l’usage réel.', effort='Moyen'),
+    dict(id='F17', statut='Fait', titre='Rapprochement avec la notice ACPR QDD',
+         pourquoi='Référentiel des contrôles complété (risque, réalisation, mode opératoire), contrôle de niveau 2, '
+                  'données en défaut archivées avec empreinte, fiche d’ajustement, origine des données externes, '
+                  'document cadre généré. Valeurs de référence inchangées.',
+         prerequis='Profondeur d’historique (point 34) non traitée : pas d’années de développement dans les données '
+                   'fictives. Aucune conformité attestée.', effort='—'),
+    dict(id='F18', statut='Fait', titre='Habillage entreprise et Synthèse refondue',
+         pourquoi='Menu marine, en-tête compact, verdict sur une règle, points de vigilance en actions, panneaux '
+                  'compacts, points critiques hors seuil, Pareto avec part cumulée ; thème sombre et anglais revus.',
+         prerequis='Ancienne version conservée dans la branche sauvegarde-avant-refonte.', effort='—'),
     dict(id='E13', statut='Plus tard', titre='Workflow d’entreprise persistant et authentifié',
          pourquoi='Adapter les rôles, habilitations, échéances et validations à l’organisation après la prise de poste.',
          prerequis='Hébergement approuvé, stockage durable, authentification, séparation réelle des rôles, journal '

@@ -204,12 +204,12 @@ def test_dossier_zip_empreintes_et_pieces_manquantes(contexte):
     assert missing.loc['Identité et droits des intervenants', 'État'] == 'Manquant'
 
 
-def test_roadmap_claude_futur_et_sas_preserve():
+def test_roadmap_assistant_et_sas_preserve():
     from assurance_feuille import tableau
     df = tableau().set_index('id')
-    assert df.loc['E12', 'statut'] == 'Plus tard'
-    assert 'Claude' in df.loc['E12', 'titre']
-    assert 'Aucun service IA branché' in df.loc['E12', 'prerequis']
+    assert df.loc['F16', 'statut'] == 'Fait' and 'Claude' in df.loc['F16', 'titre']
+    assert df.loc['V4', 'statut'] == 'À vérifier' and 'ANTHROPIC_API_KEY' in df.loc['V4', 'prerequis']
+    assert df.loc['E14', 'statut'] == 'En attente de décision'
     assert '59 valeurs sur 59' in df.loc['F11', 'titre']
 
 
