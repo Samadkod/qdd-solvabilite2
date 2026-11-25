@@ -57,20 +57,15 @@ def entete_page(rubrique: str, titre: str, description: str, contexte: str, camp
     )
 
 
+
+# Script installé une fois dans la page, qui lit à chaque passage les repères mis à jour par le serveur
+# (div .qdd-repere : thème connu du serveur, numéro de la dernière demande de fermeture du menu).
 _SCRIPT_INTERFACE = """<script>
 (function () {
+  if (window.__qddVeille) { return; }
+  window.__qddVeille = true;
   const doc = window.document;
-  window.__qddThemeServeur = "%(theme)s";
-  // 1. Sur téléphone, le menu latéral se referme après un choix de page (comme une navigation native).
-  if (%(fermer)s && window.matchMedia("(max-width: 767.98px)").matches) {
-    const b = doc.querySelector('[data-testid="stSidebarCollapseButton"] button');
-    if (b) { b.click(); }
-  }
-  // 2. Changement de thème (menu ⋮ > Settings) : Streamlit ne relance pas le script, l'habillage sombre ou clair
-  //    n'arrivait qu'au clic suivant. On compare le thème affiché à celui connu du serveur et on relance une fois.
-  if (window.__qddThemeVeille) { return; }
-  window.__qddThemeVeille = true;
-  let dernier = 0;
+  let derniereFermeture = null, derniereRelance = 0;
   function themeAffiche() {
     const app = doc.querySelector(".stApp");
     if (!app) { return null; }
@@ -80,21 +75,38 @@ _SCRIPT_INTERFACE = """<script>
     return (0.299 * r + 0.587 * g + 0.114 * b) < 128 ? "dark" : "light";
   }
   setInterval(function () {
+    const repere = doc.querySelector(".qdd-repere");
+    if (!repere) { return; }
+    // 1. Sur téléphone, le menu latéral se referme après un choix de page (comme une navigation native).
+    const n = repere.dataset.fermer;
+    if (derniereFermeture === null) { derniereFermeture = n; }
+    if (n !== derniereFermeture) {
+      derniereFermeture = n;
+      if (window.matchMedia("(max-width: 767.98px)").matches) {
+        const b = doc.querySelector('[data-testid="stSidebarCollapseButton"] button');
+        if (b) { b.click(); }
+      }
+    }
+    // 2. Changement de thème (menu ⋮ > Settings) : Streamlit ne relance pas le script, l'habillage sombre ou
+    //    clair n'arrivait qu'au clic suivant. Thème affiché différent de celui du serveur : on relance une fois.
     const affiche = themeAffiche();
-    if (!affiche || affiche === window.__qddThemeServeur || Date.now() - dernier < 4000) { return; }
-    const relance = doc.querySelector(".st-key-qdd_relais button");
-    if (relance) { dernier = Date.now(); relance.click(); }
-  }, 600);
+    if (affiche && affiche !== repere.dataset.theme && Date.now() - derniereRelance > 2500) {
+      const relance = doc.querySelector(".st-key-qdd_relais button");
+      if (relance) { derniereRelance = Date.now(); relance.click(); }
+    }
+  }, 300);
 })();
 </script>"""
 
 
 def comportement_interface(fermer_menu: bool) -> None:
     """Menu refermé après un choix de page sur téléphone ; habillage appliqué dès le changement de thème.
-    À appeler dans la barre latérale ; le bouton de relance est invisible (design_entreprise.css)."""
+    À appeler dans la barre latérale ; le relais est invisible (design_entreprise.css)."""
+    if fermer_menu:
+        st.session_state["_qdd_fermetures"] = st.session_state.get("_qdd_fermetures", 0) + 1
+    theme = "dark" if theme_sombre() else "light"
     with st.container(key="qdd_relais"):
+        st.markdown(f'<div class="qdd-repere" data-theme="{theme}" '
+                    f'data-fermer="{st.session_state.get("_qdd_fermetures", 0)}"></div>', unsafe_allow_html=True)
         st.button("relance", key="qdd_relance_theme")
-        compteur = st.session_state["_qdd_nonce"] = st.session_state.get("_qdd_nonce", 0) + 1
-        st.html(_SCRIPT_INTERFACE % {"theme": "dark" if theme_sombre() else "light",
-                                     "fermer": "true" if fermer_menu else "false"}
-                + f"<!-- {compteur} -->", unsafe_allow_javascript=True)
+        st.html(_SCRIPT_INTERFACE, unsafe_allow_javascript=True)
