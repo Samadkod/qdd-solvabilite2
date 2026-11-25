@@ -53,25 +53,35 @@ Méthode du dispositif (pour expliquer, pas pour calculer) :
 """
 
 # ------------------------------------------------------------------ questions proposées
+# Construites à partir des missions du poste (guide_terrain.MISSIONS) ; chacune se traite avec les outils
+# ci-dessous, sans chiffre de mémoire (tests/test_assistant_qdd.py vérifie les outils qu'elle mobilise).
 QUESTIONS = {
-    "Comprendre la campagne": [
-        "Quelle est la situation de la campagne en trois phrases ?",
-        "Pourquoi la note a-t-elle baissé depuis N-1 ?",
-        "Quelles sont les trois priorités de cette campagne ?",
+    "Piloter la campagne": [
+        "Fais-moi le point de la campagne en cinq lignes : note, objectif, points bloquants.",
+        "Pourquoi la note a-t-elle baissé depuis N-1 ? Décompose facteur par facteur.",
+        "Quelles données critiques sont hors tolérance, et de combien de points sous leur minimum ?",
     ],
-    "Contrôles": [
-        "Quels contrôles sont en retard, et depuis combien de périodes ?",
-        "Que vérifie le contrôle C07 et pourquoi est-il bloquant ?",
-        "Quels constats du contrôle de niveau 2 sont à corriger ?",
+    "Contrôles et fiabilité des QRT": [
+        "Quelles restitutions QRT ne sont pas conformes, et quel écart avec leur source ?",
+        "Quels contrôles sont en retard, depuis combien de périodes, et quel effet sur leur résultat ?",
+        "Que vérifie le contrôle C07, comment est-il réalisé, et pourquoi est-il bloquant ?",
     ],
-    "Anomalies et corrections": [
-        "Qui doit corriger quoi, et avant quelle date ?",
-        "Prépare le message à envoyer à la direction sinistres pour les lignes en anomalie de C05.",
-        "Quelles données critiques sont hors tolérance, et de combien ?",
+    "Anomalies et résolution": [
+        "Qui doit corriger quoi ? Classe les anomalies ouvertes par propriétaire et par échéance.",
+        "Rédige le message à la direction sinistres pour corriger les provisions négatives (C05), "
+        "avec le nombre de lignes et des exemples.",
+        "Quelles anomalies reviennent d'une campagne à l'autre, et que faut-il faire ?",
     ],
-    "Prise de poste": [
-        "Explique la note minimum de la donnée provisions RC décennale, avec les vrais chiffres.",
-        "Quelles étapes du lignage ne sont couvertes par aucun contrôle ?",
+    "Gouvernance et lignage": [
+        "Quelles étapes du lignage ne sont couvertes par aucun contrôle, et lesquelles traiter d'abord ?",
+        "Quels constats du contrôle de niveau 2 dois-je traiter en priorité ?",
+        "Les données externes du dépositaire sont-elles bien documentées et contrôlées ?",
+    ],
+    "Audit et comité": [
+        "Prépare les points clés à présenter au comité de pilotage QDD pour cette campagne.",
+        "Un auditeur demande comment est obtenue la note des provisions RC décennale : explique-la avec les vrais "
+        "chiffres.",
+        "Quelles preuves puis-je montrer pour la campagne, et où les trouver dans l'application ?",
     ],
 }
 
@@ -351,6 +361,7 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
         question = None
         if not st.session_state["assistant_fil"]:
             st.markdown("##### Questions proposées")
+            st.caption("Rangées selon les missions d'un chargé de qualité des données Solvabilité II.")
             for theme, liste in QUESTIONS.items():
                 st.caption(theme)
                 choix = st.pills(theme, liste, key=f"assistant_q_{theme}", label_visibility="collapsed",

@@ -37,7 +37,7 @@ def test_schemas_stricts_et_complets():
         s = o["input_schema"]
         assert o["strict"] is True and s["additionalProperties"] is False
         assert set(s["required"]) == set(s["properties"])  # mode strict : toutes les propriétés requises
-    assert sum(len(v) for v in QUESTIONS.values()) == 11
+    assert sum(len(v) for v in QUESTIONS.values()) == 15
 
 
 def test_indicateurs_egaux_aux_valeurs_de_reference(contexte):
@@ -136,3 +136,36 @@ def test_page_sans_cle_annonce_l_assistant_non_configure(monkeypatch):
     assert not at.exception
     assert any("Assistant non configuré" in i.value for i in at.info)
     assert at.chat_input[0].disabled
+
+
+# outils que chaque question proposée mobilise : ils doivent tous répondre sans erreur sur la campagne N
+OUTILS_PAR_QUESTION = [
+    [("indicateurs_campagne", {"campagne": "N"}), ("points_de_controle", {"campagne": "N", "controle": "", "statut": "Bloquant"})],
+    [("variation_note", {})],
+    [("donnees_critiques", {"campagne": "N"})],
+    [("points_de_controle", {"campagne": "N", "controle": "Q02", "statut": "tous"})],
+    [("points_de_controle", {"campagne": "N", "controle": "", "statut": "en retard"})],
+    [("regle_controle", {"controle": "C07"}), ("points_de_controle", {"campagne": "N", "controle": "C07", "statut": "tous"})],
+    [("anomalies", {"campagne": "N", "statut": "non clôturées"})],
+    [("lignes_en_anomalie", {"campagne": "N", "controle": "C05"}), ("regle_controle", {"controle": "C05"})],
+    [("anomalies", {"campagne": "N", "statut": "Récurrente"})],
+    [("lignage", {"campagne": "N", "donnee": "", "seulement_non_couverts": True})],
+    [("controle_niveau2", {"campagne": "N"})],
+    [("controle_niveau2", {"campagne": "N"}), ("lignage", {"campagne": "N", "donnee": "placements_ACTIONS", "seulement_non_couverts": False})],
+    [("indicateurs_campagne", {"campagne": "N"}), ("controle_niveau2", {"campagne": "N"}), ("variation_note", {})],
+    [("donnees_critiques", {"campagne": "N"}), ("points_de_controle", {"campagne": "N", "controle": "", "statut": "tous"})],
+    [("indicateurs_campagne", {"campagne": "N"}), ("controle_niveau2", {"campagne": "N"})],
+]
+
+
+def test_chaque_question_proposee_a_ses_outils(contexte):
+    questions = [q for liste in QUESTIONS.values() for q in liste]
+    assert len(questions) == len(OUTILS_PAR_QUESTION)
+    for q, appels in zip(questions, OUTILS_PAR_QUESTION):
+        for nom, entree in appels:
+            r = executer_outil(nom, entree, contexte)
+            assert "erreur" not in r, (q, nom, r)
+    rec = executer_outil("anomalies", {"campagne": "N", "statut": "Récurrente"}, contexte)
+    assert rec["nombre"] == 11  # = tuile « Anomalies récurrentes » de la Synthèse
+    q02 = executer_outil("points_de_controle", {"campagne": "N", "controle": "Q02", "statut": "Bloquant"}, contexte)
+    assert [p["point"] for p in q02["points"]] == ["Q02|DOMMAGES_OUVRAGE"]  # la restitution QRT non conforme
