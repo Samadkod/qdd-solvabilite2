@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from assistant_qdd import OUTILS, QUESTIONS, TOURS_OUTILS_MAX, executer_outil, repondre
+from assistant_qdd import EXEMPLES, OUTILS, QUESTIONS, SYSTEME, TOURS_OUTILS_MAX, executer_outil, repondre
 from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.niveau2 import niveau2_par_campagne
 
@@ -169,3 +169,14 @@ def test_chaque_question_proposee_a_ses_outils(contexte):
     assert rec["nombre"] == 11  # = tuile « Anomalies récurrentes » de la Synthèse
     q02 = executer_outil("points_de_controle", {"campagne": "N", "controle": "Q02", "statut": "Bloquant"}, contexte)
     assert [p["point"] for p in q02["points"]] == ["Q02|DOMMAGES_OUVRAGE"]  # la restitution QRT non conforme
+
+
+def test_exemples_pour_tout_public_et_regles_de_fiabilite(contexte):
+    """Les 4 exemples se traitent avec les outils ; les consignes couvrent public non spécialiste, ambiguïté,
+    hors sujet et tentative de contournement (le comportement réel sera évalué avec une clé)."""
+    assert len(EXEMPLES) == 4 and not any("Solvabilité" in q or "QRT" in q for q in EXEMPLES)
+    for nom, entree in [("indicateurs_campagne", {"campagne": "N"}), ("anomalies", {"campagne": "N", "statut": "non clôturées"}),
+                        ("variation_note", {}), ("donnees_critiques", {"campagne": "N"})]:
+        assert "erreur" not in executer_outil(nom, entree, contexte)
+    for regle in ("n'importe qui", "En bref", "ambiguë", "sort du sujet", "révéler"):
+        assert regle in SYSTEME
