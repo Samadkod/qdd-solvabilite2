@@ -370,19 +370,35 @@ def preparer_piece_jointe(nom: str, donnees: bytes) -> tuple[list, str]:
             f"{nom} ({portee})")
 
 
-def anneau_html(cout: float, budget: float, contexte_pct: float) -> str:
-    """Jauge circulaire : part du budget de la visite consommée, montant et part de contexte."""
-    part = max(0.0, min(1.0, cout / budget)) if budget else 0.0
+def _cercle(part: float, couleur: str) -> str:
     r, tour = 9, 2 * 3.14159265 * 9
-    couleur = "#AD3030" if part >= 0.9 else "#C98A10" if part >= 0.7 else "var(--qdd-accent)"
-    montant = f"{cout:.2f} $ sur {budget:.2f} $".replace(".", ",")
-    ctx = f" · contexte {contexte_pct:.1f} %".replace(".", ",") if contexte_pct else ""
-    return (f'<div class="qdd-anneau" title="Part du budget de la visite consommée : {part * 100:.0f} %">'
-            f'<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">'
+    return (f'<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">'
             f'<circle cx="11" cy="11" r="{r}" fill="none" stroke="var(--qdd-ligne)" stroke-width="3"/>'
             f'<circle cx="11" cy="11" r="{r}" fill="none" stroke="{couleur}" stroke-width="3" stroke-linecap="round" '
-            f'stroke-dasharray="{part * tour:.2f} {tour:.2f}" transform="rotate(-90 11 11)"/></svg>'
-            f'<span><b>{montant}</b>{ctx}</span></div>')
+            f'stroke-dasharray="{part * tour:.2f} {tour:.2f}" transform="rotate(-90 11 11)"/></svg>')
+
+
+def anneau_html(cout: float, budget: float, contexte_jetons: int) -> str:
+    """Deux jauges circulaires avec une info-bulle en langage simple : budget de la visite et contexte."""
+    part = max(0.0, min(1.0, cout / budget)) if budget else 0.0
+    couleur = "#AD3030" if part >= 0.9 else "#C98A10" if part >= 0.7 else "var(--qdd-accent)"
+    fr = lambda x, d=2: f"{x:.{d}f}".replace(".", ",")
+    info_budget = (f"Budget de cette visite : {fr(cout)} $ dépensés sur {fr(budget)} $ ({part * 100:.0f} %). "
+                   "Une fois atteint, l'assistant s'arrête jusqu'à la prochaine visite.")
+    ctx = max(0.0, min(1.0, contexte_jetons / CONTEXTE_MAX))
+    milliers = lambda n: f"{n:,}".replace(",", " ")
+    info_ctx = (f"Ce que l'assistant garde en tête de cette conversation : {fr(ctx * 100, 1)} % de ce qu'il peut lire "
+                f"d'un coup ({milliers(contexte_jetons)} jetons sur {milliers(CONTEXTE_MAX)}, mesuré au dernier "
+                "échange, Claude Opus 5.5).")
+    if not contexte_jetons:
+        info_ctx = ("Ce que l'assistant garde en tête de cette conversation : rien pour l'instant ; la mesure "
+                    "apparaît après la première réponse.")
+    texte_ctx = f"Contexte {fr(ctx * 100, 1)} %" if contexte_jetons else "Contexte —"
+    return (f'<div class="qdd-anneau">'
+            f'<span class="qdd-jauge" tabindex="0" data-info="{info_ctx}">{_cercle(ctx, "var(--qdd-gris)")}'
+            f'<span>{texte_ctx}</span></span>'
+            f'<span class="qdd-jauge" tabindex="0" data-info="{info_budget}">{_cercle(part, couleur)}'
+            f'<span><b>{fr(cout)} $ sur {fr(budget)} $</b></span></span></div>')
 
 
 # ------------------------------------------------------------------ boucle de réponse
@@ -436,6 +452,10 @@ def repondre(client, messages: list, contexte: dict, compteur: dict | None = Non
                     "input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"))
             trace["reflexion"] += [b.thinking for b in reponse.content
                                    if getattr(b, "type", "") == "thinking" and getattr(b, "thinking", "")]
+        if rappel:
+            for b in reponse.content:
+                if getattr(b, "type", "") == "thinking" and getattr(b, "thinking", ""):
+                    rappel("Réflexion : " + b.thinking)
         if reponse.stop_reason == "refusal":
             return "Je ne peux pas répondre à cette demande. Reformulez-la autour de la campagne.", appels, messages
         outils = [b for b in reponse.content if b.type == "tool_use"]
@@ -462,6 +482,10 @@ def repondre(client, messages: list, contexte: dict, compteur: dict | None = Non
                                                "entree": entree, "resultat": apercu,
                                                "elements": 0 if "erreur" in res else _nb_lignes(res),
                                                "duree": time.perf_counter() - debut, "erreur": "erreur" in res})
+            if rappel:
+                n = 0 if "erreur" in res else _nb_lignes(res)
+                rappel(f"Fait : {NOMS_OUTILS.get(b.name, b.name)} · {n} élément{'s' if n > 1 else ''}"
+                       f" · {time.perf_counter() - debut:.1f} s".replace(".", ","))
             resultats.append({"type": "tool_result", "tool_use_id": b.id, "is_error": "erreur" in res,
                               "content": json.dumps(res, ensure_ascii=False, default=str)})
         messages.append({"role": "user", "content": resultats})
@@ -644,8 +668,7 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                 question = (saisie.text or "").strip() or ("Explique-moi ce fichier." if fichiers else None)
         pied_g, pied_d = st.columns([3, 1.6], vertical_alignment="center")
         pied_g.caption(":material/lock: " + AVERTISSEMENT)
-        pied_d.markdown(anneau_html(cout_session, BUDGET_VISITE, conv["compteur"]["contexte"] / CONTEXTE_MAX * 100),
-                        unsafe_allow_html=True)
+        pied_d.markdown(anneau_html(cout_session, BUDGET_VISITE, conv["compteur"]["contexte"]), unsafe_allow_html=True)
         if cle and epuise:
             st.caption("Budget de la visite atteint : l'assistant reprendra lors d'une prochaine visite.")
 
@@ -688,8 +711,13 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
 
         def rappel(texte: str) -> None:
             vues.append(texte)
-            statut.update(label=f"En cours · {_duree(time.perf_counter() - debut)} · {texte}")
-            etapes.markdown("\n".join(f"- {v}" for v in vues[-6:]))
+            if not texte.startswith(("Réflexion : ", "Fait : ")):
+                statut.update(label=f"En cours · {_duree(time.perf_counter() - debut)} · {texte}", expanded=True)
+            reflexion = next((v[len("Réflexion : "):] for v in reversed(vues) if v.startswith("Réflexion : ")), "")
+            faites = [v[len("Fait : "):] for v in vues if v.startswith("Fait : ")]
+            html = (f'<div class="qdd-direct-reflexion">{reflexion[:400]}</div>' if reflexion else "")
+            html += "".join(f'<div class="qdd-direct-etape"><span>✓</span>{x}</div>' for x in faites)
+            etapes.markdown(html, unsafe_allow_html=True)
 
         try:
             texte, sources, conv["api"] = repondre(anthropic.Anthropic(api_key=cle), conv["api"], contexte,

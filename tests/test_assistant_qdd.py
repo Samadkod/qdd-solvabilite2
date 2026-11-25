@@ -243,9 +243,11 @@ def test_pieces_jointes_et_jauge():
     with pytest.raises(ValueError, match="trop lourd"):
         preparer_piece_jointe("gros.csv", b"a" * (TAILLE_MAX + 1))
     # jauge : part du budget et couleur d'alerte
-    assert 'stroke-dasharray="0.00' in anneau_html(0, BUDGET_VISITE, 0)
-    plein = anneau_html(BUDGET_VISITE, BUDGET_VISITE, 1.2)
-    assert "#AD3030" in plein and "0,50 $ sur 0,50 $" in plein and "contexte 1,2 %" in plein
+    vide = anneau_html(0, BUDGET_VISITE, 0)
+    assert 'stroke-dasharray="0.00' in vide and "Contexte —" in vide and "rien pour l'instant" in vide
+    plein = anneau_html(BUDGET_VISITE, BUDGET_VISITE, 12_000)
+    assert "#AD3030" in plein and "0,50 $ sur 0,50 $" in plein and "Contexte 1,2 %" in plein
+    assert "1,2 % de ce qu'il peut lire d'un coup (12 000 jetons sur 1 000 000, mesuré au dernier échange" in plein and "Budget de cette visite : 0,50 $ dépensés sur 0,50 $ (100 %)" in plein
 
 
 def test_trace_d_une_reponse(contexte):
@@ -264,4 +266,6 @@ def test_trace_d_une_reponse(contexte):
     assert x["nom"] == "Lignes en anomalie" and x["elements"] == len(x["resultat"]["exemples"]) and not x["erreur"]
     assert x["resultat"]["nombre_lignes"] > 0 and x["duree"] >= 0
     assert trace["jetons"] == 2400 and abs(trace["cout"] - 2 * (1000 * 4 + 200 * 20) / 1e6) < 1e-12
-    assert vu[:2] == ["Je lis votre question…", "Je consulte : Lignes en anomalie"]
+    assert vu[:3] == ["Je lis votre question…", "Réflexion : Je cherche les lignes de C05.",
+                      "Je consulte : Lignes en anomalie"]
+    assert vu[3].startswith("Fait : Lignes en anomalie · 8 éléments · ")
