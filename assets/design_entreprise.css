@@ -328,3 +328,9 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 .qdd-fiche-point:before {position: absolute; left: 0; top: 0; font-weight: 700;}
 .qdd-fiche-point.ok:before {content: "✓"; color: #22744a;}
 .qdd-fiche-point.ko:before {content: "✕"; color: var(--qdd-gris);}
+[class*="st-key-assistant_dl_"] button {min-height: 1.8rem; padding: 0 .3rem;}
+[class*="st-key-assistant_dl_"] button p {font-size: .78rem;}
+/* barre d'outils des tableaux de réponse (télécharger, rechercher, plein écran) : ne pas la rogner */
+.st-key-assistant_zone [data-baseweb="tab-panel"], .st-key-assistant_zone [data-testid="stChatMessageContent"],
+.st-key-assistant_zone [data-testid="stTabs"] {overflow: visible !important;}
+.st-key-assistant_zone [data-testid="stDataFrame"] {margin-top: .6rem;}

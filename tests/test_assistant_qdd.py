@@ -269,3 +269,21 @@ def test_trace_d_une_reponse(contexte):
     assert vu[:3] == ["Je lis votre question…", "Réflexion : Je cherche les lignes de C05.",
                       "Je consulte : Lignes en anomalie"]
     assert vu[3].startswith("Fait : Lignes en anomalie · 8 éléments · ")
+
+
+def test_tableaux_de_reponse_verdict_et_telechargement():
+    from datetime import datetime
+    from assistant_qdd import decouper_reponse, export_reponse
+    texte = ("**Verdict :** non.\n\n| Campagne | PCC | Clôturée |\n|---|:---:|---|\n| `N-1` | **2026** | Non |\n"
+             "| N | 2027 | Non |\n\nFin du texte.\n\n| pas un tableau |")
+    morceaux = decouper_reponse(texte)
+    assert [g for g, _ in morceaux] == ["texte", "tableau", "texte"]
+    df = morceaux[1][1]
+    assert list(df.columns) == ["Campagne", "PCC", "Clôturée"] and df.iloc[0].tolist() == ["N-1", "2026", "Non"]
+    assert "| pas un tableau |" in morceaux[2][1]  # une ligne isolée reste du texte
+    assert decouper_reponse("Sans tableau.") == [("texte", "Sans tableau.")]
+    assert "Verdict" in SYSTEME and "oui ou un non" in SYSTEME
+    m = {"texte": "**Verdict :** non.", "date": datetime(2026, 11, 25, 14, 32),
+         "consultations": [{"nom": "Registre des anomalies", "appel": "anomalies(campagne=N)", "elements": 14}]}
+    md = export_reponse(m, "Peut-on clôturer ?")
+    assert md.startswith("# Peut-on clôturer ?") and "25/11/2026 14:32" in md and "(14 élément(s))" in md

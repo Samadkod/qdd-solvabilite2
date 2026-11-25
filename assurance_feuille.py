@@ -47,6 +47,12 @@ EXTENSIONS = [
                   '(durée, réussite) et ses accès.',
          prerequis='Dépend de E14 : connexion des utilisateurs et base de données pour garder la consommation d’une '
                    'visite à l’autre ; quotas par personne au lieu d’un budget par visite.', effort='Moyen'),
+    dict(id='F22', statut='Fait', titre='Assistant : verdict, tableaux interactifs, réponse téléchargeable',
+         pourquoi='Une question fermée reçoit d’abord un verdict clair. Les tableaux d’une réponse deviennent des '
+                  'tableaux interactifs (recherche, plein écran, téléchargement CSV au survol). Chaque réponse se '
+                  'télécharge seule, avec sa question, sa date et ses consultations.',
+         prerequis='Pas de bouton « Copier » : le navigateur bloque souvent l’accès au presse-papiers depuis Streamlit ; '
+                   'le téléchargement le remplace.', effort='—'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

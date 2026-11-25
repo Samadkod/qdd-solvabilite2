@@ -43,7 +43,8 @@ Règles absolues :
    utile, puis l'action à mener s'il y en a une. Pas de jargon inutile.
 5. Les outils sont en lecture seule : tu ne modifies rien. Pour corriger une donnée, renvoie vers l'Atelier de
    résolution (correction sur copie, recontrôle, validation par une autre personne).
-6. Commence par une phrase « En bref » compréhensible par un non-spécialiste. Explique en mots simples chaque terme
+6. Si la question appelle un oui ou un non (une affirmation à vérifier, « peut-on… ? »), commence par une ligne
+   « **Verdict :** … » qui tranche. Sinon, commence par une phrase « En bref » compréhensible par un non-spécialiste. Explique en mots simples chaque terme
    technique la première fois (par exemple : « note QDD : le pourcentage de fiabilité des données qui comptent dans
    le calcul du capital »). Termine, quand c'est utile, par « Qui doit agir » : le service et l'action.
 7. Si la question est ambiguë (quel trimestre, quelle donnée, quel contrôle), pose une seule question courte pour
@@ -492,6 +493,61 @@ def repondre(client, messages: list, contexte: dict, compteur: dict | None = Non
     return "Trop d'étapes pour cette question : posez-la de façon plus ciblée.", appels, messages
 
 
+# ------------------------------------------------------------------ mise en forme des réponses
+def _cellule(x: str) -> str:
+    """Contenu d'une cellule de tableau Markdown, sans la mise en forme (gras, code)."""
+    return x.strip().replace("**", "").replace("`", "").strip()
+
+
+def decouper_reponse(texte: str) -> list[tuple[str, object]]:
+    """Découpe une réponse en morceaux de texte et en tableaux (DataFrame), dans l'ordre.
+
+    Un tableau Markdown (ligne d'en-tête, ligne de séparation |---|, lignes) devient un tableau interactif :
+    recherche, plein écran et téléchargement CSV au survol. Un tableau mal formé reste du texte.
+    """
+    import re
+    lignes, morceaux, tampon, i = texte.split("\n"), [], [], 0
+    sep = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$")
+    while i < len(lignes):
+        if (lignes[i].strip().startswith("|") and i + 1 < len(lignes) and sep.match(lignes[i + 1])):
+            entete = [_cellule(x) for x in lignes[i].strip().strip("|").split("|")]
+            j, rangs = i + 2, []
+            while j < len(lignes) and lignes[j].strip().startswith("|"):
+                cellules = [_cellule(x) for x in lignes[j].strip().strip("|").split("|")]
+                rangs.append((cellules + [""] * len(entete))[:len(entete)])
+                j += 1
+            if rangs:
+                if tampon:
+                    morceaux.append(("texte", "\n".join(tampon)))
+                    tampon = []
+                morceaux.append(("tableau", pd.DataFrame(rangs, columns=entete)))
+                i = j
+                continue
+        tampon.append(lignes[i])
+        i += 1
+    if tampon and "\n".join(tampon).strip():
+        morceaux.append(("texte", "\n".join(tampon)))
+    return morceaux
+
+
+def afficher_reponse(texte: str) -> None:
+    import streamlit as st
+    for genre, contenu in decouper_reponse(texte):
+        if genre == "tableau":
+            st.dataframe(contenu, hide_index=True, width="stretch")
+        else:
+            st.markdown(contenu)
+
+
+def export_reponse(m: dict, question: str) -> str:
+    """Une réponse seule en Markdown : la question, la réponse, sa date et ses sources."""
+    lignes = [f"# {question}", "", f"*Assistant QDD · {m['date']:%d/%m/%Y %H:%M} · données fictives*", "", m["texte"], ""]
+    if m.get("consultations"):
+        lignes += ["## Ce qu'il a consulté", ""] + [f"- {x['nom']} : `{x['appel']}` ({x['elements']} élément(s))"
+                                                    for x in m["consultations"]]
+    return "\n".join(lignes)
+
+
 # ------------------------------------------------------------------ page
 def cle_api() -> str | None:
     import streamlit as st
@@ -622,7 +678,8 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                 st.markdown(f'<div class="qdd-msg-meta">{meta}</div>', unsafe_allow_html=True)
                 if cons or m.get("reflexion"):
                     rep_t, cons_t, refl_t = st.tabs(["Réponse", f"Ce qu'il a consulté ({len(cons)})", "Réflexion"])
-                    rep_t.markdown(m["texte"])
+                    with rep_t:
+                        afficher_reponse(m["texte"])
                     with cons_t:
                         for k, x in enumerate(cons):
                             g, d = st.columns([5, 2], vertical_alignment="center")
@@ -639,9 +696,9 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                             st.caption("Pas de réflexion détaillée pour cette réponse.")
                         st.caption("Résumé de la réflexion fourni par le modèle, gardé le temps de la visite.")
                 else:
-                    st.markdown(m["texte"])
+                    afficher_reponse(m["texte"])
                 if not m.get("erreur"):
-                    pied = st.columns([1.6, .35, .35, 1.1, 2.6], vertical_alignment="center")
+                    pied = st.columns([1.6, .35, .35, 1.1, 1.3, 2.2], vertical_alignment="center")
                     pied[0].markdown('<div class="qdd-cons-chiffres">Cette réponse vous aide ?</div>',
                                      unsafe_allow_html=True)
                     for col, (valeur, icone) in zip(pied[1:3], ((1, ":material/thumb_up:"), (-1, ":material/thumb_down:"))):
@@ -653,9 +710,14 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                     if n == dernier and cle and not epuise and pied[3].button(
                             "Régénérer", icon=":material/refresh:", key=f"assistant_regen_{actif}_{n}", type="tertiary"):
                         regenerer = True
+                    question_m = conv["fil"][n - 1]["texte"] if n > 0 else conv["titre"]
+                    pied[4].download_button("Télécharger", export_reponse(m, question_m).encode("utf-8"),
+                                            icon=":material/download:", type="tertiary", mime="text/markdown",
+                                            file_name=f"reponse_assistant_qdd_{m['date']:%Y%m%d_%H%M}.md",
+                                            key=f"assistant_dl_{actif}_{n}", help="Télécharger cette réponse (Markdown)")
                     if m.get("jetons"):
                         cout = f"{m['cout']:.3f}".replace(".", ",")
-                        pied[4].markdown(f'<div class="qdd-cons-chiffres qdd-droite">{_duree(m["duree"])} · '
+                        pied[5].markdown(f'<div class="qdd-cons-chiffres qdd-droite">{_duree(m["duree"])} · '
                                          f'{_nombre(m["jetons"])} jetons · {cout} $</div>', unsafe_allow_html=True)
         saisie = st.chat_input("Posez votre question… (vous pouvez joindre un fichier)", disabled=not cle or epuise,
                                key="assistant_saisie", accept_file="multiple", file_type=TYPES_FICHIERS)
