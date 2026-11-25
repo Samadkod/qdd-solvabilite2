@@ -135,6 +135,7 @@ def test_page_sans_cle_annonce_l_assistant_non_configure(monkeypatch):
     assert not at.exception
     assert any("pas encore activé" in i.value for i in at.info)
     assert at.chat_input[0].disabled
+    assert all(b.disabled for b in at.button if b.key and b.key.startswith("assistant_ex_"))
 
 
 # Questions de référence (métier) : plus affichées dans l'interface, gardées pour évaluer l'assistant avec une clé.
@@ -197,3 +198,24 @@ def test_exemples_pour_tout_public_et_regles_de_fiabilite(contexte):
         assert "erreur" not in executer_outil(nom, entree, contexte)
     for regle in ("n'importe qui", "En bref", "ambiguë", "sort du sujet", "révéler"):
         assert regle in SYSTEME
+
+
+def test_cout_contexte_dates_et_export():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from assistant_qdd import compter, date_courte, export_markdown
+    compteur = {}
+    compter(compteur, SimpleNamespace(input_tokens=1000, output_tokens=500, cache_read_input_tokens=10000,
+                                      cache_creation_input_tokens=2000))
+    # 1000×4 + 500×20 + 10000×0,20 + 2000×5 = 26 000 $ par million → 0,026 $
+    assert abs(compteur["cout"] - 0.026) < 1e-12 and compteur["contexte"] == 13000
+    compter(compteur, None)  # réponse sans usage (faux client) : rien ne change
+    assert abs(compteur["cout"] - 0.026) < 1e-12
+    d = datetime(2026, 11, 3, 14, 32, tzinfo=ZoneInfo("Europe/Paris"))
+    assert date_courte(d) == "3 nov. à 14:32"
+    conv = {"titre": "Où en est la qualité ?", "campagne": "N", "fil": [
+        {"role": "user", "texte": "Où en est la qualité ?", "date": d},
+        {"role": "assistant", "texte": "**En bref** : 97,49 %.", "date": d, "sources": ["indicateurs_campagne(campagne=N)"]}]}
+    md = export_markdown(conv)
+    assert md.startswith("# Où en est la qualité ?") and "## Assistant QDD · 03/11/2026 14:32" in md
+    assert "`indicateurs_campagne(campagne=N)`" in md and "données fictives" in md

@@ -236,3 +236,45 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
   margin: 2.2rem 0 1rem; letter-spacing: -.02em;}
 .st-key-assistant_q_exemples [data-testid="stButtonGroup"] {justify-content: center;}
 .st-key-assistant_q_exemples button {background: transparent; color: var(--qdd-gris);}
+
+/* ---------- Assistant : bandeau d'accueil ---------- */
+.st-key-assistant_accueil {background: var(--qdd-marine); border-radius: 6px; padding: 2rem 2rem 1.8rem; margin-top: .3rem;}
+.qdd-acc-surtitre {font-size: .66rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: #8fb6e6; margin-bottom: .5rem;}
+.qdd-acc-titre {font-size: 2.5rem; font-weight: 700; letter-spacing: -.04em; line-height: 1.05; color: #ffffff;}
+.qdd-acc-texte {font-size: .92rem; line-height: 1.55; color: #c9d6e4; margin-top: .8rem; max-width: 34rem;}
+.st-key-assistant_accueil [data-testid="stButton"] button {background: #ffffff; border: 1px solid #ffffff;
+  border-radius: 6px; justify-content: space-between !important; text-align: left; min-height: 2.9rem;
+  flex-direction: row-reverse; gap: .6rem;}
+.st-key-assistant_accueil [data-testid="stButton"] button p {color: var(--qdd-encre); font-weight: 600;
+  font-size: .86rem; white-space: normal;}
+.st-key-assistant_accueil [data-testid="stButton"] button:hover {background: #eaf1fb;}
+.st-key-assistant_accueil [data-testid="stButton"] button:disabled {background: #1d3b5c; border-color: #2f4d6d;}
+.st-key-assistant_accueil [data-testid="stButton"] button:disabled p {color: #9fb3c8;}
+.st-key-assistant_accueil [data-testid="stVerticalBlock"] {gap: .5rem;}
+
+/* ---------- Assistant : historique de la visite ---------- */
+.st-key-assistant_historique {border-right: 1px solid var(--qdd-ligne); padding-right: 1rem; min-height: 60vh;}
+.qdd-hist-titre {font-size: .64rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--qdd-gris); margin: 1rem 0 .3rem;}
+[class*="st-key-assistant_conv_"] button {justify-content: flex-start !important; text-align: left; padding: .45rem .6rem;
+  border-radius: 4px;}
+[class*="st-key-assistant_conv_"] button p {font-size: .82rem; line-height: 1.3; margin: 0; color: var(--qdd-encre);}
+[class*="st-key-assistant_conv_"] button p + p, [class*="st-key-assistant_conv_"] button p:last-child:not(:first-child) {
+  font-size: .7rem; color: var(--qdd-gris);}
+
+/* ---------- Assistant : conversation ---------- */
+.qdd-conv-titre {font-size: 1.15rem; font-weight: 600; color: var(--qdd-encre); letter-spacing: -.01em;}
+.qdd-msg-meta {font-size: .7rem; font-weight: 600; letter-spacing: .04em; color: var(--qdd-gris); margin-bottom: .2rem;}
+.qdd-pied-droite {font-size: .74rem; color: var(--qdd-gris); text-align: right; padding-top: .35rem;
+  font-variant-numeric: tabular-nums;}
+@media (max-width: 900px) {
+  .st-key-assistant_historique {border-right: 0; min-height: 0; padding-right: 0;}
+  .qdd-acc-titre {font-size: 1.9rem;}
+  .st-key-assistant_accueil {padding: 1.3rem;}
+  .qdd-pied-droite {text-align: left;}
+}
+.st-key-assistant_nouvelle button p {white-space: nowrap;}
+@media (max-width: 900px) {
+  .st-key-assistant_historique:not(:has([class*="st-key-assistant_conv_"])) {display: none;}
+}

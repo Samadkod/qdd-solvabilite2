@@ -41,3 +41,5 @@ section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff;}
 .qdd-verdict {border-left-color: #4caf7a;} .qdd-verdict.ko {border-left-color: #e06464;}
 .qdd-vig[data-ton="rouge"] b {color: #e06464;} .qdd-vig[data-ton="orange"] b {color: #e0a35a;}
 .qdd-vig[data-ton="vert"] b {color: #4caf7a;}
+.st-key-assistant_accueil {background: #0b151e; border: 1px solid var(--qdd-ligne);}
+[class*="st-key-assistant_conv_"] button p {color: var(--qdd-encre);}
