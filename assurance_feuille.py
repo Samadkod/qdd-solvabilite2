@@ -19,11 +19,13 @@ EXTENSIONS = [
                    'dans la console. Passer les questions de référence des tests, une question floue, une hors sujet '
                    'et une tentative de contournement ; vérifier chaque chiffre contre l’application ; mesurer le coût '
                    'réel par réponse.', effort='Faible'),
-    dict(id='E12', statut='Plus tard', titre='Assistant : fichier joint et jauge de consommation',
-         pourquoi='Joindre un export de l’atelier (CSV, Excel, PDF) pour se le faire expliquer ; anneau qui se '
-                  'remplit selon un budget par visite (à la place du plafond de 15 réponses), avec la part de contexte.',
-         prerequis='Taille limitée et annoncée (coût) ; en entreprise, accord de la DSI avant d’envoyer un fichier réel '
-                   'à un service externe.', effort='Faible à moyen'),
+    dict(id='F19', statut='Fait', titre='Assistant : fichier joint et jauge de consommation',
+         pourquoi='Joindre un export de l’atelier (CSV, Excel, PDF, texte) pour se le faire expliquer ; jauge '
+                  'circulaire du budget de la visite (0,50 $), qui remplace le plafond de 15 réponses, avec la part de '
+                  'contexte.',
+         prerequis='Tableaux limités à 500 lignes et fichiers à 5 Mo (annoncé à l’utilisateur) ; le fichier est traité '
+                   'comme une donnée, jamais comme des consignes. En entreprise, accord de la DSI avant d’envoyer un '
+                   'fichier réel à un service externe.', effort='—'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

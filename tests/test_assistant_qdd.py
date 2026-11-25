@@ -219,3 +219,29 @@ def test_cout_contexte_dates_et_export():
     md = export_markdown(conv)
     assert md.startswith("# Où en est la qualité ?") and "## Assistant QDD · 03/11/2026 14:32" in md
     assert "`indicateurs_campagne(campagne=N)`" in md and "données fictives" in md
+
+
+def test_pieces_jointes_et_jauge():
+    import io
+    import pandas as pd
+    from assistant_qdd import BUDGET_VISITE, LIGNES_MAX, TAILLE_MAX, anneau_html, preparer_piece_jointe
+    # CSV « ; » de l'atelier, plus long que la limite : tronqué et annoncé
+    df = pd.DataFrame({"controle": ["C05"] * (LIGNES_MAX + 20), "objet": range(LIGNES_MAX + 20)})
+    blocs, resume = preparer_piece_jointe("lignes.csv", df.to_csv(index=False, sep=";").encode("utf-8-sig"))
+    assert resume == f"lignes.csv ({LIGNES_MAX} premières lignes sur {LIGNES_MAX + 20})"
+    assert blocs[0]["type"] == "text" and blocs[0]["text"].count("\n") == LIGNES_MAX + 3  # en-tête, balises, lignes
+    # Excel complet, sous la limite
+    buf = io.BytesIO(); df.head(3).to_excel(buf, index=False)
+    assert preparer_piece_jointe("extrait.xlsx", buf.getvalue())[1] == "extrait.xlsx (3 lignes)"
+    # PDF : document natif
+    pdf = preparer_piece_jointe("note.pdf", b"%PDF-1.4 test")[0][0]
+    assert pdf["type"] == "document" and pdf["source"]["media_type"] == "application/pdf"
+    # refus : format et taille
+    with pytest.raises(ValueError, match="format non pris en charge"):
+        preparer_piece_jointe("macro.exe", b"x")
+    with pytest.raises(ValueError, match="trop lourd"):
+        preparer_piece_jointe("gros.csv", b"a" * (TAILLE_MAX + 1))
+    # jauge : part du budget et couleur d'alerte
+    assert 'stroke-dasharray="0.00' in anneau_html(0, BUDGET_VISITE, 0)
+    plein = anneau_html(BUDGET_VISITE, BUDGET_VISITE, 1.2)
+    assert "#AD3030" in plein and "0,50 $ sur 0,50 $" in plein and "contexte 1,2 %" in plein

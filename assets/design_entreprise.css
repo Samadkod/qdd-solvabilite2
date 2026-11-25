@@ -278,3 +278,13 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 @media (max-width: 900px) {
   .st-key-assistant_historique:not(:has([class*="st-key-assistant_conv_"])) {display: none;}
 }
+
+/* Assistant : jauge de consommation et fichiers joints */
+.qdd-anneau {display: flex; align-items: center; justify-content: flex-end; gap: .45rem; font-size: .74rem;
+  color: var(--qdd-gris); font-variant-numeric: tabular-nums;}
+.qdd-anneau b {color: var(--qdd-encre); font-weight: 600;}
+.qdd-piece {display: inline-block; font-size: .74rem; color: var(--qdd-encre); background: var(--qdd-fond);
+  border: 1px solid var(--qdd-ligne); border-radius: 4px; padding: .15rem .5rem; margin: 0 .3rem .35rem 0;}
+.qdd-piece:before {content: ""; display: inline-block; width: 8px; height: 10px; margin-right: .35rem;
+  border: 1.5px solid var(--qdd-gris); border-radius: 2px; vertical-align: -1px;}
+@media (max-width: 900px) {.qdd-anneau {justify-content: flex-start;}}
