@@ -35,12 +35,13 @@ EXTENSIONS = [
                   'pendant la réponse.',
          prerequis='Avis gardés le temps de la visite et repris dans l’export ; les conserver suppose E14. Pas de '
                    'bouton « Arrêter » : Streamlit ne sait pas interrompre une réponse en cours.', effort='—'),
-    dict(id='E15', statut='Plus tard', titre='Fiche de l’assistant',
+    dict(id='F21', statut='Fait', titre='Fiche de l’assistant',
          pourquoi='Une page de présentation : ce qu’il fait et ne fait pas, comment il marche (demander, il consulte, '
                   'reprendre), les données qu’il lit, le modèle et l’hébergement, la lecture seule, le budget, '
                   'les nouveautés et la version.',
-         prerequis='Aucun : tout est déjà dans le code (outils, modèle, budget, feuille de route, date de version). '
-                   'Principe repris d’un outil d’entreprise, sans son contenu.', effort='Faible'),
+         prerequis='Contenu lu dans le code de l’assistant et la feuille de route : la fiche ne peut pas dire '
+                   'autre chose que ce qu’il fait (tests/test_fiche_assistant.py). Principe repris d’un outil '
+                   'd’entreprise, sans son contenu.', effort='—'),
     dict(id='E16', statut='En attente de décision', titre='Mon espace : quotas, consommation, analyses, accès',
          pourquoi='Chaque utilisateur voit son budget du mois, sa consommation dans le temps, ses dernières questions '
                   '(durée, réussite) et ses accès.',

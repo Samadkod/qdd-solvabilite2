@@ -24,7 +24,8 @@ from qdd_s2.niveau2 import niveau2_par_campagne
 from qdd_s2.moteur import Parametres
 from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
-from assistant_qdd import afficher as afficher_assistant
+from assistant_qdd import afficher as afficher_assistant, cle_api
+from fiche_assistant import afficher as afficher_fiche_assistant
 from statuts import legende as legende_statuts, tableau
 from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
@@ -120,6 +121,8 @@ PAGES = {
                   "La même campagne calculée par la chaîne SAS, comparée valeur par valeur au moteur Python."),
     "assistant": ("Assistant IA", "Assistant QDD", ":material/smart_toy:",
                   "Posez vos questions sur la campagne, avec vos mots."),
+    "fiche_assistant": ("Assistant IA", "Fiche de l'assistant", ":material/description:",
+                        "Ce qu'il fait et ne fait pas, ce qu'il lit, son budget et ses nouveautés."),
     "feuille": ("Évolutions", "Feuille de route", ":material/route:",
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),
@@ -466,6 +469,7 @@ def page_code() -> None:
     "verif_sas": afficher_verification_sas,
     "feuille": afficher_feuille_de_route,
     "assistant": lambda: afficher_assistant(c, camps[:k + 1], var, base_fictive()),
+    "fiche_assistant": lambda: afficher_fiche_assistant(aller, bool(cle_api())),
     "lignes": lambda: afficher_lignes(c, base_fictive()),
     "regles": lambda: afficher_regles(c, base_fictive()),
     "donnees": page_donnees,

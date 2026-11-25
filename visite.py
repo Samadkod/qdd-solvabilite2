@@ -32,6 +32,8 @@ USAGES = {
     "assistant": ("Une question en langage courant sur la campagne ; l'assistant interroge le moteur en direct, "
                   "répond avec les vrais chiffres et cite la page où les vérifier.", "Pour aller vite, ou préparer "
                   "un message à un propriétaire de données."),
+    "fiche_assistant": ("La présentation de l'assistant : ce qu'il fait et ne fait pas, ce qu'il lit, son modèle, son "
+                        "budget, ses nouveautés.", "Avant de s'en servir, ou pour le présenter."),
     "feuille": ("Ce qui est prévu, ce qui reste à vérifier, ce qui a été fait.", "Pour suivre le projet."),
     "comprendre": ("Le calcul pas à pas sur une donnée au choix, avec les vrais chiffres.", "Quand un chiffre "
                    "n'est pas clair."),

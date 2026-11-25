@@ -101,6 +101,9 @@ EN = {
     "Voir les contrôles en retard": "See overdue controls",
     "Évolution depuis la campagne précédente, colorée selon son sens": "Change since the previous campaign, coloured by direction",
     "Assistant IA": "AI assistant", "Assistant QDD": "DQ assistant",
+    "Fiche de l'assistant": "Assistant fact sheet",
+    "Ce qu'il fait et ne fait pas, ce qu'il lit, son budget et ses nouveautés.":
+        "What it does and does not do, what it reads, its budget and what's new.",
     "Posez vos questions sur la campagne, avec vos mots.": "Ask your questions about the campaign, in your own words.",
     # titres des tuiles
     "Note QDD agrégée": "Overall DQ score", "Objectif (note minimum)": "Target (minimum score)",

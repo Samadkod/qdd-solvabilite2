@@ -313,3 +313,18 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 .qdd-direct-etape {font-size: .8rem; color: var(--qdd-encre); padding: .3rem .6rem; margin: .25rem 0;
   border: 1px solid var(--qdd-ligne); border-radius: 6px; background: var(--qdd-surface); font-variant-numeric: tabular-nums;}
 .qdd-direct-etape span {color: #22744a; font-weight: 700; margin-right: .5rem;}
+
+/* Fiche de l'assistant */
+.qdd-fiche-hero {background: var(--qdd-marine); border-radius: 6px; padding: 1.8rem 2rem; margin: .2rem 0 .8rem;}
+.qdd-fiche-tags {display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1rem;}
+.qdd-fiche-tags span {font-size: .72rem; font-weight: 600; color: #ffffff; border: 1px solid #ffffff55; border-radius: 999px;
+  padding: .15rem .65rem;}
+.qdd-fiche-tags span.ok {color: #b9efce; border-color: #4caf7a88;}
+.qdd-fiche-tags span.ko {color: #ffd99a; border-color: #e0a35a88;}
+.qdd-fiche-etape {border-top: 3px solid var(--qdd-accent); padding-top: .6rem;}
+.qdd-fiche-etape b {display: block; font-size: 1.02rem; color: var(--qdd-encre); margin-bottom: .2rem;}
+.qdd-fiche-etape span {font-size: .84rem; color: var(--qdd-gris); line-height: 1.5;}
+.qdd-fiche-point {position: relative; padding-left: 1.4rem; font-size: .88rem; line-height: 1.5; color: var(--qdd-encre);}
+.qdd-fiche-point:before {position: absolute; left: 0; top: 0; font-weight: 700;}
+.qdd-fiche-point.ok:before {content: "✓"; color: #22744a;}
+.qdd-fiche-point.ko:before {content: "✕"; color: var(--qdd-gris);}
