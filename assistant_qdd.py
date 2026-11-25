@@ -71,37 +71,6 @@ EXEMPLES = [
     "Qu'est-ce qui a changé depuis le trimestre dernier ?",
     "Explique-moi simplement ce que veut dire la note QDD.",
 ]
-# Questions d'expert (volet replié) ; chacune se traite avec les outils ci-dessous, sans chiffre de mémoire
-# (tests/test_assistant_qdd.py vérifie les outils qu'elle mobilise).
-QUESTIONS = {
-    "Piloter la campagne": [
-        "Fais-moi le point de la campagne en cinq lignes : note, objectif, points bloquants.",
-        "Pourquoi la note a-t-elle baissé depuis N-1 ? Décompose facteur par facteur.",
-        "Quelles données critiques sont hors tolérance, et de combien de points sous leur minimum ?",
-    ],
-    "Contrôles et fiabilité des QRT": [
-        "Quelles restitutions QRT ne sont pas conformes, et quel écart avec leur source ?",
-        "Quels contrôles sont en retard, depuis combien de périodes, et quel effet sur leur résultat ?",
-        "Que vérifie le contrôle C07, comment est-il réalisé, et pourquoi est-il bloquant ?",
-    ],
-    "Anomalies et résolution": [
-        "Qui doit corriger quoi ? Classe les anomalies ouvertes par propriétaire et par échéance.",
-        "Rédige le message à la direction sinistres pour corriger les provisions négatives (C05), "
-        "avec le nombre de lignes et des exemples.",
-        "Quelles anomalies reviennent d'une campagne à l'autre, et que faut-il faire ?",
-    ],
-    "Gouvernance et lignage": [
-        "Quelles étapes du lignage ne sont couvertes par aucun contrôle, et lesquelles traiter d'abord ?",
-        "Quels constats du contrôle de niveau 2 dois-je traiter en priorité ?",
-        "Les données externes du dépositaire sont-elles bien documentées et contrôlées ?",
-    ],
-    "Audit et comité": [
-        "Prépare les points clés à présenter au comité de pilotage QDD pour cette campagne.",
-        "Un auditeur demande comment est obtenue la note des provisions RC décennale : explique-la avec les vrais "
-        "chiffres.",
-        "Quelles preuves puis-je montrer pour la campagne, et où les trouver dans l'application ?",
-    ],
-}
 
 
 # ------------------------------------------------------------------ outils
@@ -359,50 +328,34 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
     nb = sum(1 for m in st.session_state["assistant_fil"] if m["role"] == "assistant" and not m.get("erreur"))
     reste = PLAFOND_QUESTIONS - nb
 
-    gauche, droite = st.columns([3, 1.25], gap="large")
-    with droite, st.container(border=True, key="assistant_aide"):
-        st.markdown("**Comment il répond**")
-        st.caption("Il lit les chiffres de l'application au moment de votre question : il ne devine pas. Sous chaque "
-                   "réponse, « Sources » montre ce qu'il a consulté. Il ne modifie rien. Si votre question sort du "
-                   "sujet, il vous le dit. Données 100 % fictives.")
-        st.caption("**Astuce** : précisez si besoin le trimestre, la donnée ou le contrôle qui vous intéresse.")
-        st.markdown(f"**Questions restantes** : {max(reste, 0)} sur {PLAFOND_QUESTIONS}")
-        if st.button("Nouvelle conversation", icon=":material/restart_alt:", key="assistant_effacer",
-                     width="stretch", disabled=not st.session_state["assistant_fil"]):
-            st.session_state["assistant_api"], st.session_state["assistant_fil"] = [], []
-            st.rerun()
-
-    with gauche:
-        if not cle:
-            st.info("**Assistant non configuré.** Il faut une clé d'API Anthropic, enregistrée dans les secrets de "
-                    "l'application (`ANTHROPIC_API_KEY`), jamais dans le code. Les exemples ci-dessous montrent ce "
-                    "qu'il saura faire.", icon=":material/key:")
+    _, centre, _ = st.columns([1, 6, 1])
+    with centre, st.container(key="assistant_zone"):
         question = None
+        if not cle:
+            st.info("L'assistant n'est pas encore activé sur cet environnement.", icon=":material/info:")
         if not st.session_state["assistant_fil"]:
-            st.markdown("##### Posez votre question, comme à un collègue")
-            st.caption("Avec vos propres mots, dans la zone en bas. Pour démarrer, vous pouvez aussi choisir un exemple :")
+            st.markdown('<div class="qdd-assistant-accueil">Que voulez-vous savoir sur la campagne ?</div>',
+                        unsafe_allow_html=True)
             choix = st.pills("Exemples", EXEMPLES, key="assistant_q_exemples", label_visibility="collapsed",
                              disabled=not cle or reste <= 0)
             if choix:
                 question = choix
-            with st.expander("Questions d'expert · qualité des données", icon=":material/school:"):
-                for theme, liste in QUESTIONS.items():
-                    st.caption(theme)
-                    choix = st.pills(theme, liste, key=f"assistant_q_{theme}", label_visibility="collapsed",
-                                     disabled=not cle or reste <= 0)
-                    if choix:
-                        question = choix
         for m in st.session_state["assistant_fil"]:
             with st.chat_message(m["role"], avatar=":material/person:" if m["role"] == "user" else ":material/smart_toy:"):
                 st.markdown(m["texte"])
                 if m.get("sources"):
                     with st.expander("Sources", icon=":material/fact_check:"):
                         st.markdown("\n".join(f"- `{s}`" for s in m["sources"]))
-        saisie = st.chat_input("Votre question, avec vos mots…" if cle else "Assistant non configuré",
-                               disabled=not cle or reste <= 0, key="assistant_saisie")
+        saisie = st.chat_input("Votre question…", disabled=not cle or reste <= 0, key="assistant_saisie")
         question = saisie or question
-        if reste <= 0 and cle:
-            st.caption("Plafond de questions atteint pour cette session.")
+        if st.session_state["assistant_fil"]:
+            g, d = st.columns([3, 1], vertical_alignment="center")
+            if cle and reste <= 5:
+                g.caption(f"{max(reste, 0)} question(s) restante(s) pour cette session.")
+            if d.button("Nouvelle conversation", icon=":material/restart_alt:", key="assistant_effacer",
+                        type="tertiary"):
+                st.session_state["assistant_api"], st.session_state["assistant_fil"] = [], []
+                st.rerun()
 
     if question and cle and reste > 0:
         import anthropic
@@ -411,7 +364,7 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
             {"role": "user", "content": f"{question}\n\n[Campagne affichée dans l'application : {c['campagne']}]"})
         contexte = {"camps": camps, "var": var, "base": base}
         avant = list(st.session_state["assistant_api"][:-1])  # historique sans la question, restauré en cas d'échec
-        with gauche, st.spinner("L'assistant consulte le moteur…"):
+        with centre, st.spinner("Recherche en cours…"):
             try:
                 texte, sources, st.session_state["assistant_api"] = repondre(
                     anthropic.Anthropic(api_key=cle), st.session_state["assistant_api"], contexte)

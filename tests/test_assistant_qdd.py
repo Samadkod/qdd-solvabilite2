@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from assistant_qdd import EXEMPLES, OUTILS, QUESTIONS, SYSTEME, TOURS_OUTILS_MAX, executer_outil, repondre
+from assistant_qdd import EXEMPLES, OUTILS, SYSTEME, TOURS_OUTILS_MAX, executer_outil, repondre
 from qdd_s2.campagne import Config, lancer_campagnes
 from qdd_s2.niveau2 import niveau2_par_campagne
 
@@ -37,7 +37,6 @@ def test_schemas_stricts_et_complets():
         s = o["input_schema"]
         assert o["strict"] is True and s["additionalProperties"] is False
         assert set(s["required"]) == set(s["properties"])  # mode strict : toutes les propriétés requises
-    assert sum(len(v) for v in QUESTIONS.values()) == 15
 
 
 def test_indicateurs_egaux_aux_valeurs_de_reference(contexte):
@@ -134,11 +133,29 @@ def test_page_sans_cle_annonce_l_assistant_non_configure(monkeypatch):
     at.session_state["page"] = "assistant"
     at.run()
     assert not at.exception
-    assert any("Assistant non configuré" in i.value for i in at.info)
+    assert any("pas encore activé" in i.value for i in at.info)
     assert at.chat_input[0].disabled
 
 
-# outils que chaque question proposée mobilise : ils doivent tous répondre sans erreur sur la campagne N
+# Questions de référence (métier) : plus affichées dans l'interface, gardées pour évaluer l'assistant avec une clé.
+# Chacune mobilise des outils qui doivent répondre sans erreur sur la campagne N.
+QUESTIONS_REFERENCE = [
+    "Fais-moi le point de la campagne en cinq lignes : note, objectif, points bloquants.",
+    "Pourquoi la note a-t-elle baissé depuis N-1 ? Décompose facteur par facteur.",
+    "Quelles données critiques sont hors tolérance, et de combien de points sous leur minimum ?",
+    "Quelles restitutions QRT ne sont pas conformes, et quel écart avec leur source ?",
+    "Quels contrôles sont en retard, depuis combien de périodes, et quel effet sur leur résultat ?",
+    "Que vérifie le contrôle C07, comment est-il réalisé, et pourquoi est-il bloquant ?",
+    "Qui doit corriger quoi ? Classe les anomalies ouvertes par propriétaire et par échéance.",
+    "Rédige le message à la direction sinistres pour corriger les provisions négatives (C05).",
+    "Quelles anomalies reviennent d'une campagne à l'autre, et que faut-il faire ?",
+    "Quelles étapes du lignage ne sont couvertes par aucun contrôle, et lesquelles traiter d'abord ?",
+    "Quels constats du contrôle de niveau 2 dois-je traiter en priorité ?",
+    "Les données externes du dépositaire sont-elles bien documentées et contrôlées ?",
+    "Prépare les points clés à présenter au comité de pilotage QDD pour cette campagne.",
+    "Un auditeur demande comment est obtenue la note des provisions RC décennale.",
+    "Quelles preuves puis-je montrer pour la campagne, et où les trouver dans l'application ?",
+]
 OUTILS_PAR_QUESTION = [
     [("indicateurs_campagne", {"campagne": "N"}), ("points_de_controle", {"campagne": "N", "controle": "", "statut": "Bloquant"})],
     [("variation_note", {})],
@@ -158,8 +175,8 @@ OUTILS_PAR_QUESTION = [
 ]
 
 
-def test_chaque_question_proposee_a_ses_outils(contexte):
-    questions = [q for liste in QUESTIONS.values() for q in liste]
+def test_chaque_question_de_reference_a_ses_outils(contexte):
+    questions = QUESTIONS_REFERENCE
     assert len(questions) == len(OUTILS_PAR_QUESTION)
     for q, appels in zip(questions, OUTILS_PAR_QUESTION):
         for nom, entree in appels:

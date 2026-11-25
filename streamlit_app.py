@@ -119,7 +119,7 @@ PAGES = {
     "verif_sas": ("Exploitation", "Vérification SAS", ":material/verified:",
                   "La même campagne calculée par la chaîne SAS, comparée valeur par valeur au moteur Python."),
     "assistant": ("Assistant IA", "Assistant QDD", ":material/smart_toy:",
-                  "Posez une question sur la campagne : l'assistant interroge le moteur et cite ses sources."),
+                  "Posez vos questions sur la campagne, avec vos mots."),
     "feuille": ("Évolutions", "Feuille de route", ":material/route:",
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),

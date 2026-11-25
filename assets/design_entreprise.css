@@ -230,3 +230,9 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 [class*="st-key-assistant_q_"] [data-testid="stButtonGroup"] > div {flex-wrap: wrap !important; overflow: visible !important;}
 [class*="st-key-assistant_q_"] button {max-width: 100%; white-space: normal !important; text-align: left; height: auto;}
 [class*="st-key-assistant_q_"] button p {white-space: normal !important;}
+
+/* Assistant : accueil sobre */
+.qdd-assistant-accueil {font-size: 1.35rem; font-weight: 600; color: var(--qdd-encre); text-align: center;
+  margin: 2.2rem 0 1rem; letter-spacing: -.02em;}
+.st-key-assistant_q_exemples [data-testid="stButtonGroup"] {justify-content: center;}
+.st-key-assistant_q_exemples button {background: transparent; color: var(--qdd-gris);}
