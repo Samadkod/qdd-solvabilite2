@@ -26,7 +26,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 | | Rôle | Vérification |
 |---|---|---|
 | **SAS / PROC SQL** (`sas/`) | Version **production** | Vérification statique (`scripts/lint_sas.py`) ; comparaison automatique de 59 valeurs à la référence Python (`sas/98_verifier.sas`) |
-| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 135 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
+| **Python** (`qdd_s2/`) | Référence testée, prototypage, application | 144 tests, dont la reproduction des tableaux 3, 5, 6, 7, 9, 11, 14, 16, 17, 22 et 24 du mémoire |
 | JavaScript (`app/moteur.js`) | Calculs de l'atelier HTML | Parité avec le Python testée sur toutes les valeurs |
 | Excel (rapport) | Restitution | Les 11 indicateurs calculés par formules sont égaux à ceux du moteur |
 
@@ -37,7 +37,7 @@ Restitution : rapport Excel (formules vivantes) · export Qlik Sense (modèle en
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py     # SI fictif (DuckDB)
 python -m qdd_s2                          # campagnes N-2, N-1 et N -> output/
-python -m pytest -q                       # 135 tests
+python -m pytest -q                       # 144 tests
 python scripts/lint_sas.py                # vérification statique du SAS
 streamlit run streamlit_app.py            # application
 ```
@@ -63,6 +63,7 @@ streamlit run streamlit_app.py            # application
 | `qdd_s2/niveau2.py` | Contrôle de niveau 2 : 7 constats à règle écrite sur les contrôles de niveau 1 |
 | `archives/donnees_en_defaut/` | Lignes en anomalie figées par campagne avant tout ajustement, manifeste SHA-256 (`archives_defaut.py`) |
 | `qdd_s2/document_cadre.py` | Document cadre généré depuis les référentiels et les paramètres du moteur |
+| `assistant_qdd.py` | Assistant QDD : Claude répond en interrogeant le moteur (outils en lecture seule) ; clé d'API dans les secrets Streamlit, jamais dans le dépôt |
 | `qdd_s2/export_qlik.py`, `app/chargement_qdd.qvs` | Modèle en étoile et script de chargement Qlik |
 | `app/` | Atelier HTML : fiches, QCM, vrai/faux, simulateur, campagne, avis, plan 90 jours |
 

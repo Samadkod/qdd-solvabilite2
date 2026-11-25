@@ -29,6 +29,9 @@ USAGES = {
                 "en un seul fichier.", "Pour préparer un audit ou une revue de clôture."),
     "verif_sas": ("Le résultat de la chaîne SAS comparé valeur par valeur au moteur Python.", "Pour prouver que "
                   "la version SAS calcule juste."),
+    "assistant": ("Une question en langage courant sur la campagne ; l'assistant interroge le moteur en direct, "
+                  "répond avec les vrais chiffres et cite la page où les vérifier.", "Pour aller vite, ou préparer "
+                  "un message à un propriétaire de données."),
     "feuille": ("Ce qui est prévu, ce qui reste à vérifier, ce qui a été fait.", "Pour suivre le projet."),
     "comprendre": ("Le calcul pas à pas sur une donnée au choix, avec les vrais chiffres.", "Quand un chiffre "
                    "n'est pas clair."),

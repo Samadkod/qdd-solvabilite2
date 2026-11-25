@@ -224,3 +224,9 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
     flex: 1 1 100% !important; width: 100% !important; min-width: 100% !important;}
   .st-key-qdd_filtres [data-testid="stVerticalBlock"] {gap: .5rem;}
 }
+
+/* Assistant : les questions proposées passent à la ligne au lieu d'être coupées */
+[class*="st-key-assistant_q_"] [data-testid="stButtonGroup"],
+[class*="st-key-assistant_q_"] [data-testid="stButtonGroup"] > div {flex-wrap: wrap !important; overflow: visible !important;}
+[class*="st-key-assistant_q_"] button {max-width: 100%; white-space: normal !important; text-align: left; height: auto;}
+[class*="st-key-assistant_q_"] button p {white-space: normal !important;}
