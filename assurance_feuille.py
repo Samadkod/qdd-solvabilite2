@@ -30,9 +30,22 @@ EXTENSIONS = [
          pourquoi='Pendant la réponse, l’étape en cours et la durée s’affichent ; chaque réponse indique son temps, '
                   'ses consultations du moteur, ses jetons et son coût, avec trois onglets (réponse, ce qu’il a '
                   'consulté, réflexion). Un clic sur une consultation montre ce qu’il a demandé et ce qu’il a obtenu. '
-                  'Avis utile / pas utile, régénérer la dernière réponse.',
+                  'Avis utile / pas utile, régénérer la dernière réponse. Deux jauges (contexte, budget de la '
+                  'visite) avec une info-bulle en langage simple ; réflexion et consultations cochées affichées '
+                  'pendant la réponse.',
          prerequis='Avis gardés le temps de la visite et repris dans l’export ; les conserver suppose E14. Pas de '
                    'bouton « Arrêter » : Streamlit ne sait pas interrompre une réponse en cours.', effort='—'),
+    dict(id='E15', statut='Plus tard', titre='Fiche de l’assistant',
+         pourquoi='Une page de présentation : ce qu’il fait et ne fait pas, comment il marche (demander, il consulte, '
+                  'reprendre), les données qu’il lit, le modèle et l’hébergement, la lecture seule, le budget, '
+                  'les nouveautés et la version.',
+         prerequis='Aucun : tout est déjà dans le code (outils, modèle, budget, feuille de route, date de version). '
+                   'Principe repris d’un outil d’entreprise, sans son contenu.', effort='Faible'),
+    dict(id='E16', statut='En attente de décision', titre='Mon espace : quotas, consommation, analyses, accès',
+         pourquoi='Chaque utilisateur voit son budget du mois, sa consommation dans le temps, ses dernières questions '
+                  '(durée, réussite) et ses accès.',
+         prerequis='Dépend de E14 : connexion des utilisateurs et base de données pour garder la consommation d’une '
+                   'visite à l’autre ; quotas par personne au lieu d’un budget par visite.', effort='Moyen'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '
