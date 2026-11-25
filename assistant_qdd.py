@@ -325,6 +325,8 @@ def export_markdown(conv: dict) -> str:
         lignes += [m["texte"], ""]
         if m.get("sources"):
             lignes += ["Sources : " + " ; ".join(f"`{x}`" for x in m["sources"]), ""]
+        if m.get("avis"):
+            lignes += ["Avis : " + ("utile" if m["avis"] == 1 else "pas utile"), ""]
     return "\n".join(lignes)
 
 
@@ -384,23 +386,56 @@ def anneau_html(cout: float, budget: float, contexte_pct: float) -> str:
 
 
 # ------------------------------------------------------------------ boucle de réponse
-def repondre(client, messages: list, contexte: dict, compteur: dict | None = None) -> tuple[str, list[str], list]:
+NOMS_OUTILS = {
+    "indicateurs_campagne": "Indicateurs de la campagne", "donnees_critiques": "Données et leur note",
+    "points_de_controle": "Points de contrôle", "regle_controle": "Fiche du contrôle", "anomalies": "Registre des anomalies",
+    "lignes_en_anomalie": "Lignes en anomalie", "variation_note": "Variation de la note",
+    "controle_niveau2": "Contrôle de niveau 2", "lignage": "Lignage",
+}
+
+
+def _nb_lignes(res: dict) -> int:
+    """Nombre d'éléments renvoyés par un outil : longueur de sa première liste, sinon 1."""
+    listes = [v for v in res.values() if isinstance(v, list)]
+    return len(listes[0]) if listes else 1
+
+
+def repondre(client, messages: list, contexte: dict, compteur: dict | None = None, trace: dict | None = None,
+             rappel=None) -> tuple[str, list[str], list]:
     """Fait tourner la boucle jusqu'à la réponse finale.
 
     messages : historique au format de l'API (la question est déjà le dernier message « user »).
     Retourne (texte de la réponse, outils appelés pour la traçabilité, historique complété).
     Les blocs de la réponse (réflexion comprise) sont renvoyés tels quels au tour suivant, comme l'exige l'API.
-    compteur : dict facultatif où s'additionnent le coût ($) et la taille du dernier contexte (unités).
+    compteur : dict facultatif où s'additionnent le coût ($) et la taille du dernier contexte (session).
+    trace : dict facultatif rempli pour cette réponse : consultations (outil, éléments, durée), résumé de la
+    réflexion, jetons et coût. rappel(texte) : affichage en direct de l'avancement.
     """
+    import time
     appels: list[str] = []
+    if trace is not None:
+        trace.update(consultations=[], reflexion=[], jetons=0, cout=0.0)
     for _ in range(TOURS_OUTILS_MAX + 1):
+        if rappel:
+            rappel("Je réfléchis à la réponse…" if appels else "Je lis votre question…")
         reponse = client.beta.messages.create(
             model=MODELE, max_tokens=16000, system=SYSTEME, tools=OUTILS, messages=messages,
+            thinking={"type": "adaptive", "display": "summarized"},
             output_config={"effort": EFFORT}, cache_control={"type": "ephemeral"},
             betas=["server-side-fallback-2026-07-01"], fallbacks="default")
         messages.append({"role": "assistant", "content": reponse.content})
+        usage = getattr(reponse, "usage", None)
         if compteur is not None:
-            compter(compteur, getattr(reponse, "usage", None))
+            compter(compteur, usage)
+        if trace is not None:
+            local = {}
+            compter(local, usage)
+            trace["cout"] += local.get("cout", 0.0)
+            if usage is not None:
+                trace["jetons"] += sum(int(getattr(usage, k, 0) or 0) for k in (
+                    "input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"))
+            trace["reflexion"] += [b.thinking for b in reponse.content
+                                   if getattr(b, "type", "") == "thinking" and getattr(b, "thinking", "")]
         if reponse.stop_reason == "refusal":
             return "Je ne peux pas répondre à cette demande. Reformulez-la autour de la campagne.", appels, messages
         outils = [b for b in reponse.content if b.type == "tool_use"]
@@ -412,11 +447,21 @@ def repondre(client, messages: list, contexte: dict, compteur: dict | None = Non
         resultats = []
         for b in outils:
             entree = b.input if isinstance(b.input, dict) else json.loads(b.input)
+            if rappel:
+                rappel(f"Je consulte : {NOMS_OUTILS.get(b.name, b.name)}")
+            debut = time.perf_counter()
             try:
                 res = executer_outil(b.name, entree, contexte)
             except Exception as e:  # noqa: BLE001 — l'erreur est rendue au modèle, pas à l'utilisateur
                 res = {"erreur": f"{type(e).__name__} : {e}"}
-            appels.append(f"{b.name}({', '.join(f'{k}={v}' for k, v in entree.items() if v not in ('', None))})")
+            appel = f"{b.name}({', '.join(f'{k}={v}' for k, v in entree.items() if v not in ('', None))})"
+            appels.append(appel)
+            if trace is not None:
+                apercu = {k: (v[:100] if isinstance(v, list) else v) for k, v in res.items()}  # gardé pour l'affichage
+                trace["consultations"].append({"nom": NOMS_OUTILS.get(b.name, b.name), "outil": b.name, "appel": appel,
+                                               "entree": entree, "resultat": apercu,
+                                               "elements": 0 if "erreur" in res else _nb_lignes(res),
+                                               "duree": time.perf_counter() - debut, "erreur": "erreur" in res})
             resultats.append({"type": "tool_result", "tool_use_id": b.id, "is_error": "erreur" in res,
                               "content": json.dumps(res, ensure_ascii=False, default=str)})
         messages.append({"role": "user", "content": resultats})
@@ -442,8 +487,43 @@ def _nouvelle(campagne: str) -> dict:
             "compteur": {"cout": 0.0, "contexte": 0}}
 
 
+def _nombre(n: int) -> str:
+    return f"{n:,}".replace(",", " ")
+
+
+def _duree(sec: float) -> str:
+    return f"{sec:.1f} s".replace(".", ",") if sec < 10 else f"{sec:.0f} s"
+
+
+def _detail_consultation(x: dict) -> None:
+    """Panneau d'une consultation : ce que l'assistant a demandé au moteur, ce qu'il a obtenu."""
+    import streamlit as st
+    st.caption(f"{x['nom']} · moteur de l'application · {_duree(x['duree'])}")
+    st.markdown('<div class="qdd-hist-titre">Ce qu\'il a demandé</div>', unsafe_allow_html=True)
+    st.code(x["appel"], language="text")
+    st.markdown('<div class="qdd-hist-titre">Ce qu\'il a obtenu</div>', unsafe_allow_html=True)
+    res = x.get("resultat") or {}
+    listes = {k: v for k, v in res.items() if isinstance(v, list) and v and isinstance(v[0], dict)}
+    simples = {k: v for k, v in res.items() if not isinstance(v, (list, dict)) and k not in ("page", "sql")}
+    if listes:
+        cle, lignes = next(iter(listes.items()))
+        st.markdown(f"**{x['elements']} élément(s)**" + (" (100 premiers affichés)" if x["elements"] > 100 else ""))
+        st.dataframe(pd.DataFrame(lignes), hide_index=True, width="stretch", height=320)
+    if simples:
+        st.dataframe(pd.DataFrame({"Champ": list(simples), "Valeur": [str(v) for v in simples.values()]}),
+                     hide_index=True, width="stretch")
+    if "sql" in res:
+        with st.expander("Requête SQL du contrôle"):
+            st.code(res["sql"], language="sql")
+    st.caption(":material/lock: Lecture seule : cet outil ne peut rien modifier.")
+
+
 def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
     import streamlit as st
+
+    @st.dialog("Consultation", width="large")
+    def panneau(x: dict) -> None:
+        _detail_consultation(x)
 
     cle = cle_api()
     convs = st.session_state.setdefault("assistant_convs", [])
@@ -472,6 +552,7 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                 st.session_state["assistant_actif"] = i
                 st.rerun()
 
+    regenerer = False
     with zone, st.container(key="assistant_zone"):
         question = None
         if not cle:
@@ -496,19 +577,62 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
             b.download_button("Exporter", export_markdown(conv).encode("utf-8"), icon=":material/download:",
                               file_name=f"conversation_assistant_qdd_{conv['cree']:%Y%m%d_%H%M}.md",
                               mime="text/markdown", key="assistant_export", width="stretch")
-        for m in conv["fil"]:
-            moi = m["role"] == "user"
-            with st.chat_message(m["role"], avatar=":material/person:" if moi else ":material/smart_toy:"):
-                meta = (f"Vous · {date_courte(m['date'])}" if moi
-                        else f"Assistant QDD · a répondu {'' if date_courte(m['date']).startswith('aujourd') else 'le '}"
-                             f"{date_courte(m['date'])}")
+        dernier = max((n for n, m in enumerate(conv["fil"]) if m["role"] == "assistant"), default=-1)
+        for n, m in enumerate(conv["fil"]):
+            if m["role"] == "user":
+                with st.chat_message("user", avatar=":material/person:"):
+                    st.markdown(f'<div class="qdd-msg-meta">Vous · {date_courte(m["date"])}</div>',
+                                unsafe_allow_html=True)
+                    for x in m.get("pieces", []):
+                        st.markdown(f'<div class="qdd-piece">{x}</div>', unsafe_allow_html=True)
+                    st.markdown(m["texte"])
+                continue
+            with st.chat_message("assistant", avatar=":material/smart_toy:"):
+                quand = date_courte(m["date"])
+                cons = m.get("consultations", [])
+                meta = f"Assistant QDD · a répondu {'' if quand.startswith('aujourd') else 'le '}{quand}"
+                if m.get("duree"):
+                    meta += f" en {_duree(m['duree'])}"
+                if cons:
+                    meta += f" · {len(cons)} consultation{'s' if len(cons) > 1 else ''} du moteur"
                 st.markdown(f'<div class="qdd-msg-meta">{meta}</div>', unsafe_allow_html=True)
-                for x in m.get("pieces", []):
-                    st.markdown(f'<div class="qdd-piece">{x}</div>', unsafe_allow_html=True)
-                st.markdown(m["texte"])
-                if m.get("sources"):
-                    with st.expander("Sources", icon=":material/fact_check:"):
-                        st.markdown("\n".join(f"- `{x}`" for x in m["sources"]))
+                if cons or m.get("reflexion"):
+                    rep_t, cons_t, refl_t = st.tabs(["Réponse", f"Ce qu'il a consulté ({len(cons)})", "Réflexion"])
+                    rep_t.markdown(m["texte"])
+                    with cons_t:
+                        for k, x in enumerate(cons):
+                            g, d = st.columns([5, 2], vertical_alignment="center")
+                            if g.button(f"{x['nom']}\n\n`{x['appel']}`", key=f"assistant_cons_{actif}_{n}_{k}",
+                                        type="tertiary", width="stretch", icon=":material/database:"):
+                                panneau(x)
+                            d.markdown(f'<div class="qdd-cons-chiffres"><b>{x["elements"]} élément(s)</b> · '
+                                       f'{_duree(x["duree"])}</div>', unsafe_allow_html=True)
+                        st.caption("Cliquez sur une consultation pour voir ce qu'il a demandé et obtenu.")
+                    with refl_t:
+                        if m.get("reflexion"):
+                            st.markdown("\n\n".join(m["reflexion"]))
+                        else:
+                            st.caption("Pas de réflexion détaillée pour cette réponse.")
+                        st.caption("Résumé de la réflexion fourni par le modèle, gardé le temps de la visite.")
+                else:
+                    st.markdown(m["texte"])
+                if not m.get("erreur"):
+                    pied = st.columns([1.6, .35, .35, 1.1, 2.6], vertical_alignment="center")
+                    pied[0].markdown('<div class="qdd-cons-chiffres">Cette réponse vous aide ?</div>',
+                                     unsafe_allow_html=True)
+                    for col, (valeur, icone) in zip(pied[1:3], ((1, ":material/thumb_up:"), (-1, ":material/thumb_down:"))):
+                        if col.button("", icon=icone, key=f"assistant_avis_{actif}_{n}_{valeur}",
+                                      type="primary" if m.get("avis") == valeur else "tertiary",
+                                      help="Utile" if valeur == 1 else "Pas utile"):
+                            m["avis"] = None if m.get("avis") == valeur else valeur
+                            st.rerun()
+                    if n == dernier and cle and not epuise and pied[3].button(
+                            "Régénérer", icon=":material/refresh:", key=f"assistant_regen_{actif}_{n}", type="tertiary"):
+                        regenerer = True
+                    if m.get("jetons"):
+                        cout = f"{m['cout']:.3f}".replace(".", ",")
+                        pied[4].markdown(f'<div class="qdd-cons-chiffres qdd-droite">{_duree(m["duree"])} · '
+                                         f'{_nombre(m["jetons"])} jetons · {cout} $</div>', unsafe_allow_html=True)
         saisie = st.chat_input("Posez votre question… (vous pouvez joindre un fichier)", disabled=not cle or epuise,
                                key="assistant_saisie", accept_file="multiple", file_type=TYPES_FICHIERS)
         fichiers = []
@@ -525,8 +649,14 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
         if cle and epuise:
             st.caption("Budget de la visite atteint : l'assistant reprendra lors d'une prochaine visite.")
 
-    if question and cle and not epuise:
-        import anthropic
+    if not cle or epuise or not (question or regenerer):
+        return
+    import time
+    import anthropic
+    if regenerer:  # rejoue la dernière question : historique de l'API ramené juste après elle
+        conv["fil"].pop()
+        conv["api"] = conv["api"][:conv["fil"][-1]["api_index"]]
+    else:
         if not conv["fil"]:
             conv["titre"] = question if len(question) <= 60 else question[:57].rstrip() + "…"
             conv["cree"] = maintenant()
@@ -538,27 +668,46 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                 pieces.append(resume)
             except ValueError as e:
                 pieces.append(f"{e} Fichier ignoré.")
-        conv["fil"].append({"role": "user", "texte": question, "date": maintenant(), "pieces": pieces})
         consigne = f"{question}\n\n[Campagne affichée dans l'application : {c['campagne']}]"
         conv["api"].append({"role": "user", "content": blocs + [{"type": "text", "text": consigne}] if blocs
                             else consigne})
-        contexte = {"camps": camps, "var": var, "base": base}
-        avant = list(conv["api"][:-1])  # historique sans la question, restauré en cas d'échec
-        with zone, st.spinner("Recherche en cours…"):
-            try:
-                texte, sources, conv["api"] = repondre(anthropic.Anthropic(api_key=cle), conv["api"], contexte,
-                                                       conv["compteur"])
-            except anthropic.AuthenticationError:
-                texte, sources = "Clé d'API refusée : vérifiez le secret `ANTHROPIC_API_KEY`.", []
-            except anthropic.RateLimitError:
-                texte, sources = "Trop de demandes en même temps : réessayez dans une minute.", []
-            except anthropic.APIStatusError as e:
-                texte, sources = f"Le service a renvoyé une erreur ({e.status_code}). Réessayez plus tard.", []
-            except anthropic.APIConnectionError:
-                texte, sources = "Service injoignable : vérifiez la connexion et réessayez.", []
-        erreur = texte.startswith(ERREURS)
-        if erreur:
-            conv["api"] = avant  # question non traitée : historique de l'API inchangé
-        conv["fil"].append({"role": "assistant", "texte": texte, "sources": sources, "erreur": erreur,
-                            "date": maintenant()})
-        st.rerun()
+        conv["fil"].append({"role": "user", "texte": question, "date": maintenant(), "pieces": pieces,
+                            "api_index": len(conv["api"])})
+    contexte = {"camps": camps, "var": var, "base": base}
+    avant = list(conv["api"])  # historique jusqu'à la question, restauré en cas d'échec
+    trace: dict = {}
+    debut = time.perf_counter()
+    if not regenerer:  # la question s'affiche tout de suite, pendant que l'assistant travaille
+        with zone, st.chat_message("user", avatar=":material/person:"):
+            st.markdown(f'<div class="qdd-msg-meta">Vous · {date_courte(conv["fil"][-1]["date"])}</div>',
+                        unsafe_allow_html=True)
+            st.markdown(question)
+    with zone, st.status("Je lis votre question…", expanded=True) as statut:
+        etapes = st.empty()
+        vues: list[str] = []
+
+        def rappel(texte: str) -> None:
+            vues.append(texte)
+            statut.update(label=f"En cours · {_duree(time.perf_counter() - debut)} · {texte}")
+            etapes.markdown("\n".join(f"- {v}" for v in vues[-6:]))
+
+        try:
+            texte, sources, conv["api"] = repondre(anthropic.Anthropic(api_key=cle), conv["api"], contexte,
+                                                   conv["compteur"], trace, rappel)
+        except anthropic.AuthenticationError:
+            texte, sources = "Clé d'API refusée : vérifiez le secret `ANTHROPIC_API_KEY`.", []
+        except anthropic.RateLimitError:
+            texte, sources = "Trop de demandes en même temps : réessayez dans une minute.", []
+        except anthropic.APIStatusError as e:
+            texte, sources = f"Le service a renvoyé une erreur ({e.status_code}). Réessayez plus tard.", []
+        except anthropic.APIConnectionError:
+            texte, sources = "Service injoignable : vérifiez la connexion et réessayez.", []
+        statut.update(label="Réponse prête", state="complete", expanded=False)
+    erreur = texte.startswith(ERREURS)
+    if erreur:
+        conv["api"] = avant  # question non traitée : historique de l'API inchangé
+    conv["fil"].append({"role": "assistant", "texte": texte, "sources": sources, "erreur": erreur,
+                        "date": maintenant(), "duree": time.perf_counter() - debut, "avis": None,
+                        "consultations": trace.get("consultations", []), "reflexion": trace.get("reflexion", []),
+                        "jetons": trace.get("jetons", 0), "cout": trace.get("cout", 0.0)})
+    st.rerun()

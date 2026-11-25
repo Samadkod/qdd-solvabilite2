@@ -288,3 +288,16 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 .qdd-piece:before {content: ""; display: inline-block; width: 8px; height: 10px; margin-right: .35rem;
   border: 1.5px solid var(--qdd-gris); border-radius: 2px; vertical-align: -1px;}
 @media (max-width: 900px) {.qdd-anneau {justify-content: flex-start;}}
+
+/* Assistant : consultations, avis, chiffres de la réponse */
+.qdd-cons-chiffres {font-size: .74rem; color: var(--qdd-gris); font-variant-numeric: tabular-nums;}
+.qdd-cons-chiffres b {color: var(--qdd-encre); font-weight: 600;}
+.qdd-droite {text-align: right;}
+[class*="st-key-assistant_cons_"] button {justify-content: flex-start !important; text-align: left;
+  border: 1px solid var(--qdd-ligne) !important; border-radius: 6px; padding: .45rem .7rem; background: var(--qdd-surface);}
+[class*="st-key-assistant_cons_"] button:hover {border-color: var(--qdd-accent) !important;}
+[class*="st-key-assistant_cons_"] button p {font-size: .82rem; margin: 0; line-height: 1.35; color: var(--qdd-encre);}
+[class*="st-key-assistant_cons_"] button code {font-size: .7rem; color: var(--qdd-gris); background: transparent;}
+[class*="st-key-assistant_avis_"] button, [class*="st-key-assistant_regen_"] button {min-height: 1.8rem; padding: 0 .3rem;}
+[class*="st-key-assistant_regen_"] button p {font-size: .78rem;}
+@media (max-width: 900px) {.qdd-droite {text-align: left;}}

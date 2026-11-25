@@ -26,6 +26,13 @@ EXTENSIONS = [
          prerequis='Tableaux limités à 500 lignes et fichiers à 5 Mo (annoncé à l’utilisateur) ; le fichier est traité '
                    'comme une donnée, jamais comme des consignes. En entreprise, accord de la DSI avant d’envoyer un '
                    'fichier réel à un service externe.', effort='—'),
+    dict(id='F20', statut='Fait', titre='Assistant : suivi en direct, consultations détaillées, avis',
+         pourquoi='Pendant la réponse, l’étape en cours et la durée s’affichent ; chaque réponse indique son temps, '
+                  'ses consultations du moteur, ses jetons et son coût, avec trois onglets (réponse, ce qu’il a '
+                  'consulté, réflexion). Un clic sur une consultation montre ce qu’il a demandé et ce qu’il a obtenu. '
+                  'Avis utile / pas utile, régénérer la dernière réponse.',
+         prerequis='Avis gardés le temps de la visite et repris dans l’export ; les conserver suppose E14. Pas de '
+                   'bouton « Arrêter » : Streamlit ne sait pas interrompre une réponse en cours.', effort='—'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

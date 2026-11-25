@@ -114,6 +114,7 @@ def test_boucle_appelle_l_outil_puis_repond(contexte):
     req = client.requetes[0]
     assert req["model"] == "claude-opus-5-5" and req["fallbacks"] == "default" and "temperature" not in req
     assert req["tools"] == OUTILS and req["cache_control"] == {"type": "ephemeral"}
+    assert req["thinking"] == {"type": "adaptive", "display": "summarized"}
 
 
 def test_refus_et_boucle_bornee(contexte):
@@ -245,3 +246,22 @@ def test_pieces_jointes_et_jauge():
     assert 'stroke-dasharray="0.00' in anneau_html(0, BUDGET_VISITE, 0)
     plein = anneau_html(BUDGET_VISITE, BUDGET_VISITE, 1.2)
     assert "#AD3030" in plein and "0,50 $ sur 0,50 $" in plein and "contexte 1,2 %" in plein
+
+
+def test_trace_d_une_reponse(contexte):
+    """Consultations (outil, éléments, durée, résultat), résumé de réflexion, jetons et coût de la réponse."""
+    outil = _bloc(type="tool_use", id="t1", name="lignes_en_anomalie", input={"campagne": "N", "controle": "C05"})
+    reflexion = _bloc(type="thinking", thinking="Je cherche les lignes de C05.")
+    usage = SimpleNamespace(input_tokens=1000, output_tokens=200, cache_read_input_tokens=0, cache_creation_input_tokens=0)
+    client = FauxClient([
+        SimpleNamespace(stop_reason="tool_use", content=[reflexion, outil], usage=usage),
+        SimpleNamespace(stop_reason="end_turn", content=[_bloc(type="text", text="8 lignes.")], usage=usage),
+    ])
+    trace, vu = {}, []
+    texte, _, _ = repondre(client, [{"role": "user", "content": "C05 ?"}], contexte, None, trace, vu.append)
+    assert texte == "8 lignes." and trace["reflexion"] == ["Je cherche les lignes de C05."]
+    (x,) = trace["consultations"]
+    assert x["nom"] == "Lignes en anomalie" and x["elements"] == len(x["resultat"]["exemples"]) and not x["erreur"]
+    assert x["resultat"]["nombre_lignes"] > 0 and x["duree"] >= 0
+    assert trace["jetons"] == 2400 and abs(trace["cout"] - 2 * (1000 * 4 + 200 * 20) / 1e6) < 1e-12
+    assert vu[:2] == ["Je lis votre question…", "Je consulte : Lignes en anomalie"]
