@@ -47,6 +47,12 @@ EXTENSIONS = [
                   '(durée, réussite) et ses accès.',
          prerequis='Dépend de E14 : connexion des utilisateurs et base de données pour garder la consommation d’une '
                    'visite à l’autre ; quotas par personne au lieu d’un budget par visite.', effort='Moyen'),
+    dict(id='F23', statut='Fait', titre='Téléphone : menu refermé après un choix, thème appliqué tout de suite',
+         pourquoi='Sur téléphone, choisir une page dans le menu latéral le referme et montre la page, sans toucher '
+                  'l’écran à côté. Passer en thème sombre ou clair (menu ⋮ > Settings) applique l’habillage aussitôt, '
+                  'sans attendre un clic sur une autre page.',
+         prerequis='Vérifié sur un iPhone simulé (Playwright), avant et après la correction ; '
+                   'à confirmer sur un vrai téléphone.', effort='—'),
     dict(id='F22', statut='Fait', titre='Assistant : verdict, tableaux interactifs, réponse téléchargeable',
          pourquoi='Une question fermée reçoit d’abord un verdict clair. Les tableaux d’une réponse deviennent des '
                   'tableaux interactifs (recherche, plein écran, téléchargement CSV au survol). Chaque réponse se '

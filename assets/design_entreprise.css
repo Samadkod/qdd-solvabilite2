@@ -334,3 +334,6 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 .st-key-assistant_zone [data-baseweb="tab-panel"], .st-key-assistant_zone [data-testid="stChatMessageContent"],
 .st-key-assistant_zone [data-testid="stTabs"] {overflow: visible !important;}
 .st-key-assistant_zone [data-testid="stDataFrame"] {margin-top: .6rem;}
+
+/* Relais technique (relance au changement de thème, fermeture du menu sur téléphone) : jamais visible */
+.st-key-qdd_relais {display: none !important;}

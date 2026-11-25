@@ -36,7 +36,7 @@ from exercices_sas import afficher_exercices
 from explications import (ETAPES_COURTES, LEGENDE_CONTROLES, LEGENDE_DONNEES, MODALITES, afficher_d_ou_sortent,
                           lire_axe, lire_variation)
 from guide_terrain import afficher_guide
-from assurance_style import appliquer_style, bandeau, couleur_texte, entete_page
+from assurance_style import appliquer_style, bandeau, comportement_interface, couleur_texte, entete_page
 from chargement import SEUIL_VARIATION, execution as executer_controles, volumetrie
 from assurance_feuille import afficher_feuille_de_route
 from operations_qdd.ui import afficher_diagnostic, afficher_impact, afficher_resolution, afficher_dossier
@@ -154,6 +154,7 @@ def aller(page: str, **etat) -> None:
 
 def _choisir(page: str) -> None:
     st.session_state["page"] = page
+    st.session_state["_fermer_menu"] = True  # sur téléphone, le menu se referme pour montrer la page choisie
 
 
 if "langue" not in st.session_state:  # français par défaut ; ?lang=en pour partager un lien en anglais
@@ -198,6 +199,7 @@ with st.sidebar:
                          format_func={"memoire": "Mémoire (max/min − 1)", "symetrique": "Symétrique borné"}.get)
         montant = st.toggle("Ratio d'anomalies pondéré en montant", value=True)
         st.caption("Contrôle de cohérence (éq. 12) : ΔSCR max doit rester sous le seuil.")
+    comportement_interface(st.session_state.pop("_fermer_menu", False))
 
 page = st.session_state["page"]
 st.query_params["page"] = page

@@ -55,3 +55,46 @@ def entete_page(rubrique: str, titre: str, description: str, contexte: str, camp
         f'<p>{escape(description)}</p>{droite}</div>',
         unsafe_allow_html=True,
     )
+
+
+_SCRIPT_INTERFACE = """<script>
+(function () {
+  const doc = window.document;
+  window.__qddThemeServeur = "%(theme)s";
+  // 1. Sur téléphone, le menu latéral se referme après un choix de page (comme une navigation native).
+  if (%(fermer)s && window.matchMedia("(max-width: 767.98px)").matches) {
+    const b = doc.querySelector('[data-testid="stSidebarCollapseButton"] button');
+    if (b) { b.click(); }
+  }
+  // 2. Changement de thème (menu ⋮ > Settings) : Streamlit ne relance pas le script, l'habillage sombre ou clair
+  //    n'arrivait qu'au clic suivant. On compare le thème affiché à celui connu du serveur et on relance une fois.
+  if (window.__qddThemeVeille) { return; }
+  window.__qddThemeVeille = true;
+  let dernier = 0;
+  function themeAffiche() {
+    const app = doc.querySelector(".stApp");
+    if (!app) { return null; }
+    const m = getComputedStyle(app).backgroundColor.match(/\\d+(\\.\\d+)?/g);
+    if (!m) { return null; }
+    const [r, g, b] = m.map(Number);
+    return (0.299 * r + 0.587 * g + 0.114 * b) < 128 ? "dark" : "light";
+  }
+  setInterval(function () {
+    const affiche = themeAffiche();
+    if (!affiche || affiche === window.__qddThemeServeur || Date.now() - dernier < 4000) { return; }
+    const relance = doc.querySelector(".st-key-qdd_relais button");
+    if (relance) { dernier = Date.now(); relance.click(); }
+  }, 600);
+})();
+</script>"""
+
+
+def comportement_interface(fermer_menu: bool) -> None:
+    """Menu refermé après un choix de page sur téléphone ; habillage appliqué dès le changement de thème.
+    À appeler dans la barre latérale ; le bouton de relance est invisible (design_entreprise.css)."""
+    with st.container(key="qdd_relais"):
+        st.button("relance", key="qdd_relance_theme")
+        compteur = st.session_state["_qdd_nonce"] = st.session_state.get("_qdd_nonce", 0) + 1
+        st.html(_SCRIPT_INTERFACE % {"theme": "dark" if theme_sombre() else "light",
+                                     "fermer": "true" if fermer_menu else "false"}
+                + f"<!-- {compteur} -->", unsafe_allow_javascript=True)
