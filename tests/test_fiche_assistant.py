@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import assistant_qdd as a
-from fiche_assistant import NOUVEAUTES, contenu
+from fiche_assistant import contenu, nouveautes
 
 RACINE = Path(__file__).resolve().parents[1]
 
@@ -16,8 +16,7 @@ def test_fiche_suit_le_code_de_l_assistant():
     assert [n for n, _ in c["outils"]] == [a.NOMS_OUTILS[o["name"]] for o in a.OUTILS] and len(c["outils"]) == 9
     assert str(a.LIGNES_MAX) in c["fichiers"] and "PDF" in c["fichiers"]
     from assurance_feuille import tableau
-    feuille = tableau().set_index("id")
-    assert all(feuille.loc[i, "statut"] == "Fait" for i in NOUVEAUTES)
+    assert nouveautes(tableau()) == ["F22", "F21", "F20"]  # les trois dernières livraisons de l'assistant
 
 
 def test_page_fiche_sans_cle(monkeypatch):

@@ -11,7 +11,15 @@ import assistant_qdd as a
 
 VERSION = "1.4 · 25 novembre 2026"
 NOM_MODELE = {"claude-opus-5-5": "Claude Opus 5.5"}
-NOUVEAUTES = ["F20", "F19", "F16"]  # éléments « Fait » de la feuille de route qui concernent l'assistant
+NB_NOUVEAUTES = 3
+
+
+def nouveautes(feuille) -> list[str]:
+    """Les dernières livraisons de l'assistant : éléments « Fait » dont le titre parle de l'assistant, les plus récents
+    d'abord (numéro le plus élevé). Suit la feuille de route sans liste à tenir à la main."""
+    faits = feuille[(feuille["statut"] == "Fait") & feuille["titre"].str.contains("ssistant")]
+    ids = sorted(faits["id"], key=lambda i: int(i[1:]), reverse=True)
+    return ids[:NB_NOUVEAUTES]
 
 FAIT = [
     "Répond aux questions sur la campagne affichée : note, données hors tolérance, contrôles, anomalies, lignage.",
@@ -102,8 +110,9 @@ def afficher(aller, active: bool) -> None:
             t.markdown("**Nouveautés**")
             if l.button("Toutes", type="tertiary", key="fiche_feuille"):
                 aller("feuille")
-            feuille = tableau().set_index("id")
-            for ident in NOUVEAUTES:
+            brut = tableau()
+            feuille = brut.set_index("id")
+            for ident in nouveautes(brut):
                 e = feuille.loc[ident]
                 st.markdown(f"**{e['titre']}**  \n{e['pourquoi']}")
     with droite:
