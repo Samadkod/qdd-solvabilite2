@@ -18,7 +18,9 @@ EN = {
     "Retour à l'atelier QDD": "Back to the DQ workshop", "Paramètres de la méthode": "Method parameters",
     "Langue": "Language", "Campagne": "Campaign",
     # pages : titres
-    "Synthèse": "Overview", "Note & données": "Score & data", "Contrôles": "Controls", "Anomalies": "Issues",
+    "Synthèse": "Overview", "Note & données": "Score & data", "Contrôles": "Controls", "Anomalies": "Issues", "Relances": "Follow-ups",
+    "Pour chaque responsable : ce qui lui revient, et le message prêt à envoyer.":
+        "For each owner: what is theirs to act on, and a ready-to-send message.",
     "Lignes en anomalie": "Failing rows", "Règles de contrôle": "Control rules",
     "Lignage & dictionnaire": "Lineage & data dictionary", "Chargement & exécution": "Loading & execution",
     "Atelier de résolution": "Resolution workshop", "Dossier de campagne": "Campaign evidence file",

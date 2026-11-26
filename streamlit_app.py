@@ -26,6 +26,7 @@ from qdd_s2.gouvernance import cycle_de_vie
 from suivi_controles import afficher_suivi
 from assistant_qdd import afficher as afficher_assistant, cle_api
 from fiche_assistant import afficher as afficher_fiche_assistant
+from relances import afficher as afficher_relances
 from statuts import legende as legende_statuts, tableau
 from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
@@ -107,6 +108,8 @@ PAGES = {
     "donnees": ("Pilotage QDD", "Note & données", ":material/monitoring:", "La note de chaque donnée, pourquoi elle a bougé et où sont les écarts."),
     "controles": ("Pilotage QDD", "Contrôles", ":material/fact_check:", "Liste de suivi : exécution, résultat, échéance et durée de chaque point de contrôle."),
     "anomalies": ("Pilotage QDD", "Anomalies", ":material/flag:", "Le registre : qui doit corriger quoi, pour quand."),
+    "relances": ("Pilotage QDD", "Relances", ":material/campaign:",
+                 "Pour chaque responsable : ce qui lui revient, et le message prêt à envoyer."),
     "lignes": ("Pilotage QDD", "Lignes en anomalie", ":material/table_rows:",
                "Chaque ligne en erreur, contrôle par contrôle : quoi corriger, exactement."),
     "regles": ("Pilotage QDD", "Règles de contrôle", ":material/rule:",
@@ -470,6 +473,7 @@ def page_code() -> None:
     "chargement": page_chargement,
     "verif_sas": afficher_verification_sas,
     "feuille": afficher_feuille_de_route,
+    "relances": lambda: afficher_relances(c),
     "assistant": lambda: afficher_assistant(c, camps[:k + 1], var, base_fictive()),
     "fiche_assistant": lambda: afficher_fiche_assistant(aller, bool(cle_api())),
     "lignes": lambda: afficher_lignes(c, base_fictive()),

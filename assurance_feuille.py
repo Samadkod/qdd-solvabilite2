@@ -79,13 +79,18 @@ EXTENSIONS = [
                   'pour 16,7 M€, alors que Q02 est conforme.',
          prerequis='Coût mesuré : 0,14 à 0,27 $ par enquête (moyenne 0,21 $), 31 à 74 s, 7 à 11 consultations ; '
                    'une ou deux enquêtes par visite avec le budget de 0,50 $.', effort='—'),
-    dict(id='E17', statut='Plus tard', titre='Relances aux propriétaires, groupées par responsable',
-         pourquoi='Piloter, c’est faire agir les autres : pour chaque responsable, ses contrôles en retard et ses '
-                  'anomalies à échéance dépassée (11 sur la campagne N), avec un message prêt à copier, par exemple '
-                  '« R04 · RC décennale : contrôle non refait, résultat retenu 94,59 %, seuil 99,32 % ».',
-         prerequis='Étape 1 dans l’application, sans outil nouveau : liste par responsable et message à copier ou '
-                   'télécharger (responsable, dernière réalisation et échéance existent déjà). Étape 2, en entreprise : '
-                   'envoi par la messagerie interne avec l’accord de la DSI, après E13.', effort='Faible'),
+    dict(id='F29', statut='Fait', titre='Relances aux propriétaires, groupées par responsable',
+         pourquoi='Page « Relances » : pour chaque responsable, ses anomalies échues ou à échéance dans les 30 jours '
+                  'et ses contrôles à refaire, du plus urgent au moins urgent, avec un message prêt à copier ou à '
+                  'télécharger (tous les messages en un fichier, liste complète en CSV). Sur la campagne N : '
+                  '7 responsables, 11 échéances dépassées, 6 contrôles à refaire, 2 échéances sous 30 jours.',
+         prerequis='Comptes égaux aux tuiles de la Synthèse (tests/test_relances.py). Rien n’est envoyé par '
+                   'l’application : le chargé QDD relit et envoie.', effort='—'),
+    dict(id='E17', statut='Plus tard', titre='Envoi des relances par la messagerie de l’entreprise',
+         pourquoi='Envoyer les messages préparés par la page Relances directement aux propriétaires, et garder la '
+                  'trace de l’envoi et de la réponse.',
+         prerequis='En entreprise seulement : messagerie interne (courriel, Teams) avec l’accord de la DSI, annuaire '
+                   'des propriétaires ; dépend de E13 (connexion, conservation).', effort='Moyen'),
     dict(id='E18', statut='Plus tard', titre='Contrôles des zones de risque non couvertes',
          pourquoi='8 zones de risque critiques sur 33 n’ont aucun contrôle (flux F04, F05, F06, F09, F13) : la note '
                   'ne mesure pas ce qui s’y passe. Ce sont aussi 8 anomalies « Couverture » récurrentes.',

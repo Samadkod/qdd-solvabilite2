@@ -13,6 +13,9 @@ USAGES = {
                   "savoir ce qui reste à faire."),
     "anomalies": ("Le registre : chaque anomalie, sa gravité, son propriétaire, son échéance, son statut ; le "
                   "cycle de vie sur les campagnes.", "Pour relancer les propriétaires et suivre les corrections."),
+    "relances": ("Pour chaque responsable : ses anomalies échues ou proches de l'échéance et ses contrôles à "
+                 "refaire, avec le message prêt à copier ou télécharger.", "Chaque semaine de campagne, pour faire "
+                 "agir les propriétaires."),
     "lignes": ("Les lignes fautives elles-mêmes (contrat, sinistre, titre), avec un message en clair, et leurs "
                "regroupements.", "Pour transmettre à un propriétaire exactement quoi corriger."),
     "regles": ("Le catalogue des 20 contrôles : ce que chacun vérifie, sa famille, son responsable.",
