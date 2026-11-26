@@ -561,6 +561,18 @@ def afficher_reponse(texte: str) -> None:
             st.markdown(contenu)
 
 
+def _telechargements(md: str, titre: str, nom: str, cle: str) -> None:
+    """Deux boutons : PDF (mis en page au clic, export_pdf) et Markdown (texte modifiable)."""
+    import streamlit as st
+    from export_pdf import pdf_depuis_markdown
+
+    st.download_button("PDF", lambda: pdf_depuis_markdown(md, titre), file_name=f"{nom}.pdf",
+                       mime="application/pdf", icon=":material/picture_as_pdf:", key=f"{cle}_pdf", width="stretch",
+                       help="Pour lire, imprimer ou envoyer")
+    st.download_button("Markdown", md.encode("utf-8"), file_name=f"{nom}.md", mime="text/markdown",
+                       icon=":material/description:", key=cle, width="stretch", help="Texte modifiable (Word, Notion…)")
+
+
 def export_reponse(m: dict, question: str) -> str:
     """Une réponse seule en Markdown : la question, la réponse, sa date et ses sources."""
     lignes = [f"# {question}", "", f"*Assistant QDD · {m['date']:%d/%m/%Y %H:%M} · données fictives*", "", m["texte"], ""]
@@ -676,9 +688,9 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
         else:
             t, b = st.columns([4, 1], vertical_alignment="center")
             t.markdown(f'<div class="qdd-conv-titre">{conv["titre"]}</div>', unsafe_allow_html=True)
-            b.download_button("Exporter", export_markdown(conv).encode("utf-8"), icon=":material/download:",
-                              file_name=f"conversation_assistant_qdd_{conv['cree']:%Y%m%d_%H%M}.md",
-                              mime="text/markdown", key="assistant_export", width="stretch")
+            with b.popover("Exporter", icon=":material/download:", width="stretch"):
+                _telechargements(export_markdown(conv), conv["titre"],
+                                 f"conversation_assistant_qdd_{conv['cree']:%Y%m%d_%H%M}", "assistant_export")
         dernier = max((n for n, m in enumerate(conv["fil"]) if m["role"] == "assistant"), default=-1)
         for n, m in enumerate(conv["fil"]):
             if m["role"] == "user":
@@ -733,10 +745,10 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                             "Régénérer", icon=":material/refresh:", key=f"assistant_regen_{actif}_{n}", type="tertiary"):
                         regenerer = True
                     question_m = conv["fil"][n - 1]["texte"] if n > 0 else conv["titre"]
-                    pied[4].download_button("Télécharger", export_reponse(m, question_m).encode("utf-8"),
-                                            icon=":material/download:", type="tertiary", mime="text/markdown",
-                                            file_name=f"reponse_assistant_qdd_{m['date']:%Y%m%d_%H%M}.md",
-                                            key=f"assistant_dl_{actif}_{n}", help="Télécharger cette réponse (Markdown)")
+                    with pied[4].popover("Télécharger", icon=":material/download:", type="tertiary",
+                                         help="Télécharger cette réponse (PDF ou Markdown)"):
+                        _telechargements(export_reponse(m, question_m), question_m,
+                                         f"reponse_assistant_qdd_{m['date']:%Y%m%d_%H%M}", f"assistant_dl_{actif}_{n}")
                     if m.get("jetons"):
                         cout = f"{m['cout']:.3f}".replace(".", ",")
                         pied[5].markdown(f'<div class="qdd-cons-chiffres qdd-droite">{_duree(m["duree"])} · '

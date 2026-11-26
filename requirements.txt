@@ -5,3 +5,4 @@ openpyxl
 duckdb
 altair
 anthropic==2.14.0
+fpdf2==2.9.0

@@ -47,6 +47,12 @@ EXTENSIONS = [
                   '(durée, réussite) et ses accès.',
          prerequis='Dépend de E14 : connexion des utilisateurs et base de données pour garder la consommation d’une '
                    'visite à l’autre ; quotas par personne au lieu d’un budget par visite.', effort='Moyen'),
+    dict(id='F25', statut='Fait', titre='Assistant : réponse et conversation en PDF',
+         pourquoi='Exporter et Télécharger proposent désormais PDF (pour lire, imprimer, envoyer à un manager ou un '
+                  'comité) ou Markdown (texte modifiable). Le PDF met en page le même contenu : titres, gras, listes, '
+                  'tableaux, sources ; mention « données fictives » et numéro de page en pied.',
+         prerequis='Bibliothèque fpdf2 (légère, sans dépendance) et police Liberation Sans embarquée (licence libre '
+                   'OFL) pour les accents et symboles. PDF généré au clic.', effort='—'),
     dict(id='F24', statut='Fait', titre='Assistant : totaux fournis par le moteur, plus de comptage à la main',
          pourquoi='L’évaluation réelle a montré des erreurs de comptage (10 anomalies en retard au lieu de 11, '
                   '7 données conformes au lieu de 6, points de contrôle confondus avec contrôles). Les consultations '

@@ -16,7 +16,7 @@ def test_fiche_suit_le_code_de_l_assistant():
     assert [n for n, _ in c["outils"]] == [a.NOMS_OUTILS[o["name"]] for o in a.OUTILS] and len(c["outils"]) == 9
     assert str(a.LIGNES_MAX) in c["fichiers"] and "PDF" in c["fichiers"]
     from assurance_feuille import tableau
-    assert nouveautes(tableau()) == ["F24", "F22", "F21"]  # les trois dernières livraisons de l'assistant
+    assert nouveautes(tableau()) == ["F25", "F24", "F22"]  # les trois dernières livraisons de l'assistant
 
 
 def test_page_fiche_sans_cle(monkeypatch):
