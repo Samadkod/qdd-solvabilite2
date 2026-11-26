@@ -78,16 +78,17 @@ EXTENSIONS = [
                   'C07 est bloquant et que faut-il corriger, sinistre par sinistre ? » → les 60 sinistres, l’écart de '
                   'dates de chacun, la cause commune, l’action par dossier.',
          prerequis='Requête SQL en lecture seule sur la base fictive (SELECT seulement, accès aux fichiers coupé, '
-                   'lignes et durée limitées), lignes en anomalie complètes page par page, plus de tours de '
+                   'lignes et durée limitées), lignes en anomalie complètes page par page, note par responsable, étape, segment et critère (déjà calculée), plus de tours de '
                    'consultation, gabarit d’enquête. Budget inchangé (0,50 $ par visite, crédit total limité) : '
                    'enquête économe, résultats compacts. Questions de diagnostic et réponses attendues ajoutées aux '
                    'tests, puis évaluation en ligne sur 3 ou 4 questions.', effort='Moyen'),
-    dict(id='E17', statut='Plus tard', titre='Alertes aux propriétaires avant échéance',
-         pourquoi='Prévenir chaque propriétaire d’une anomalie quand son échéance approche ou est dépassée '
-                  '(11 anomalies en retard sur la campagne N), au lieu d’attendre qu’il ouvre l’application.',
-         prerequis='D’abord, dans l’application, une liste « échéances à 30 jours » par propriétaire (sans outil '
-                   'nouveau). Ensuite, en entreprise, envoi par la messagerie interne (courriel, Teams) avec '
-                   'l’accord de la DSI ; dépend de E13 (vrais destinataires, annuaire).', effort='Moyen'),
+    dict(id='E17', statut='Plus tard', titre='Relances aux propriétaires, groupées par responsable',
+         pourquoi='Piloter, c’est faire agir les autres : pour chaque responsable, ses contrôles en retard et ses '
+                  'anomalies à échéance dépassée (11 sur la campagne N), avec un message prêt à copier, par exemple '
+                  '« R04 · RC décennale : contrôle non refait, résultat retenu 94,59 %, seuil 99,32 % ».',
+         prerequis='Étape 1 dans l’application, sans outil nouveau : liste par responsable et message à copier ou '
+                   'télécharger (responsable, dernière réalisation et échéance existent déjà). Étape 2, en entreprise : '
+                   'envoi par la messagerie interne avec l’accord de la DSI, après E13.', effort='Faible'),
     dict(id='E18', statut='Plus tard', titre='Contrôles des zones de risque non couvertes',
          pourquoi='8 zones de risque critiques sur 33 n’ont aucun contrôle (flux F04, F05, F06, F09, F13) : la note '
                   'ne mesure pas ce qui s’y passe. Ce sont aussi 8 anomalies « Couverture » récurrentes.',
@@ -106,6 +107,29 @@ EXTENSIONS = [
                   'Non testé : la base fictive n’a qu’une diagonale de paiements par arrêté.',
          prerequis='Triangles réels (années de survenance × années de développement), donc à faire après la prise '
                    'de poste sur les données de l’entreprise ; ne pas fabriquer de triangles fictifs.', effort='Moyen'),
+    dict(id='E22', statut='En cours', titre='Assistant : garde-fous techniques',
+         pourquoi='Une réponse lente ne doit pas bloquer la page, et une enquête à plusieurs tours ne doit pas '
+                  'dépasser le budget de la visite (le budget n’est vérifié aujourd’hui qu’avant la question).',
+         prerequis='Délai maximal sur chaque appel à l’API, budget revérifié entre deux tours de consultation, '
+                   'longueur maximale de réponse réduite. Côté console Anthropic (propriétaire) : plafond de dépense '
+                   'mensuel et rechargement automatique désactivé, seul vrai plafond entre les visites.',
+         effort='Faible'),
+    dict(id='E23', statut='Plus tard', titre='Dossier de comité en un clic (PDF)',
+         pourquoi='Le document à apporter en comité, produit par le moteur : note et variation, données critiques '
+                  'hors tolérance, restitutions QRT, anomalies ouvertes par responsable, contrôles en retard, points à '
+                  'arbitrer, avec la date et l’empreinte SHA-256 du dossier de preuves. Évite de le refaire à la main '
+                  'chaque trimestre.',
+         prerequis='Assemble l’existant (indicateurs, variation, registre, contrôle de niveau 2, export PDF, '
+                   'manifeste). Les décisions du comité restent humaines : le compte rendu n’est pas généré.',
+         effort='Moyen'),
+    dict(id='E24', statut='Plus tard', titre='Gain de note avant correction',
+         pourquoi='Avant de corriger, savoir ce que chaque correction rapporte : pour chaque point de contrôle en '
+                  'anomalie, la note si ce point était corrigé et le changement de statut de la donnée. Exemple : les '
+                  '89 lignes de C10 portent sur le code activité, donnée non critique : les corriger ne change pas la '
+                  'note ; corriger C07 ou R04 RC décennale, si. Transforme la liste d’anomalies en arbitrage chiffré.',
+         prerequis='Recalcul par le moteur avec le résultat du point porté à 100 % (hypothèse affichée), sans '
+                   'toucher la base ; l’Atelier de résolution reste le seul chemin d’une vraie correction.',
+         effort='Moyen'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '
