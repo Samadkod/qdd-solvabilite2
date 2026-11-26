@@ -72,6 +72,20 @@ Méthode du dispositif (pour expliquer, pas pour calculer) :
   leur sensibilité. Les contrôles de restitution QRT (Q01 à Q04) ont un seuil fixe de 99,9 % et sont exclus de la note.
 - Une anomalie se clôture seulement si le contrôle a été refait dans la campagne et n'est plus en anomalie.
 - Contrôle de niveau 2 : constats à règle écrite sur les contrôles de niveau 1 (complétude, périodicité, couverture).
+- Linéarité : la sensibilité est recalculée avec des chocs de −15 %, +5 % et +30 % ; si l'écart dépasse 10 %, la
+  sensibilité n'est pas linéaire (champ « sensibilite_lineaire » de donnees_critiques, page Note & données).
+- Une donnée critique à dire d'expert sans sensibilité calculable reçoit la moyenne des sensibilités mesurées.
+
+Limites connues du dispositif (à citer telles quelles si on te les demande, sans en inventer d'autres) :
+- Prototype sur données 100 % fictives ; ne vaut pas attestation de conformité.
+- SCR calculé par une formule standard simplifiée, non réglementaire ; corrélations entre segments illustratives.
+- La validation d'une correction par une autre personne est déclarative (noms saisis, pas de connexion des
+  utilisateurs) et peut être désactivée dans l'Atelier de résolution.
+- Pas de base de données : corrections, validations et conversations ne sont pas conservées après la visite.
+- Profondeur d'historique non testée (une seule diagonale de paiements par arrêté).
+- Chargement dans Qlik Sense et connexion ODBC jamais exécutés.
+- La note ne mesure que ce que les contrôles existants couvrent : des zones de risque critiques peuvent n'avoir
+  aucun contrôle (leur nombre vient de indicateurs_campagne).
 """
 
 # ------------------------------------------------------------------ questions proposées
@@ -198,7 +212,13 @@ def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
                             "sensibilite_scr": d["sensibilite"].map(_pct), "critique": d["critique"].astype(bool),
                             "note": d["note"].map(_pct), "note_minimum": d["note_min"].map(_pct),
                             "statut": d["statut"].map(_statut), "proprietaire": d.get("proprietaire"),
-                            "criteres_couverts": d.get("criteres_couverts")})
+                            "criteres_couverts": d.get("criteres_couverts"),
+                            "critique_a_dire_d_expert": d["critique_expert"].fillna(False).astype(bool)
+                            if "critique_expert" in d else False,
+                            # écart maximal entre la sensibilité au choc de 15 % et celles à −15 %, +5 %, +30 %
+                            "ecart_de_linearite": d["non_linearite"].map(_pct) if "non_linearite" in d else None,
+                            "sensibilite_lineaire": d["non_linearite"].map(
+                                lambda x: None if pd.isna(x) else bool(x <= 0.10)) if "non_linearite" in d else None})
         crit = out[out["critique"]]
         totaux = {"donnees": len(out), "donnees_critiques": len(crit),
                   "critiques_par_statut": _compte(crit["statut"]),
@@ -561,12 +581,23 @@ def afficher_reponse(texte: str) -> None:
             st.markdown(contenu)
 
 
-def _telechargements(md: str, titre: str, nom: str, cle: str) -> None:
-    """Deux boutons : PDF (mis en page au clic, export_pdf) et Markdown (texte modifiable)."""
+def _pdf(md: str, titre: str) -> bytes:
     import streamlit as st
     from export_pdf import pdf_depuis_markdown
 
-    st.download_button("PDF", lambda: pdf_depuis_markdown(md, titre), file_name=f"{nom}.pdf",
+    @st.cache_data(max_entries=300, show_spinner=False)
+    def _fabriquer(texte: str, t: str) -> bytes:
+        return pdf_depuis_markdown(texte, t)
+    return _fabriquer(md, titre)
+
+
+def _telechargements(md: str, titre: str, nom: str, cle: str) -> None:
+    """Deux boutons : PDF (export_pdf, préparé à l'avance) et Markdown (texte modifiable)."""
+    import streamlit as st
+
+    # PDF préparé avant le clic (mis en cache par contenu) : sur téléphone, un téléchargement fabriqué après le clic
+    # (fonction différée) n'aboutissait pas, le navigateur ne le reliant plus au geste de l'utilisateur.
+    st.download_button("PDF", _pdf(md, titre), file_name=f"{nom}.pdf",
                        mime="application/pdf", icon=":material/picture_as_pdf:", key=f"{cle}_pdf", width="stretch",
                        help="Pour lire, imprimer ou envoyer")
     st.download_button("Markdown", md.encode("utf-8"), file_name=f"{nom}.md", mime="text/markdown",

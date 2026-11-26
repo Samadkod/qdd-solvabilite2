@@ -71,6 +71,30 @@ EXTENSIONS = [
                   'télécharge seule, avec sa question, sa date et ses consultations.',
          prerequis='Pas de bouton « Copier » : le navigateur bloque souvent l’accès au presse-papiers depuis Streamlit ; '
                    'le téléchargement le remplace.', effort='—'),
+    dict(id='E17', statut='Plus tard', titre='Alertes aux propriétaires avant échéance',
+         pourquoi='Prévenir chaque propriétaire d’une anomalie quand son échéance approche ou est dépassée '
+                  '(11 anomalies en retard sur la campagne N), au lieu d’attendre qu’il ouvre l’application.',
+         prerequis='D’abord, dans l’application, une liste « échéances à 30 jours » par propriétaire (sans outil '
+                   'nouveau). Ensuite, en entreprise, envoi par la messagerie interne (courriel, Teams) avec '
+                   'l’accord de la DSI ; dépend de E13 (vrais destinataires, annuaire).', effort='Moyen'),
+    dict(id='E18', statut='Plus tard', titre='Contrôles des zones de risque non couvertes',
+         pourquoi='8 zones de risque critiques sur 33 n’ont aucun contrôle (flux F04, F05, F06, F09, F13) : la note '
+                  'ne mesure pas ce qui s’y passe. Ce sont aussi 8 anomalies « Couverture » récurrentes.',
+         prerequis='Écrire chaque contrôle en SQL, en SAS et dans l’atelier HTML, avec son mode opératoire. Ajouter '
+                   'des contrôles fait bouger la note et les valeurs de référence : à valider par le propriétaire '
+                   'avant de régénérer les valeurs attendues SAS.', effort='Moyen'),
+    dict(id='E19', statut='En attente de décision', titre='Sensibilité non linéaire des placements obligations',
+         pourquoi='Le test de linéarité (chocs −15 %, +5 %, +30 %) donne 10,76 % d’écart pour les placements '
+                  'obligations, au-dessus du seuil de 10 % : leur poids dépend du choc retenu. Les autres données '
+                  'sont linéaires.',
+         prerequis='Décider avec l’actuariat : garder le choc de 15 %, prendre la sensibilité la plus prudente, ou '
+                   'relever le seuil. Toute option change le poids et donc la note : décision du propriétaire.',
+         effort='Faible'),
+    dict(id='E20', statut='Plus tard', titre='Profondeur d’historique des données',
+         pourquoi='La notice ACPR demande de vérifier que l’historique est assez long pour les calculs (triangles). '
+                  'Non testé : la base fictive n’a qu’une diagonale de paiements par arrêté.',
+         prerequis='Triangles réels (années de survenance × années de développement), donc à faire après la prise '
+                   'de poste sur les données de l’entreprise ; ne pas fabriquer de triangles fictifs.', effort='Moyen'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

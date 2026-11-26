@@ -307,3 +307,16 @@ def test_totaux_fournis_par_les_outils_egaux_au_moteur(contexte):
     assert ret["totaux"]["points_de_controle"] == ret["totaux"]["points_en_retard"] == 6
     assert ret["totaux"]["controles_distincts"] == 3  # C07, C08, R04
     assert "Ne compte jamais toi-même" in SYSTEME
+
+
+def test_linearite_et_limites_connues_donnees_a_l_assistant(contexte):
+    """Évaluation du 26/11/2026 : l'assistant présentait le choc unique comme une limite non traitée, alors que
+    l'application teste déjà −15 %, +5 % et +30 %. La consultation et les consignes le lui donnent désormais."""
+    d = {x["donnee_id"]: x for x in executer_outil("donnees_critiques", {"campagne": "N"}, contexte)["donnees"]}
+    assert d["placements_OBLIGATIONS"]["sensibilite_lineaire"] is False  # écart 10,76 % > 10 %
+    assert d["placements_OBLIGATIONS"]["ecart_de_linearite"] == "10,76 %"
+    assert d["provisions_sinistres_RC_DECENNALE"]["sensibilite_lineaire"] is True
+    assert d["date_survenance"]["critique_a_dire_d_expert"] is True
+    assert d["date_survenance"]["sensibilite_lineaire"] is None  # pas de sensibilité calculable
+    for limite in ("formule standard simplifiée", "déclarative", "Pas de base de données", "Qlik Sense", "−15 %"):
+        assert limite in SYSTEME
