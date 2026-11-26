@@ -83,7 +83,8 @@ EXTENSIONS = [
                    'enquête économe, résultats compacts. Questions de diagnostic et réponses attendues ajoutées aux '
                    'tests, puis évaluation en ligne sur 3 ou 4 questions. Construit le 26/11/2026 (bouton « Mode '
                    'diagnostic », requête SQL verrouillée, note par axe, lignes paginées, gabarit, étalons C07 et R04 '
-                   'dans les tests) ; reste l’évaluation en ligne et la mesure du coût réel.', effort='Moyen'),
+                   'dans les tests), complété par la méthode d’un agent de diagnostic (ordre d’enquête, preuve séparée de la '
+                   'déduction, nature du défaut, dictionnaire) ; reste l’évaluation en ligne et la mesure du coût réel.', effort='Moyen'),
     dict(id='E17', statut='Plus tard', titre='Relances aux propriétaires, groupées par responsable',
          pourquoi='Piloter, c’est faire agir les autres : pour chaque responsable, ses contrôles en retard et ses '
                   'anomalies à échéance dépassée (11 sur la campagne N), avec un message prêt à copier, par exemple '

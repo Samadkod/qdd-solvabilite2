@@ -33,7 +33,7 @@ def contexte():
 
 def test_schemas_stricts_et_complets():
     noms = [o["name"] for o in OUTILS]
-    assert len(noms) == len(set(noms)) == 11
+    assert len(noms) == len(set(noms)) == 12
     for o in OUTILS:
         s = o["input_schema"]
         assert o["strict"] is True and s["additionalProperties"] is False
@@ -398,3 +398,21 @@ def test_mode_diagnostic_ajoute_le_gabarit_et_allonge_l_enquete(contexte):
     normal = FauxClient([SimpleNamespace(stop_reason="end_turn", content=[_bloc(type="text", text="ok")])])
     repondre(normal, [{"role": "user", "content": "x"}], contexte)
     assert normal.requetes[0]["system"] == a.SYSTEME
+
+
+
+def test_dictionnaire_et_consignes_du_runbook(contexte):
+    """Éléments repris du mail « Construire mon agent IA » : dictionnaire consultable, preuve séparée de la
+    déduction, ordre d'enquête (historique, lignage), nature du défaut, humain qui décide, modèle dans l'export."""
+    import assistant_qdd as a
+    r = executer_outil("dictionnaire", {"campagne": "N", "terme": "S.17.01"}, contexte)
+    ids = {x["donnee_id"] for x in r["donnees"]}
+    assert "provisions_sinistres_RC_DECENNALE" in ids and r["nombre"] == len(ids)
+    rc = next(x for x in r["donnees"] if x["donnee_id"] == "provisions_sinistres_RC_DECENNALE")
+    assert rc["format_attendu"] == "Numérique (€), ≥ 0" and "S.17.01" in rc["etats_qrt"]
+    assert executer_outil("dictionnaire", {"campagne": "N", "terme": ""}, contexte)["nombre"] == 11
+    for consigne in ("**Prouvé**", "**Déduit**", "N-1 et N-2", "lignage", "**Nature :**", "sans l'exécuter"):
+        assert consigne in a.DIAGNOSTIC
+    assert "un humain habilité décide" in a.SYSTEME and "résultat d'une consultation" in a.SYSTEME
+    m = {"date": a.maintenant(), "texte": "ok", "consultations": []}
+    assert f"modèle {a.MODELE}" in a.export_reponse(m, "q")
