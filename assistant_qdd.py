@@ -20,6 +20,9 @@ import pandas as pd
 
 MODELE = "claude-opus-5-5"
 EFFORT = "medium"
+MAX_JETONS_REPONSE = 8000      # réflexion comprise ; une réponse ne coûte jamais plus de 0,16 $ en sortie par tour
+DELAI_APPEL = 120              # secondes par appel à l'API : une réponse lente ne bloque pas la page
+ARRET_BUDGET = "Budget de la visite atteint pendant l'enquête : je m'arrête avant de dépenser davantage."
 BUDGET_VISITE = 0.50            # $ par visite (session de navigateur) : protège le crédit sur le lien public
 TYPES_FICHIERS = ["csv", "xlsx", "pdf", "txt", "md"]
 TAILLE_MAX = 5 * 1024 * 1024    # octets par fichier joint
@@ -460,30 +463,35 @@ def _nb_lignes(res: dict) -> int:
 
 
 def repondre(client, messages: list, contexte: dict, compteur: dict | None = None, trace: dict | None = None,
-             rappel=None) -> tuple[str, list[str], list]:
+             rappel=None, budget: float | None = None) -> tuple[str, list[str], list]:
     """Fait tourner la boucle jusqu'à la réponse finale.
 
     messages : historique au format de l'API (la question est déjà le dernier message « user »).
     Retourne (texte de la réponse, outils appelés pour la traçabilité, historique complété).
     Les blocs de la réponse (réflexion comprise) sont renvoyés tels quels au tour suivant, comme l'exige l'API.
     compteur : dict facultatif où s'additionnent le coût ($) et la taille du dernier contexte (session).
+    budget : reste du budget de la visite ($) ; revérifié après chaque tour, l'enquête s'arrête s'il est atteint.
     trace : dict facultatif rempli pour cette réponse : consultations (outil, éléments, durée), résumé de la
     réflexion, jetons et coût. rappel(texte) : affichage en direct de l'avancement.
     """
     import time
     appels: list[str] = []
+    depense = 0.0
     if trace is not None:
         trace.update(consultations=[], reflexion=[], jetons=0, cout=0.0)
     for _ in range(TOURS_OUTILS_MAX + 1):
         if rappel:
             rappel("Je réfléchis à la réponse…" if appels else "Je lis votre question…")
         reponse = client.beta.messages.create(
-            model=MODELE, max_tokens=16000, system=SYSTEME, tools=OUTILS, messages=messages,
+            model=MODELE, max_tokens=MAX_JETONS_REPONSE, system=SYSTEME, tools=OUTILS, messages=messages,
             thinking={"type": "adaptive", "display": "summarized"},
             output_config={"effort": EFFORT}, cache_control={"type": "ephemeral"},
             betas=["server-side-fallback-2026-07-01"], fallbacks="default")
         messages.append({"role": "assistant", "content": reponse.content})
         usage = getattr(reponse, "usage", None)
+        tour = {}
+        compter(tour, usage)
+        depense += tour.get("cout", 0.0)
         if compteur is not None:
             compter(compteur, usage)
         if trace is not None:
@@ -532,6 +540,8 @@ def repondre(client, messages: list, contexte: dict, compteur: dict | None = Non
             resultats.append({"type": "tool_result", "tool_use_id": b.id, "is_error": "erreur" in res,
                               "content": json.dumps(res, ensure_ascii=False, default=str)})
         messages.append({"role": "user", "content": resultats})
+        if budget is not None and depense >= budget:
+            return (f"{ARRET_BUDGET} Reposez une question plus ciblée lors d'une prochaine visite.", appels, messages)
     return "Trop d'étapes pour cette question : posez-la de façon plus ciblée.", appels, messages
 
 
@@ -623,7 +633,7 @@ def cle_api() -> str | None:
     return cle or os.environ.get("ANTHROPIC_API_KEY") or None
 
 
-ERREURS = ("Clé d'API refusée", "Trop de demandes", "Le service a renvoyé", "Service injoignable")
+ERREURS = ("Clé d'API refusée", "Trop de demandes", "Le service a renvoyé", "Service injoignable", "Service trop lent")
 AVERTISSEMENT = "L'assistant lit les données, il ne modifie rien. Vérifiez sa réponse avant d'agir."
 
 
@@ -847,14 +857,17 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
             etapes.markdown(html, unsafe_allow_html=True)
 
         try:
-            texte, sources, conv["api"] = repondre(anthropic.Anthropic(api_key=cle), conv["api"], contexte,
-                                                   conv["compteur"], trace, rappel)
+            client = anthropic.Anthropic(api_key=cle, timeout=DELAI_APPEL, max_retries=2)
+            texte, sources, conv["api"] = repondre(client, conv["api"], contexte, conv["compteur"], trace, rappel,
+                                                   budget=max(0.0, BUDGET_VISITE - cout_session))
         except anthropic.AuthenticationError:
             texte, sources = "Clé d'API refusée : vérifiez le secret `ANTHROPIC_API_KEY`.", []
         except anthropic.RateLimitError:
             texte, sources = "Trop de demandes en même temps : réessayez dans une minute.", []
         except anthropic.APIStatusError as e:
             texte, sources = f"Le service a renvoyé une erreur ({e.status_code}). Réessayez plus tard.", []
+        except anthropic.APITimeoutError:
+            texte, sources = "Service trop lent à répondre : réessayez, ou posez une question plus ciblée.", []
         except anthropic.APIConnectionError:
             texte, sources = "Service injoignable : vérifiez la connexion et réessayez.", []
         statut.update(label="Réponse prête", state="complete", expanded=False)

@@ -107,13 +107,13 @@ EXTENSIONS = [
                   'Non testé : la base fictive n’a qu’une diagonale de paiements par arrêté.',
          prerequis='Triangles réels (années de survenance × années de développement), donc à faire après la prise '
                    'de poste sur les données de l’entreprise ; ne pas fabriquer de triangles fictifs.', effort='Moyen'),
-    dict(id='E22', statut='En cours', titre='Assistant : garde-fous techniques',
-         pourquoi='Une réponse lente ne doit pas bloquer la page, et une enquête à plusieurs tours ne doit pas '
-                  'dépasser le budget de la visite (le budget n’est vérifié aujourd’hui qu’avant la question).',
-         prerequis='Délai maximal sur chaque appel à l’API, budget revérifié entre deux tours de consultation, '
-                   'longueur maximale de réponse réduite. Côté console Anthropic (propriétaire) : plafond de dépense '
-                   'mensuel et rechargement automatique désactivé, seul vrai plafond entre les visites.',
-         effort='Faible'),
+    dict(id='F26', statut='Fait', titre='Assistant : garde-fous techniques',
+         pourquoi='Délai maximal de 120 s par appel (au-delà, message clair, rien n’est facturé dans le budget de la '
+                  'visite) ; budget revérifié après chaque tour de consultation : une enquête s’arrête dès que le '
+                  'reste de la visite est dépensé ; réponse limitée à 8 000 jetons, réflexion comprise (au plus '
+                  '0,16 $ en sortie par tour).',
+         prerequis='Côté console Anthropic (propriétaire) : plafond de dépense mensuel et rechargement automatique '
+                   'désactivé, seul vrai plafond entre les visites.', effort='—'),
     dict(id='E23', statut='Plus tard', titre='Dossier de comité en un clic (PDF)',
          pourquoi='Le document à apporter en comité, produit par le moteur : note et variation, données critiques '
                   'hors tolérance, restitutions QRT, anomalies ouvertes par responsable, contrôles en retard, points à '
@@ -130,6 +130,19 @@ EXTENSIONS = [
          prerequis='Recalcul par le moteur avec le résultat du point porté à 100 % (hypothèse affichée), sans '
                    'toucher la base ; l’Atelier de résolution reste le seul chemin d’une vraie correction.',
          effort='Moyen'),
+    dict(id='E25', statut='Plus tard', titre='Inventaire des tâches manuelles de l’équipe (prise de poste)',
+         pourquoi='Répondre à « qu’est-ce qui vous prend du temps chaque trimestre ? » : pour chaque tâche, sa '
+                  'fréquence, le temps passé, l’outil, et ce qui peut être automatisé, avec le temps gagné estimé et la '
+                  'fonction de l’application qui le couvre déjà (contrôles, relances, dossier de comité, preuves).',
+         prerequis='Gabarit vide dans l’application (aucune donnée inventée), rempli avec l’équipe après la prise de '
+                   'poste ; les données réelles restent en interne.', effort='Faible'),
+    dict(id='E26', statut='À vérifier', titre='Points de la notice ACPR les plus souvent relevés',
+         pourquoi='Répondre à « sur quoi l’ACPR met-elle de mauvaises appréciations ? » : rattacher chaque point de '
+                  'la notice QDD à ce que l’application couvre (preuve, page) et à ce qui manque, en priorisant les '
+                  'faiblesses que l’ACPR signale publiquement.',
+         prerequis='Sources publiques à rassembler et citer (notice ACPR, rapports et publications de l’ACPR, mémoire '
+                   'de C. Motard) ; aucune faiblesse affirmée sans source. Les constats propres à l’entreprise '
+                   '(rapports de contrôle) restent confidentiels et internes.', effort='Moyen'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

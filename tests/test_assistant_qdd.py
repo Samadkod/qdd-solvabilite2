@@ -320,3 +320,19 @@ def test_linearite_et_limites_connues_donnees_a_l_assistant(contexte):
     assert d["date_survenance"]["sensibilite_lineaire"] is None  # pas de sensibilité calculable
     for limite in ("formule standard simplifiée", "déclarative", "Pas de base de données", "Qlik Sense", "−15 %"):
         assert limite in SYSTEME
+
+
+def test_garde_fous_budget_revérifie_entre_les_tours_et_reponse_bornee(contexte):
+    """E22 : une enquête à plusieurs tours s'arrête dès que le reste du budget de la visite est dépensé ;
+    longueur de réponse et délai d'appel bornés."""
+    import assistant_qdd as a
+    usage = SimpleNamespace(input_tokens=20000, output_tokens=4000, cache_read_input_tokens=0,
+                            cache_creation_input_tokens=0)  # 0,08 + 0,08 = 0,16 $ par tour
+    outil = _bloc(type="tool_use", id="t", name="variation_note", input={})
+    client = FauxClient([SimpleNamespace(stop_reason="tool_use", content=[outil], usage=usage)] * 5)
+    texte, appels, hist = repondre(client, [{"role": "user", "content": "x"}], contexte, budget=0.30)
+    assert texte.startswith(a.ARRET_BUDGET) and len(client.requetes) == 2 and len(appels) == 2
+    assert hist[-1]["role"] == "user" and hist[-1]["content"][0]["type"] == "tool_result"  # historique valide
+    assert client.requetes[0]["max_tokens"] == a.MAX_JETONS_REPONSE == 8000
+    assert a.MAX_JETONS_REPONSE * 20 / 1e6 <= 0.16 and a.DELAI_APPEL == 120
+    assert "Service trop lent" in a.ERREURS  # un délai dépassé ne consomme pas le budget
