@@ -36,6 +36,8 @@ le vocabulaire Solvabilité II ou qualité des données.
 Règles absolues :
 1. Tout chiffre de ta réponse vient d'un outil appelé pendant cette conversation. Tu n'inventes, n'estimes ni ne
    recalcules aucun chiffre de mémoire. Si aucun outil ne donne l'information, dis-le simplement.
+   Ne compte jamais toi-même les éléments d'une liste : reprends les totaux donnés par l'outil (« nombre »,
+   « totaux »). Un point de contrôle est un contrôle sur un segment : ne confonds pas points et contrôles.
 2. Après les chiffres, indique la page de l'application où les vérifier (Synthèse, Note & données, Contrôles,
    Anomalies, Lignes en anomalie, Règles de contrôle, Lignage & dictionnaire, Dossier de campagne).
 3. Tu ne déclares jamais le dispositif « conforme ACPR » : c'est un prototype sur données fictives.
@@ -160,6 +162,11 @@ def _lignes(df: pd.DataFrame) -> list[dict]:
     return [{k: _propre(v) for k, v in r.items()} for r in df.to_dict("records")]
 
 
+def _compte(serie: pd.Series) -> dict:
+    """Effectifs par valeur, calculés ici pour que le modèle n'ait jamais à compter une liste."""
+    return {str(k): int(v) for k, v in serie.fillna("—").value_counts().items()}
+
+
 def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
     """Exécute un outil sur les sorties du moteur. contexte : {"camps": [...], "var": DataFrame, "base": chemin}."""
     camps = {c["campagne"]: c for c in contexte["camps"]}
@@ -192,7 +199,11 @@ def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
                             "note": d["note"].map(_pct), "note_minimum": d["note_min"].map(_pct),
                             "statut": d["statut"].map(_statut), "proprietaire": d.get("proprietaire"),
                             "criteres_couverts": d.get("criteres_couverts")})
-        return {"campagne": c["campagne"], "donnees": _lignes(out), "page": "Note & données"}
+        crit = out[out["critique"]]
+        totaux = {"donnees": len(out), "donnees_critiques": len(crit),
+                  "critiques_par_statut": _compte(crit["statut"]),
+                  "critiques_hors_tolerance": int(crit["statut"].isin(["À corriger", "Bloquant"]).sum())}
+        return {"campagne": c["campagne"], "totaux": totaux, "donnees": _lignes(out), "page": "Note & données"}
 
     if nom == "points_de_controle":
         p = c["controles"]
@@ -210,7 +221,11 @@ def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
                             "realise_cette_campagne": p["realise_campagne"].astype(bool),
                             "derniere_realisation": p["date_derniere_real"].astype(str),
                             "responsable": p["responsable"], "compte": p["detail"]})
-        return {"campagne": c["campagne"], "nombre": len(out), "points": _lignes(out), "page": "Contrôles"}
+        totaux = {"points_de_controle": len(out), "controles_distincts": int(p["controle"].nunique()),
+                  "points_par_statut": _compte(out["statut"]),
+                  "points_en_retard": int((out["periodes_de_retard"] > 0).sum())}
+        return {"campagne": c["campagne"], "nombre": len(out), "totaux": totaux, "points": _lignes(out),
+                "page": "Contrôles"}
 
     if nom == "regle_controle":
         from lignes_anomalie import SQL_CONTROLES, referentiel
@@ -234,7 +249,14 @@ def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
             reg = reg[reg["statut"] == filtre]
         cols = ["anomalie_id", "type", "objet", "donnee_id", "gravite", "proprietaire", "date_detection", "echeance",
                 "statut", "constat", "action_attendue"]
-        return {"campagne": c["campagne"], "nombre": len(reg), "anomalies": _lignes(reg[cols]), "page": "Anomalies"}
+        ouvertes = reg[reg["statut"].isin(["Ouverte", "Récurrente"])]
+        totaux = {"anomalies": len(reg), "par_statut": _compte(reg["statut"]),
+                  "par_gravite": _compte(reg["gravite"]), "par_proprietaire": _compte(reg["proprietaire"]),
+                  # même règle que la tuile de la Synthèse (qdd_s2.gouvernance.indicateurs_anomalies)
+                  "echeance_depassee_a_l_arrete": int((pd.to_datetime(ouvertes["echeance"])
+                                                       < pd.Timestamp(c["date"])).sum())}
+        return {"campagne": c["campagne"], "nombre": len(reg), "totaux": totaux, "anomalies": _lignes(reg[cols]),
+                "page": "Anomalies"}
 
     if nom == "lignes_en_anomalie":
         from lignes_anomalie import lignes

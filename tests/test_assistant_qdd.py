@@ -287,3 +287,23 @@ def test_tableaux_de_reponse_verdict_et_telechargement():
          "consultations": [{"nom": "Registre des anomalies", "appel": "anomalies(campagne=N)", "elements": 14}]}
     md = export_reponse(m, "Peut-on clôturer ?")
     assert md.startswith("# Peut-on clôturer ?") and "25/11/2026 14:32" in md and "(14 élément(s))" in md
+
+
+def test_totaux_fournis_par_les_outils_egaux_au_moteur(contexte):
+    """Évaluation réelle du 26/11/2026 : le modèle se trompait en comptant lui-même une liste (« 10 en retard »
+    au lieu de 11, « 7 autres conformes » au lieu de 6). Les outils donnent désormais les totaux, égaux aux tuiles."""
+    ind = executer_outil("indicateurs_campagne", {"campagne": "N"}, contexte)
+    ano = executer_outil("anomalies", {"campagne": "N", "statut": "non clôturées"}, contexte)["totaux"]
+    assert ano["anomalies"] == ind["anomalies_ouvertes"] == 14
+    assert ano["par_statut"] == {"Récurrente": 11, "Ouverte": 3}
+    assert ano["echeance_depassee_a_l_arrete"] == ind["anomalies_echeance_depassee"] == 11
+    assert ano["par_gravite"]["Haute"] == ind["anomalies_gravite_haute"] == 4
+    assert sum(ano["par_proprietaire"].values()) == 14 and len(ano["par_proprietaire"]) == 7
+    dc = executer_outil("donnees_critiques", {"campagne": "N"}, contexte)["totaux"]
+    assert dc["donnees_critiques"] == ind["donnees_critiques"] == 8
+    assert dc["critiques_hors_tolerance"] == ind["donnees_critiques_hors_tolerance"] == 2
+    assert dc["critiques_par_statut"] == {"Conforme": 6, "Bloquant": 1, "À corriger": 1}
+    ret = executer_outil("points_de_controle", {"campagne": "N", "controle": "", "statut": "en retard"}, contexte)
+    assert ret["totaux"]["points_de_controle"] == ret["totaux"]["points_en_retard"] == 6
+    assert ret["totaux"]["controles_distincts"] == 3  # C07, C08, R04
+    assert "Ne compte jamais toi-même" in SYSTEME

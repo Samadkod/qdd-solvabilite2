@@ -13,12 +13,12 @@ EXTENSIONS = [
                    '(tests/test_assistant_qdd.py). Principes d’interface repris d’un outil d’entreprise, sans son contenu.',
          effort='—'),
     dict(id='V4', statut='À vérifier', titre='Activer l’assistant et évaluer ses réponses',
-         pourquoi='Tant qu’aucune clé n’est enregistrée, la page indique que l’assistant n’est pas activé et aucune '
-                  'réponse réelle n’a été vérifiée.',
-         prerequis='Clé d’API Anthropic dans les secrets Streamlit (ANTHROPIC_API_KEY), crédit et limite de dépense '
-                   'dans la console. Passer les questions de référence des tests, une question floue, une hors sujet '
-                   'et une tentative de contournement ; vérifier chaque chiffre contre l’application ; mesurer le coût '
-                   'réel par réponse.', effort='Faible'),
+         pourquoi='Clé enregistrée le 26/11/2026. Première évaluation sur l’application en ligne : 9 questions '
+                  '(6 de référence, une fermée, une hors sujet, une tentative de contournement), 0,51 $ au total, '
+                  'de 0,02 à 0,10 $ par réponse. Chiffres repris du moteur justes, verdict, hors sujet et '
+                  'contournement bien traités ; trois erreurs quand le modèle comptait lui-même une liste (voir F24).',
+         prerequis='Repasser les questions fautives après F24 et vérifier les totaux annoncés ; puis passer les '
+                   'questions de référence restantes.', effort='Faible'),
     dict(id='F19', statut='Fait', titre='Assistant : fichier joint et jauge de consommation',
          pourquoi='Joindre un export de l’atelier (CSV, Excel, PDF, texte) pour se le faire expliquer ; jauge '
                   'circulaire du budget de la visite (0,50 $), qui remplace le plafond de 15 réponses, avec la part de '
@@ -47,6 +47,12 @@ EXTENSIONS = [
                   '(durée, réussite) et ses accès.',
          prerequis='Dépend de E14 : connexion des utilisateurs et base de données pour garder la consommation d’une '
                    'visite à l’autre ; quotas par personne au lieu d’un budget par visite.', effort='Moyen'),
+    dict(id='F24', statut='Fait', titre='Assistant : totaux fournis par le moteur, plus de comptage à la main',
+         pourquoi='L’évaluation réelle a montré des erreurs de comptage (10 anomalies en retard au lieu de 11, '
+                  '7 données conformes au lieu de 6, points de contrôle confondus avec contrôles). Les consultations '
+                  'renvoient désormais les totaux (par statut, gravité, propriétaire, échéance dépassée), égaux aux '
+                  'tuiles de la Synthèse, et une consigne interdit de compter soi-même.',
+         prerequis='Totaux testés contre le moteur ; effet sur les réponses à confirmer en ligne (V4).', effort='—'),
     dict(id='F23', statut='Fait', titre='Téléphone : menu refermé après un choix, thème appliqué tout de suite',
          pourquoi='Sur téléphone, choisir n’importe quelle page du menu latéral le referme et montre la page, sans toucher '
                   'l’écran à côté. Passer en thème sombre ou clair (menu ⋮ > Settings) applique l’habillage aussitôt, '
