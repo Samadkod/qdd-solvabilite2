@@ -12,13 +12,12 @@ EXTENSIONS = [
          prerequis='Outils comparés au moteur, boucle testée avec un faux client, aucune clé dans le dépôt '
                    '(tests/test_assistant_qdd.py). Principes d’interface repris d’un outil d’entreprise, sans son contenu.',
          effort='—'),
-    dict(id='V4', statut='À vérifier', titre='Activer l’assistant et évaluer ses réponses',
-         pourquoi='Clé enregistrée le 26/11/2026. Première évaluation sur l’application en ligne : 9 questions '
-                  '(6 de référence, une fermée, une hors sujet, une tentative de contournement), 0,51 $ au total, '
-                  'de 0,02 à 0,10 $ par réponse. Chiffres repris du moteur justes, verdict, hors sujet et '
-                  'contournement bien traités ; trois erreurs quand le modèle comptait lui-même une liste (voir F24).',
-         prerequis='Repasser les questions fautives après F24 et vérifier les totaux annoncés ; puis passer les '
-                   'questions de référence restantes.', effort='Faible'),
+    dict(id='F28', statut='Fait', titre='Assistant activé et évalué sur ses réponses réelles',
+         pourquoi='Clé enregistrée le 26/11/2026. 15 questions réelles vérifiées une à une contre le moteur et la base : '
+                  '9 en mode normal (3 erreurs de comptage, corrigées par F24 puis revérifiées), 3 revérifiées, 3 en mode '
+                  'diagnostic (exactes). Verdict, hors sujet et tentative de contournement correctement traités.',
+         prerequis='Coût total des évaluations : environ 1,50 $. À refaire après chaque changement des consignes ou des '
+                   'consultations.', effort='—'),
     dict(id='F19', statut='Fait', titre='Assistant : fichier joint et jauge de consommation',
          pourquoi='Joindre un export de l’atelier (CSV, Excel, PDF, texte) pour se le faire expliquer ; jauge '
                   'circulaire du budget de la visite (0,50 $), qui remplace le plafond de 15 réponses, avec la part de '
@@ -71,20 +70,15 @@ EXTENSIONS = [
                   'télécharge seule, avec sa question, sa date et ses consultations.',
          prerequis='Pas de bouton « Copier » : le navigateur bloque souvent l’accès au presse-papiers depuis Streamlit ; '
                    'le téléchargement le remplace.', effort='—'),
-    dict(id='E21', statut='À vérifier', titre='Assistant : mode diagnostic (enquête jusqu’à la ligne fautive)',
-         pourquoi='Répondre comme un analyste : cause prouvée en croisant les données et la règle du contrôle, '
-                  'liste des objets fautifs, une action concrète par objet (dans l’Atelier de résolution), ce qu’il '
-                  'ne faut pas faire, preuves, et ce qui se passe si l’on ne corrige pas. Réponse visée : « Pourquoi '
-                  'C07 est bloquant et que faut-il corriger, sinistre par sinistre ? » → les 60 sinistres, l’écart de '
-                  'dates de chacun, la cause commune, l’action par dossier.',
-         prerequis='Requête SQL en lecture seule sur la base fictive (SELECT seulement, accès aux fichiers coupé, '
-                   'lignes et durée limitées), lignes en anomalie complètes page par page, note par responsable, étape, segment et critère (déjà calculée), plus de tours de '
-                   'consultation, gabarit d’enquête. Budget inchangé (0,50 $ par visite, crédit total limité) : '
-                   'enquête économe, résultats compacts. Questions de diagnostic et réponses attendues ajoutées aux '
-                   'tests, puis évaluation en ligne sur 3 ou 4 questions. Construit le 26/11/2026 (bouton « Mode '
-                   'diagnostic », requête SQL verrouillée, note par axe, lignes paginées, gabarit, étalons C07 et R04 '
-                   'dans les tests), complété par la méthode d’un agent de diagnostic (ordre d’enquête, preuve séparée de la '
-                   'déduction, nature du défaut, dictionnaire) ; reste l’évaluation en ligne et la mesure du coût réel.', effort='Moyen'),
+    dict(id='F27', statut='Fait', titre='Assistant : mode diagnostic (enquête jusqu’à la ligne fautive)',
+         pourquoi='Évalué en ligne le 27/11/2026 sur 3 enquêtes (C07, R04 RC décennale, origine du S.17.01) : gabarit '
+                  'suivi, prouvé séparé du déduit, toutes les affirmations vérifiables exactes. Constats établis par '
+                  'l’assistant lui-même : C07 et R04 sont bloquants à cause de la pénalité de retard (refaits sur les '
+                  'données de septembre, 98,52 % et 99,71 %, au-dessus du seuil) ; les 60 sinistres de C07 ont tous '
+                  '60 jours d’écart ; 172 sinistres RC décennale sont minorés au chargement vers l’entrepôt (F05), '
+                  'pour 16,7 M€, alors que Q02 est conforme.',
+         prerequis='Coût mesuré : 0,14 à 0,27 $ par enquête (moyenne 0,21 $), 31 à 74 s, 7 à 11 consultations ; '
+                   'une ou deux enquêtes par visite avec le budget de 0,50 $.', effort='—'),
     dict(id='E17', statut='Plus tard', titre='Relances aux propriétaires, groupées par responsable',
          pourquoi='Piloter, c’est faire agir les autres : pour chaque responsable, ses contrôles en retard et ses '
                   'anomalies à échéance dépassée (11 sur la campagne N), avec un message prêt à copier, par exemple '

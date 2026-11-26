@@ -208,7 +208,7 @@ def test_roadmap_assistant_et_sas_preserve():
     from assurance_feuille import tableau
     df = tableau().set_index('id')
     assert df.loc['F16', 'statut'] == 'Fait' and 'Claude' in df.loc['F16', 'titre']
-    assert df.loc['V4', 'statut'] == 'À vérifier' and 'Clé enregistrée' in df.loc['V4', 'pourquoi']
+    assert df.loc['F28', 'statut'] == 'Fait' and 'Clé enregistrée' in df.loc['F28', 'pourquoi']
     assert df.loc['E14', 'statut'] == 'En attente de décision'
     assert '59 valeurs sur 59' in df.loc['F11', 'titre']
 
