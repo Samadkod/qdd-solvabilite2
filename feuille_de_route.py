@@ -97,8 +97,8 @@ ELEMENTS = [
          pourquoi="Le générateur produisait des codes à 13 caractères.", prerequis="—", effort="—"),
 ]
 
-ORDRE = ["En attente de décision", "Plus tard", "À vérifier", "Fait"]
-ICONES = {"En attente de décision": ":material/pending:", "Plus tard": ":material/schedule:",
+ORDRE = ["En cours", "En attente de décision", "Plus tard", "À vérifier", "Fait"]
+ICONES = {"En cours": ":material/construction:", "En attente de décision": ":material/pending:", "Plus tard": ":material/schedule:",
           "À vérifier": ":material/science:", "Fait": ":material/check_circle:"}
 
 

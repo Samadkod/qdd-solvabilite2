@@ -71,6 +71,17 @@ EXTENSIONS = [
                   'télécharge seule, avec sa question, sa date et ses consultations.',
          prerequis='Pas de bouton « Copier » : le navigateur bloque souvent l’accès au presse-papiers depuis Streamlit ; '
                    'le téléchargement le remplace.', effort='—'),
+    dict(id='E21', statut='En cours', titre='Assistant : mode diagnostic (enquête jusqu’à la ligne fautive)',
+         pourquoi='Répondre comme un analyste : cause prouvée en croisant les données et la règle du contrôle, '
+                  'liste des objets fautifs, une action concrète par objet (dans l’Atelier de résolution), ce qu’il '
+                  'ne faut pas faire, preuves, et ce qui se passe si l’on ne corrige pas. Réponse visée : « Pourquoi '
+                  'C07 est bloquant et que faut-il corriger, sinistre par sinistre ? » → les 60 sinistres, l’écart de '
+                  'dates de chacun, la cause commune, l’action par dossier.',
+         prerequis='Requête SQL en lecture seule sur la base fictive (SELECT seulement, accès aux fichiers coupé, '
+                   'lignes et durée limitées), lignes en anomalie complètes page par page, plus de tours de '
+                   'consultation, gabarit d’enquête. Budget inchangé (0,50 $ par visite, crédit total limité) : '
+                   'enquête économe, résultats compacts. Questions de diagnostic et réponses attendues ajoutées aux '
+                   'tests, puis évaluation en ligne sur 3 ou 4 questions.', effort='Moyen'),
     dict(id='E17', statut='Plus tard', titre='Alertes aux propriétaires avant échéance',
          pourquoi='Prévenir chaque propriétaire d’une anomalie quand son échéance approche ou est dépassée '
                   '(11 anomalies en retard sur la campagne N), au lieu d’attendre qu’il ouvre l’application.',
