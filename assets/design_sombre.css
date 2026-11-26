@@ -43,3 +43,13 @@ section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff;}
 .qdd-vig[data-ton="vert"] b {color: #4caf7a;}
 .st-key-assistant_accueil {background: #0b151e; border: 1px solid var(--qdd-ligne);}
 [class*="st-key-assistant_conv_"] button p {color: var(--qdd-encre);}
+/* Assistant : boutons d'exemple du bandeau (fond blanc en clair : illisibles en sombre) */
+.st-key-assistant_accueil [data-testid="stButton"] button {background: var(--qdd-surface); border-color: var(--qdd-ligne);}
+.st-key-assistant_accueil [data-testid="stButton"] button p, .st-key-assistant_accueil [data-testid="stButton"] button span {
+  color: var(--qdd-encre);}
+.st-key-assistant_accueil [data-testid="stButton"] button:hover {background: #17304a; border-color: var(--qdd-accent);}
+/* Jauges : piste visible sur fond sombre, info-bulle sombre au texte clair */
+.qdd-jauge svg circle:first-child {stroke: #3a5063;}
+.qdd-jauge:hover::after, .qdd-jauge:focus::after {background: #22323f; color: var(--qdd-encre);
+  border: 1px solid #3a5063; box-shadow: 0 6px 18px -8px #000c;}
+.qdd-anneau b {color: var(--qdd-encre);}
