@@ -71,7 +71,7 @@ EXTENSIONS = [
                   'télécharge seule, avec sa question, sa date et ses consultations.',
          prerequis='Pas de bouton « Copier » : le navigateur bloque souvent l’accès au presse-papiers depuis Streamlit ; '
                    'le téléchargement le remplace.', effort='—'),
-    dict(id='E21', statut='En cours', titre='Assistant : mode diagnostic (enquête jusqu’à la ligne fautive)',
+    dict(id='E21', statut='À vérifier', titre='Assistant : mode diagnostic (enquête jusqu’à la ligne fautive)',
          pourquoi='Répondre comme un analyste : cause prouvée en croisant les données et la règle du contrôle, '
                   'liste des objets fautifs, une action concrète par objet (dans l’Atelier de résolution), ce qu’il '
                   'ne faut pas faire, preuves, et ce qui se passe si l’on ne corrige pas. Réponse visée : « Pourquoi '
@@ -81,7 +81,9 @@ EXTENSIONS = [
                    'lignes et durée limitées), lignes en anomalie complètes page par page, note par responsable, étape, segment et critère (déjà calculée), plus de tours de '
                    'consultation, gabarit d’enquête. Budget inchangé (0,50 $ par visite, crédit total limité) : '
                    'enquête économe, résultats compacts. Questions de diagnostic et réponses attendues ajoutées aux '
-                   'tests, puis évaluation en ligne sur 3 ou 4 questions.', effort='Moyen'),
+                   'tests, puis évaluation en ligne sur 3 ou 4 questions. Construit le 26/11/2026 (bouton « Mode '
+                   'diagnostic », requête SQL verrouillée, note par axe, lignes paginées, gabarit, étalons C07 et R04 '
+                   'dans les tests) ; reste l’évaluation en ligne et la mesure du coût réel.', effort='Moyen'),
     dict(id='E17', statut='Plus tard', titre='Relances aux propriétaires, groupées par responsable',
          pourquoi='Piloter, c’est faire agir les autres : pour chaque responsable, ses contrôles en retard et ses '
                   'anomalies à échéance dépassée (11 sur la campagne N), avec un message prêt à copier, par exemple '

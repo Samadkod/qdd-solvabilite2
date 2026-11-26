@@ -26,13 +26,14 @@ def contexte():
         out.append({"campagne": r.campagne, "date": r.date_arrete, "ind": ev.indicateurs,
                     "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"}),
                     "controles": ev.controles, "gouv": r.gouvernance, "couverture": r.couverture,
-                    "registre": r.registre, "niveau2": niv2})
+                    "registre": r.registre, "niveau2": niv2,
+                    "axes": {a: ev.par_axe(a).reset_index() for a in ("maille", "etape", "criteres", "responsable")}})
     return {"camps": out, "var": var, "base": cfg.base}
 
 
 def test_schemas_stricts_et_complets():
     noms = [o["name"] for o in OUTILS]
-    assert len(noms) == len(set(noms)) == 9
+    assert len(noms) == len(set(noms)) == 11
     for o in OUTILS:
         s = o["input_schema"]
         assert o["strict"] is True and s["additionalProperties"] is False
@@ -263,7 +264,7 @@ def test_trace_d_une_reponse(contexte):
     texte, _, _ = repondre(client, [{"role": "user", "content": "C05 ?"}], contexte, None, trace, vu.append)
     assert texte == "8 lignes." and trace["reflexion"] == ["Je cherche les lignes de C05."]
     (x,) = trace["consultations"]
-    assert x["nom"] == "Lignes en anomalie" and x["elements"] == len(x["resultat"]["exemples"]) and not x["erreur"]
+    assert x["nom"] == "Lignes en anomalie" and x["elements"] == len(x["resultat"]["lignes"]) and not x["erreur"]
     assert x["resultat"]["nombre_lignes"] > 0 and x["duree"] >= 0
     assert trace["jetons"] == 2400 and abs(trace["cout"] - 2 * (1000 * 4 + 200 * 20) / 1e6) < 1e-12
     assert vu[:3] == ["Je lis votre question…", "Réflexion : Je cherche les lignes de C05.",
@@ -336,3 +337,64 @@ def test_garde_fous_budget_revérifie_entre_les_tours_et_reponse_bornee(contexte
     assert client.requetes[0]["max_tokens"] == a.MAX_JETONS_REPONSE == 8000
     assert a.MAX_JETONS_REPONSE * 20 / 1e6 <= 0.16 and a.DELAI_APPEL == 120
     assert "Service trop lent" in a.ERREURS  # un délai dépassé ne consomme pas le budget
+
+
+
+# ------------------------------------------------------------------ mode diagnostic (E21)
+# Questions étalons : la réponse visée doit citer ces faits, que les consultations permettent d'établir.
+DIAGNOSTIC_REFERENCE = {
+    "Pourquoi C07 est bloquant et que faut-il corriger, sinistre par sinistre ?":
+        "60 sinistres ; écart de 60 jours exactement entre survenance et effet pour tous (cause commune) ; "
+        "provisions concernées 8 666 436,62 ; action par dossier, ne pas modifier la date d'effet sans pièce.",
+    "Pourquoi R04 RC décennale est bloquant ?":
+        "règlements gestion et comptabilité écartés ; contrôle non refait (1 période de retard) ; Contrôle de gestion.",
+}
+
+
+def test_requete_sql_en_lecture_seule_et_verrouillee(contexte):
+    import assistant_qdd as a
+    for sql in ("UPDATE gestion_sinistres SET provision_dossier = 0",
+                "SELECT 1; DROP TABLE gestion_sinistres",
+                "SELECT * FROM read_csv('/etc/passwd')",
+                "ATTACH 'x.db' AS x",
+                "WITH t AS (SELECT 1) SELECT * FROM t; SET enable_external_access = true"):
+        assert "erreur" in a.requete_sql(sql, contexte["base"]), sql
+    r = a.requete_sql("SELECT * FROM gestion_contrats", contexte["base"])
+    assert r["nombre"] == a.SQL_LIGNES_MAX and r["tronque"] is True
+
+
+def test_diagnostic_c07_etabli_par_les_consultations(contexte):
+    """L'étalon C07 : les 60 sinistres, l'écart de 60 jours commun à tous, le montant des provisions."""
+    sql = ("SELECT s.sinistre_id, datediff('day', s.date_survenance, c.date_effet) AS ecart_jours, s.provision_dossier "
+           "FROM gestion_sinistres s JOIN (SELECT contrat_id, MIN(date_effet) AS date_effet FROM gestion_contrats "
+           "WHERE arrete = '2026-09-30' GROUP BY contrat_id) c ON c.contrat_id = s.contrat_id "
+           "WHERE s.arrete = '2026-09-30' AND s.date_survenance < c.date_effet")
+    r = executer_outil("requete_sql", {"sql": sql}, contexte)
+    assert r["nombre"] == 60 and not r["tronque"]
+    assert {x["ecart_jours"] for x in r["lignes"]} == {60}
+    assert round(sum(abs(x["provision_dossier"]) for x in r["lignes"]), 2) == 8666436.62
+    lig = executer_outil("lignes_en_anomalie", {"campagne": "N", "controle": "C07", "page": 1}, contexte)
+    assert lig["nombre_lignes"] == len(lig["lignes"]) == 60 and lig["pages"] == 1
+    c10 = executer_outil("lignes_en_anomalie", {"campagne": "N", "controle": "C10", "page": 2}, contexte)
+    assert c10["nombre_lignes"] == 89 and c10["page_lignes"] == 1 and len(c10["lignes"]) == 89  # page bornée
+    assert set(DIAGNOSTIC_REFERENCE)
+
+
+def test_note_par_responsable_egale_au_moteur(contexte):
+    r = executer_outil("notes_par_axe", {"campagne": "N", "axe": "responsable"}, contexte)
+    attendu = contexte["camps"][-1]["axes"]["responsable"]
+    assert r["nombre"] == len(attendu) == 7
+    cg = next(x for x in r["modalites"] if x["modalite"] == "Contrôle de gestion")
+    assert cg["note"] == "95,06 %" and cg["part_realises"] == "25,00 %"
+
+
+def test_mode_diagnostic_ajoute_le_gabarit_et_allonge_l_enquete(contexte):
+    import assistant_qdd as a
+    outil = _bloc(type="tool_use", id="t", name="variation_note", input={})
+    client = FauxClient([SimpleNamespace(stop_reason="tool_use", content=[outil])] * (a.TOURS_DIAGNOSTIC + 1))
+    texte, appels, _ = repondre(client, [{"role": "user", "content": "x"}], contexte, diagnostic=True)
+    assert len(appels) == a.TOURS_DIAGNOSTIC + 1 and texte.startswith("Trop d'étapes")
+    assert client.requetes[0]["system"].endswith(a.DIAGNOSTIC) and "**Cause prouvée :**" in a.DIAGNOSTIC
+    normal = FauxClient([SimpleNamespace(stop_reason="end_turn", content=[_bloc(type="text", text="ok")])])
+    repondre(normal, [{"role": "user", "content": "x"}], contexte)
+    assert normal.requetes[0]["system"] == a.SYSTEME

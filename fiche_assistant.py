@@ -25,6 +25,7 @@ FAIT = [
     "Répond aux questions sur la campagne affichée : note, données hors tolérance, contrôles, anomalies, lignage.",
     "Consulte le moteur de l'application en direct, avec les mêmes paramètres que les pages ; aucun chiffre de mémoire.",
     "Montre ce qu'il a consulté et ce qu'il a obtenu, sous chaque réponse.",
+    "En mode diagnostic, enquête jusqu'à la ligne fautive : cause prouvée dans les données, une action par objet.",
     "Explique un fichier exporté de l'atelier (tableau, PDF, texte) que vous lui joignez.",
     "Prépare un message à un propriétaire de données, une synthèse pour un comité.",
 ]

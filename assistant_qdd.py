@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -29,6 +30,24 @@ TAILLE_MAX = 5 * 1024 * 1024    # octets par fichier joint
 LIGNES_MAX = 500                # lignes d'un tableau joint envoyées au modèle (coût)
 CARACTERES_MAX = 60_000         # caractères d'un texte joint envoyés au modèle
 TOURS_OUTILS_MAX = 8            # appels d'outils successifs pour une même question
+TOURS_DIAGNOSTIC = 15          # mode diagnostic : enquête plus longue, toujours bornée par le budget de la visite
+LIGNES_PAGE = 100              # lignes en anomalie renvoyées par page
+SQL_LIGNES_MAX = 200           # lignes renvoyées par une requête SQL de l'assistant
+SQL_DELAI = 10                 # secondes au plus par requête SQL
+# Tables de la base fictive (data/btp_fictif.duckdb) : décrites à l'assistant pour écrire ses requêtes.
+SCHEMA_BASE = (
+    "gestion_contrats(arrete, contrat_id, segment, code_activite, date_effet, prime_emise, prime_acquise) ; "
+    "gestion_sinistres(arrete, sinistre_id, contrat_id, segment, date_survenance, date_declaration, "
+    "reglements_cumules, provision_dossier) ; dwh_contrats(arrete, contrat_id, segment, prime_acquise) ; "
+    "dwh_sinistres(arrete, sinistre_id, segment, provision_dossier, reglements_cumules) ; "
+    "ref_activites_btp(code_activite) ; compta_primes(arrete, segment, prime_acquise) ; "
+    "compta_reglements(arrete, segment, reglements) ; actuariat_inputs(arrete, segment, provision_dossier_total, "
+    "reglements_total) ; actuariat_be(arrete, segment, be_sinistres_brut) ; modele_parametres(arrete, segment, "
+    "taux_cession) ; reassurance_traites(arrete, segment, taux_cession) ; placements_depositaire(arrete, actif_id, "
+    "classe, isin, cic, valeur_marche) ; placements_compta(arrete, actif_id, valeur_marche) ; qrt_s0201(arrete, "
+    "poste, montant) ; qrt_s0501(arrete, segment, primes_acquises_brutes) ; qrt_s0602(arrete, actif_id, classe, isin, "
+    "cic, valeur_marche) ; qrt_s1701(arrete, segment, be_sinistres_brut) ; qrt_s1901_diagonale(arrete, segment, "
+    "annee_survenance, paiements_cumules)")
 CAMPAGNES = ["N-2", "N-1", "N"]
 
 SYSTEME = """Tu es l'assistant de l'Atelier QDD, une application de pilotage de la qualité des données Solvabilité II.
@@ -91,6 +110,23 @@ Limites connues du dispositif (à citer telles quelles si on te les demande, san
   aucun contrôle (leur nombre vient de indicateurs_campagne).
 """
 
+# Gabarit d'enquête, ajouté aux consignes quand l'utilisateur active le mode diagnostic.
+DIAGNOSTIC = """
+Mode diagnostic activé : enquête jusqu'à l'objet fautif (contrat, sinistre, actif, segment), comme un analyste.
+1. Identifie le contrôle ou la donnée en cause (points_de_controle, donnees_critiques, notes_par_axe).
+2. Lis la règle exacte (regle_controle : requête SQL et mode opératoire).
+3. Prouve la cause dans les données : lignes_en_anomalie (toutes les pages utiles) et requete_sql pour croiser
+   (écarts, valeurs, regroupements). Cherche une cause commune (même écart, même segment, même système).
+4. Économise : requêtes ciblées, colonnes utiles, agrégats ; pas de consultation inutile.
+Structure obligatoire de la réponse :
+**Verdict :** une phrase. **Périmètre :** campagne, contrôle, nombre d'objets. **Cause prouvée :** ce que montrent
+les données et ce qu'exige la règle. **Objets et actions :** tableau objet | constat | action concrète (au plus
+60 lignes ; au-delà, regroupe et renvoie à la page Lignes en anomalie). **À ne pas faire :** ce qui masquerait le
+problème (par exemple modifier une donnée de référence sans pièce justificative). **Preuves :** consultations
+utilisées. **Si on ne corrige pas :** effet sur le statut, la note, l'anomalie. Toute correction passe par
+l'Atelier de résolution.
+"""
+
 # ------------------------------------------------------------------ questions proposées
 # Exemples pour démarrer, formulés comme les poserait un manager ou un métier ; la question libre reste la règle.
 EXEMPLES = [
@@ -138,10 +174,24 @@ OUTILS = [
            ["campagne", "statut"]),
     _outil("lignes_en_anomalie",
            "Lignes fautives (contrat, sinistre, actif) d'un contrôle de cohérence C01 à C10 : nombre total, "
-           "répartition par segment et 15 premières lignes avec leur message et leur responsable.",
+           f"répartition par segment, responsable, message, et toutes les lignes par pages de {LIGNES_PAGE}.",
            {"campagne": _CAMPAGNE,
-            "controle": {"type": "string", "description": "Code d'un contrôle de cohérence, C01 à C10."}},
-           ["campagne", "controle"]),
+            "controle": {"type": "string", "description": "Code d'un contrôle de cohérence, C01 à C10."},
+            "page": {"type": "integer", "description": "Numéro de page, à partir de 1."}},
+           ["campagne", "controle", "page"]),
+    _outil("notes_par_axe",
+           "Note QDD regroupée par axe : par responsable, par étape du lignage, par segment (maille) ou par critère. "
+           "Pour chaque modalité : note, note avant dégradation, note minimum, écart, nombre de données critiques et "
+           "de contrôles, part des contrôles réalisés et conformes.",
+           {"campagne": _CAMPAGNE,
+            "axe": {"type": "string", "enum": ["responsable", "etape", "maille", "criteres"]}},
+           ["campagne", "axe"]),
+    _outil("requete_sql",
+           "Requête SQL en LECTURE SEULE sur la base fictive (DuckDB) pour vérifier une cause ligne par ligne. "
+           "Une seule requête SELECT ou WITH ; au plus " + str(SQL_LIGNES_MAX) + " lignes renvoyées ; préfère des "
+           "agrégats et les colonnes utiles. Colonne arrete : '2026-09-30' = N, '2026-06-30' = N-1, '2026-03-31' = N-2. "
+           "Tables : " + SCHEMA_BASE,
+           {"sql": {"type": "string", "description": "Requête SELECT (DuckDB)."}}, ["sql"]),
     _outil("variation_note",
            "Décomposition de la variation de la note entre N-1 et N, facteur par facteur.", {}, []),
     _outil("controle_niveau2",
@@ -177,6 +227,49 @@ def _propre(v):
 
 def _lignes(df: pd.DataFrame) -> list[dict]:
     return [{k: _propre(v) for k, v in r.items()} for r in df.to_dict("records")]
+
+
+_SQL_INTERDIT = re.compile(
+    r"\b(attach|detach|copy|export|import|install|load|pragma|set|reset|call|create|insert|update|delete|drop|alter|"
+    r"truncate|vacuum|checkpoint|use|begin|commit|rollback|grant|read_\w+|glob)\b", re.IGNORECASE)
+
+
+def requete_sql(sql: str, base) -> dict:
+    """Une requête SELECT sur la base fictive, en lecture seule : connexion read_only, accès aux fichiers coupé et
+    réglages verrouillés (DuckDB), une seule instruction, mots-clés d'écriture refusés, lignes et durée bornées."""
+    import threading
+
+    import duckdb
+    q = (sql or "").strip().rstrip(";").strip()
+    if not re.match(r"(?is)^(select|with)\b", q):
+        return {"erreur": "Seules les requêtes SELECT (ou WITH … SELECT) sont permises."}
+    if ";" in q:
+        return {"erreur": "Une seule requête à la fois."}
+    if (m := _SQL_INTERDIT.search(q)):
+        return {"erreur": f"Mot-clé non permis en lecture seule : {m.group(0)}."}
+    con = duckdb.connect(str(base), read_only=True,
+                         config={"enable_external_access": False, "lock_configuration": True})
+    minuterie = threading.Timer(SQL_DELAI, con.interrupt)
+    minuterie.start()
+    try:
+        cur = con.execute(f"SELECT * FROM ({q}) AS resultat LIMIT {SQL_LIGNES_MAX + 1}")
+        colonnes = [d[0] for d in cur.description]
+        rangs = cur.fetchall()
+    except duckdb.InterruptException:
+        return {"erreur": f"Requête interrompue après {SQL_DELAI} s : ciblez-la davantage."}
+    except duckdb.Error as e:
+        return {"erreur": f"{type(e).__name__} : {str(e).splitlines()[0][:300]}"}
+    finally:
+        minuterie.cancel()
+        con.close()
+    df = pd.DataFrame(rangs[:SQL_LIGNES_MAX], columns=colonnes)
+    for col in df.columns:
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].dt.strftime("%Y-%m-%d")
+        elif pd.api.types.is_float_dtype(df[col]):
+            df[col] = df[col].round(2)
+    return {"colonnes": colonnes, "nombre": len(df), "tronque": len(rangs) > SQL_LIGNES_MAX, "lignes": _lignes(df),
+            "page": "Lignes en anomalie (données détaillées)"}
 
 
 def _compte(serie: pd.Series) -> dict:
@@ -289,12 +382,34 @@ def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
                               "les rapprochements (R) et restitutions (Q) comparent des totaux (page Contrôles)."}
         df = lignes(str(contexte["base"]), str(c["date"]))
         df = df[df["controle"] == code]
+        pages = max(1, -(-len(df) // LIGNES_PAGE))
+        n = min(max(1, int(entree.get("page") or 1)), pages)
+        tranche = df[["maille", "objet", "valeurs", "montant"]].iloc[(n - 1) * LIGNES_PAGE:n * LIGNES_PAGE]
         return {"campagne": c["campagne"], "controle": code, "nombre_lignes": int(df["poids"].sum()),
                 "par_segment": {k: int(v) for k, v in df.groupby("maille")["poids"].sum().items()},
                 "responsable": df["responsable"].iloc[0] if len(df) else None,
                 "message": df["message"].iloc[0] if len(df) else None,
-                "exemples": _lignes(df[["maille", "objet", "valeurs", "montant"]].head(15)),
+                "page_lignes": n, "pages": pages, "lignes": _lignes(tranche),
                 "page": "Lignes en anomalie"}
+
+    if nom == "notes_par_axe":
+        axes = c.get("axes") or {}
+        axe = entree.get("axe", "responsable")
+        if axe not in axes:
+            return {"erreur": f"Axe indisponible : {axe}. Axes : {', '.join(axes) or 'aucun'}."}
+        a = axes[axe].copy()
+        for col in ("note", "note_avant_degradation", "note_min", "taux_validation", "taux_conformite"):
+            if col in a:
+                a[col] = a[col].map(_pct)
+        if "ecart_objectif" in a:
+            a["ecart_objectif"] = a["ecart_objectif"].map(lambda x: None if pd.isna(x) else round(x * 100, 2))
+        a = a.rename(columns={axe: "modalite", "ecart_objectif": "ecart_points", "taux_validation": "part_realises",
+                              "taux_conformite": "part_conformes"})
+        return {"campagne": c["campagne"], "axe": axe, "nombre": len(a), "modalites": _lignes(a),
+                "page": "Note & données"}
+
+    if nom == "requete_sql":
+        return requete_sql(entree.get("sql", ""), contexte["base"])
 
     if nom == "variation_note":
         v = contexte["var"]
@@ -452,7 +567,8 @@ NOMS_OUTILS = {
     "indicateurs_campagne": "Indicateurs de la campagne", "donnees_critiques": "Données et leur note",
     "points_de_controle": "Points de contrôle", "regle_controle": "Fiche du contrôle", "anomalies": "Registre des anomalies",
     "lignes_en_anomalie": "Lignes en anomalie", "variation_note": "Variation de la note",
-    "controle_niveau2": "Contrôle de niveau 2", "lignage": "Lignage",
+    "controle_niveau2": "Contrôle de niveau 2", "lignage": "Lignage", "notes_par_axe": "Note par axe",
+    "requete_sql": "Requête SQL (lecture seule)",
 }
 
 
@@ -463,13 +579,14 @@ def _nb_lignes(res: dict) -> int:
 
 
 def repondre(client, messages: list, contexte: dict, compteur: dict | None = None, trace: dict | None = None,
-             rappel=None, budget: float | None = None) -> tuple[str, list[str], list]:
+             rappel=None, budget: float | None = None, diagnostic: bool = False) -> tuple[str, list[str], list]:
     """Fait tourner la boucle jusqu'à la réponse finale.
 
     messages : historique au format de l'API (la question est déjà le dernier message « user »).
     Retourne (texte de la réponse, outils appelés pour la traçabilité, historique complété).
     Les blocs de la réponse (réflexion comprise) sont renvoyés tels quels au tour suivant, comme l'exige l'API.
     compteur : dict facultatif où s'additionnent le coût ($) et la taille du dernier contexte (session).
+    diagnostic : ajoute le gabarit d'enquête aux consignes et autorise plus de tours (TOURS_DIAGNOSTIC).
     budget : reste du budget de la visite ($) ; revérifié après chaque tour, l'enquête s'arrête s'il est atteint.
     trace : dict facultatif rempli pour cette réponse : consultations (outil, éléments, durée), résumé de la
     réflexion, jetons et coût. rappel(texte) : affichage en direct de l'avancement.
@@ -479,11 +596,12 @@ def repondre(client, messages: list, contexte: dict, compteur: dict | None = Non
     depense = 0.0
     if trace is not None:
         trace.update(consultations=[], reflexion=[], jetons=0, cout=0.0)
-    for _ in range(TOURS_OUTILS_MAX + 1):
+    systeme = SYSTEME + DIAGNOSTIC if diagnostic else SYSTEME
+    for _ in range((TOURS_DIAGNOSTIC if diagnostic else TOURS_OUTILS_MAX) + 1):
         if rappel:
             rappel("Je réfléchis à la réponse…" if appels else "Je lis votre question…")
         reponse = client.beta.messages.create(
-            model=MODELE, max_tokens=MAX_JETONS_REPONSE, system=SYSTEME, tools=OUTILS, messages=messages,
+            model=MODELE, max_tokens=MAX_JETONS_REPONSE, system=systeme, tools=OUTILS, messages=messages,
             thinking={"type": "adaptive", "display": "summarized"},
             output_config={"effort": EFFORT}, cache_control={"type": "ephemeral"},
             betas=["server-side-fallback-2026-07-01"], fallbacks="default")
@@ -804,6 +922,9 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                 fichiers = list(saisie.files or [])
                 question = (saisie.text or "").strip() or ("Explique-moi ce fichier." if fichiers else None)
         pied_g, pied_d = st.columns([3, 1.6], vertical_alignment="center")
+        pied_g.toggle("Mode diagnostic", key="assistant_diagnostic", disabled=not cle or epuise,
+                      help="Enquête jusqu'à la ligne fautive : cause prouvée dans les données, objets fautifs, une "
+                           "action par objet. Plus de consultations, donc plus long et plus coûteux.")
         pied_g.caption(":material/lock: " + AVERTISSEMENT)
         pied_d.markdown(anneau_html(cout_session, BUDGET_VISITE, conv["compteur"]["contexte"]), unsafe_allow_html=True)
         if cle and epuise:
@@ -859,7 +980,8 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
         try:
             client = anthropic.Anthropic(api_key=cle, timeout=DELAI_APPEL, max_retries=2)
             texte, sources, conv["api"] = repondre(client, conv["api"], contexte, conv["compteur"], trace, rappel,
-                                                   budget=max(0.0, BUDGET_VISITE - cout_session))
+                                                   budget=max(0.0, BUDGET_VISITE - cout_session),
+                                                   diagnostic=bool(st.session_state.get("assistant_diagnostic")))
         except anthropic.AuthenticationError:
             texte, sources = "Clé d'API refusée : vérifiez le secret `ANTHROPIC_API_KEY`.", []
         except anthropic.RateLimitError:
