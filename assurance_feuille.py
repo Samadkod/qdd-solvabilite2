@@ -151,6 +151,15 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F40', statut='Fait', titre='Évaluation réglementaire de l’assistant et corrections des constats ACPR',
+         pourquoi='Sept questions posées en ligne le 27/11/2026 (notice, constats, glossaire, question piège, '
+                  'conformité ; 0,46 $) : citations de la notice exactes, chiffres de la campagne justes, pas '
+                  'd’amende inventée. Corrigé : chaque chiffre des constats porte sa source et sa page (des chiffres '
+                  '2022 et 2024 étaient rangés sous le communiqué de 2021, signalé par l’assistant), A07 rectifié '
+                  '(48 à 70 % au lieu de 48 à 54 %, graphique 14 de l’enquête 2024) ; texte de la notice lisible dans '
+                  'la page Constats ; l’outil de la notice renvoie les constats liés à chaque point.',
+         prerequis='Chiffres revérifiés dans les PDF de l’ACPR ; tests sur les sources et les constats liés.',
+         effort='—'),
     dict(id='F39', statut='Fait', titre='Fiche de l’assistant enrichie (version 1.5)',
          pourquoi='Sur le modèle des fiches d’agents d’entreprise : temps de réponse et coût mesurés en ligne affichés '
                   'dans « Comment ça marche », capacité réglementaire (notice et constats ACPR), ce qui est envoyé au '

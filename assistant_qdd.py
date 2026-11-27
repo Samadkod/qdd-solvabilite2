@@ -207,12 +207,13 @@ OUTILS = [
            {"terme": {"type": "string", "description": "Mot cherché, ou chaîne vide."}}, ["terme"]),
     _outil("constats_acpr",
            "Faiblesses que l'ACPR relève le plus souvent sur la qualité des données (communiqué du 11/01/2021, "
-           "enquêtes déclaratives 2022 et 2024) : chiffres, source, page, citation exacte, points de la notice, "
+           "enquêtes déclaratives 2022 et 2024) : chiffres (chacun suivi de sa source et de sa page), source et page de la citation, citation exacte, points de la notice, "
            "couverture par l'application, reste à faire. Filtre facultatif sur un mot (thème, sujet).",
            {"filtre": {"type": "string", "description": "Mot (ex. criticité, externes), ou chaîne vide."}}, ["filtre"]),
     _outil("notice_acpr",
            "Texte exact des points de la notice ACPR « Exigences en matière de qualité des données » du 08/11/2023 "
-           "(74 points). Donner des numéros de points (ex. « 48 » ou « 50-51 ») ou un mot à chercher.",
+           "(74 points). Donner des numéros de points (ex. « 48 » ou « 50-51 ») ou un mot à chercher. Renvoie aussi "
+           "les constats de l'ACPR rattachés à ces points (couverture par l'application, reste à faire).",
            {"recherche": {"type": "string", "description": "Numéros de points (48 ; 50-51 ; 16,17) ou mot."}},
            ["recherche"]),
     _outil("notes_par_axe",
@@ -308,23 +309,19 @@ def requete_sql(sql: str, base) -> dict:
             "page": "Lignes en anomalie (données détaillées)"}
 
 
-SOURCE_NOTICE = ("ACPR, « Exigences en matière de qualité des données pour les organismes et groupes d'assurance "
-                 "soumis à la Directive Solvabilité 2 », version du 08/11/2023")
+from constats_acpr import SOURCE_NOTICE  # noqa: E402
 
 
 def notice_acpr(recherche: str) -> dict:
-    """Points de la notice par numéros (« 48 », « 50-51 », « 16, 17 ») ou par mot ; texte exact, source citée."""
-    df = pd.read_csv(Path(__file__).parent / "referentiels" / "notice_acpr.csv", dtype={"point": int})
-    r = (recherche or "").strip()
-    nums: set[int] = set()
-    for morceau in re.split(r"[,;\s]+", r):
-        if m := re.fullmatch(r"(\d{1,2})\s*[-–à]\s*(\d{1,2})", morceau):
-            nums |= set(range(int(m.group(1)), int(m.group(2)) + 1))
-        elif morceau.isdigit():
-            nums.add(int(morceau))
-    sel = df[df["point"].isin(nums)] if nums else df[df["texte"].str.contains(re.escape(r), case=False)] if r else df.head(0)
+    """Points de la notice par numéros (« 48 », « 50-51 », « 16, 17 ») ou par mot ; texte exact, source citée, et
+    constats de l'ACPR rattachés à ces points."""
+    from constats_acpr import chercher_notice, constats_lies
+    sel = chercher_notice(recherche)
+    lies = constats_lies(set(sel["point"])) if len(sel) else sel.head(0)
+    cols = ["id", "theme", "constat", "couverture", "dans_l_application", "reste_a_faire", "notice_points"]
     return {"source": SOURCE_NOTICE, "nombre": len(sel), "points": _lignes(sel.head(12)),
-            "tronque": len(sel) > 12, "page": "Constats de l'ACPR"}
+            "tronque": len(sel) > 12, "constats_lies": lies[cols].to_dict("records") if len(lies) else [],
+            "page": "Constats de l'ACPR (encadré « Lire la notice ACPR »)"}
 
 
 def _compte(serie: pd.Series) -> dict:

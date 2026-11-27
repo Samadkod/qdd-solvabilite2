@@ -16,7 +16,7 @@ def test_fiche_suit_le_code_de_l_assistant():
     assert [n for n, _ in c["outils"]] == [a.NOMS_OUTILS[o["name"]] for o in a.OUTILS] and len(c["outils"]) == 15
     assert str(a.LIGNES_MAX) in c["fichiers"] and "PDF" in c["fichiers"]
     from assurance_feuille import tableau
-    assert nouveautes(tableau()) == ["F39", "F35", "F28"]  # les trois dernières livraisons de l'assistant
+    assert nouveautes(tableau()) == ["F40", "F39", "F35"]  # les trois dernières livraisons de l'assistant
     import fiche_assistant as f
     feuille = tableau().set_index("id")
     for chiffre in ("3 à 21 s", "0,02 à 0,10 $", "31 à 74 s", "0,14 à 0,27 $"):  # mesures reprises des évaluations

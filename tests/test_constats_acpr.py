@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+import constats_acpr
 from constats_acpr import COUVERTURES, charger, faits_campagne, markdown
 
 RACINE = Path(__file__).resolve().parents[1]
@@ -53,3 +54,31 @@ def test_faits_de_la_campagne_lus_dans_le_moteur():
 def test_grille_markdown():
     md = markdown(charger())
     assert md.count("## A") == 15 and "« Le dispositif de contrôle n'apparaît pas suffisamment robuste »" in md
+
+
+def test_chaque_chiffre_porte_sa_source_et_sa_page():
+    """Évaluation du 27/11/2026 : des chiffres de 2022 et 2024 étaient rangés sous la source de la citation (communiqué
+    2021), et A07 indiquait 48 à 54 % au lieu de 48 à 70 % (graphique 14, n°167 p. 17)."""
+    import re
+    df = constats_acpr.charger()
+    for r in df.itertuples():
+        if "%" in r.chiffre:
+            assert re.search(r"n°1(44|67) p\. \d+", r.chiffre), r.id
+    assert "48 % (moyens) à 70 % (majeurs)" in df.set_index("id").loc["A07", "chiffre"]
+
+
+def test_points_de_la_notice_et_constats_lies():
+    n = constats_acpr.charger_notice()
+    assert sorted(constats_acpr.numeros("20, 24, 29-30")) == [20, 24, 29, 30]
+    assert constats_acpr.chercher_notice("50-51")["point"].tolist() == [50, 51]
+    assert constats_acpr.chercher_notice("profondeur")["point"].tolist() == [34]
+    for r in constats_acpr.charger().itertuples():  # chaque constat renvoie à des points qui existent
+        assert constats_acpr.numeros(r.notice_points, n) <= set(n["point"]), r.id
+    assert "A03" in constats_acpr.constats_lies({20})["id"].tolist()
+
+
+def test_outil_notice_renvoie_les_constats_lies():
+    import assistant_qdd as a
+    r = a.notice_acpr("20")
+    assert r["nombre"] == 1 and [x["id"] for x in r["constats_lies"]] == ["A03"]
+    assert "Lire la notice" in r["page"]
