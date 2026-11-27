@@ -152,3 +152,7 @@ def afficher() -> None:
 
     st.markdown("#### :material/block: À éviter (technique)")
     st.markdown("\n".join(f"- {t}" for t in A_NE_PAS_FAIRE))
+
+    st.divider()
+    from inventaire_taches import afficher as afficher_inventaire
+    afficher_inventaire()

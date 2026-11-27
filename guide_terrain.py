@@ -63,40 +63,7 @@ MISSIONS = [
      "Assister à une revue de provisions et noter quelles données y entrent"),
 ]
 
-GLOSSAIRE = [
-    ("Solvabilité 2", "La réglementation européenne des assureurs (depuis 2016). Elle oblige à prouver qu'on a assez de capital, à bien gérer ses risques et à rendre des comptes au régulateur."),
-    ("ACPR", "Le gendarme français de l'assurance et de la banque. C'est lui qui reçoit les états réglementaires et qui contrôle."),
-    ("Commissaires aux comptes (CAC)", "Les auditeurs externes qui certifient les comptes. Ils peuvent demander comment une donnée a été produite et contrôlée."),
-    ("SCR", "Le capital minimum exigé. Il doit permettre de survivre à une très mauvaise année, du genre qui n'arrive qu'une fois tous les 200 ans."),
-    ("MCR", "Un deuxième plancher de capital, plus bas que le SCR. En dessous, le régulateur peut retirer l'agrément."),
-    ("Provisions techniques / Best Estimate (BE)", "L'argent mis de côté pour payer les sinistres déjà arrivés ou à venir. Le Best Estimate est la meilleure estimation de ce qu'on paiera réellement."),
-    ("ORSA", "L'évaluation interne des risques et de la solvabilité : l'assureur projette lui-même sa situation sur plusieurs années, au moins une fois par an."),
-    ("QRT", "Les tableaux officiels envoyés au régulateur, chaque trimestre et chaque année (S.02.01 = bilan, S.05.01 = primes et sinistres, S.06.02 = liste des placements, S.17.01 = provisions non-vie, S.19.01 = triangles de sinistres)."),
-    ("SFCR / RSR", "Les rapports écrits de Solvabilité 2 : le SFCR est public, le RSR est réservé au régulateur."),
-    ("Fonction actuarielle", "L'équipe d'actuaires qui donne son avis sur les provisions, y compris sur la qualité des données utilisées. Elle écrit un rapport au moins une fois par an."),
-    ("QDD", "Qualité des données. Vérifier que les données sont complètes (rien ne manque), exactes (pas d'erreur) et pertinentes (adaptées à l'usage)."),
-    ("Donnée critique", "Une donnée dont une erreur ferait bouger le SCR de façon notable. Ce sont celles qu'on surveille en priorité."),
-    ("Sensibilité", "De combien le SCR bouge quand la donnée bouge. Forte sensibilité = donnée à surveiller de très près."),
-    ("Seuil de significativité", "L'erreur maximale acceptée sur le SCR, toutes données confondues. Au-delà, l'erreur est jugée grave."),
-    ("Tolérance / note minimum", "L'erreur acceptée sur une donnée. Plus la donnée pèse lourd, plus la tolérance est petite et plus la note minimum est haute."),
-    ("Contrôle", "Une vérification automatique ou manuelle : « y a-t-il des doublons ? », « la gestion et la comptabilité donnent-elles le même total ? »…"),
-    ("Contrôle de niveau 1 / niveau 2", "Niveau 1 : fait par les équipes qui produisent la donnée. Niveau 2 : fait par une équipe indépendante (risques, conformité, QDD)."),
-    ("Rapprochement", "Comparer le même chiffre dans deux ou trois outils différents. S'ils ne sont pas égaux, au moins un des deux est faux."),
-    ("Antériorité", "Le nombre de périodes écoulées depuis la dernière fois que le contrôle a été fait. 0 = fait à temps."),
-    ("Dégradation", "La pénalité appliquée à un contrôle trop ancien. Un contrôle vieux de 6 mois ne garantit plus grand-chose."),
-    ("Lignage", "Le trajet d'une donnée, de sa saisie jusqu'au calcul du SCR, en passant par chaque outil."),
-    ("Flux", "Un passage de la donnée d'un outil à un autre (exemple : le chargement nocturne de l'outil de gestion vers l'entrepôt)."),
-    ("Zone de risque", "Un flux où la donnée peut s'abîmer : ressaisie manuelle, chargement automatique, transformation…"),
-    ("Propriétaire de données", "La direction responsable d'une donnée. C'est elle qui doit corriger les erreurs, pas l'équipe QDD."),
-    ("Dictionnaire des données", "La carte d'identité de chaque donnée : définition, règle de calcul, format, propriétaire, états où elle apparaît."),
-    ("Catalogue / MDM", "Le catalogue recense toutes les données disponibles. Le MDM (gestion des données de référence) garantit qu'une même donnée de référence (un client, un code activité) a une seule version officielle."),
-    ("Registre des anomalies", "Le carnet de bord des problèmes détectés : qui doit corriger, pour quand, et où on en est."),
-    ("Piste d'audit", "La trace de tout ce qui a été lancé, pour pouvoir prouver comment un chiffre a été obtenu."),
-    ("SAS / PROC SQL", "Le logiciel de traitement de données utilisé en actuariat. PROC SQL permet d'y écrire des requêtes SQL."),
-    ("ODBC", "Le « tuyau » standard qui permet à SAS ou à Qlik de lire directement les bases de données de l'entreprise."),
-    ("Qlik Sense", "L'outil de tableaux de bord : il affiche les résultats de façon visuelle pour les responsables."),
-    ("ISIN / CIC", "ISIN : le numéro d'identité d'un titre financier. CIC : le code qui dit de quel type d'actif il s'agit (action, obligation…)."),
-]
+from glossaire import GLOSSAIRE  # source unique : glossaire.py (page « Glossaire »)
 
 POWERBI_QLIK = [
     ("Power Query (préparer les données)", "Le script de chargement (instructions LOAD … FROM …)",

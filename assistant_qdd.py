@@ -99,6 +99,10 @@ Méthode du dispositif (pour expliquer, pas pour calculer) :
   sensibilité n'est pas linéaire (champ « sensibilite_lineaire » de donnees_critiques, page Note & données).
 - Une donnée critique à dire d'expert sans sensibilité calculable reçoit la moyenne des sensibilités mesurées.
 
+Réglementation : pour ce que dit ou relève l'ACPR, consulte notice_acpr (texte exact des points) et constats_acpr
+(constats sourcés) ; cite le point ou la source et la page ; rappelle que les enquêtes sont déclaratives. Pour
+définir un mot, consulte glossaire et reprends sa définition. Ne cite jamais l'ACPR de mémoire.
+
 Limites connues du dispositif (à citer telles quelles si on te les demande, sans en inventer d'autres) :
 - Prototype sur données 100 % fictives ; ne vaut pas attestation de conformité.
 - SCR calculé par une formule standard simplifiée, non réglementaire ; corrélations entre segments illustratives.
@@ -197,6 +201,20 @@ OUTILS = [
            {"campagne": _CAMPAGNE,
             "terme": {"type": "string", "description": "Identifiant ou mot (ex. survenance, S.17.01), ou chaîne vide."}},
            ["campagne", "terme"]),
+    _outil("glossaire",
+           "Glossaire de l'application : définition en clair d'un mot du métier ou de l'outil (SCR, antériorité, "
+           "relances…), sa catégorie et la page où il sert. Chaîne vide pour tout le glossaire.",
+           {"terme": {"type": "string", "description": "Mot cherché, ou chaîne vide."}}, ["terme"]),
+    _outil("constats_acpr",
+           "Faiblesses que l'ACPR relève le plus souvent sur la qualité des données (communiqué du 11/01/2021, "
+           "enquêtes déclaratives 2022 et 2024) : chiffres, source, page, citation exacte, points de la notice, "
+           "couverture par l'application, reste à faire. Filtre facultatif sur un mot (thème, sujet).",
+           {"filtre": {"type": "string", "description": "Mot (ex. criticité, externes), ou chaîne vide."}}, ["filtre"]),
+    _outil("notice_acpr",
+           "Texte exact des points de la notice ACPR « Exigences en matière de qualité des données » du 08/11/2023 "
+           "(74 points). Donner des numéros de points (ex. « 48 » ou « 50-51 ») ou un mot à chercher.",
+           {"recherche": {"type": "string", "description": "Numéros de points (48 ; 50-51 ; 16,17) ou mot."}},
+           ["recherche"]),
     _outil("notes_par_axe",
            "Note QDD regroupée par axe : par responsable, par étape du lignage, par segment (maille) ou par critère. "
            "Pour chaque modalité : note, note avant dégradation, note minimum, écart, nombre de données critiques et "
@@ -288,6 +306,25 @@ def requete_sql(sql: str, base) -> dict:
             df[col] = df[col].round(2)
     return {"colonnes": colonnes, "nombre": len(df), "tronque": len(rangs) > SQL_LIGNES_MAX, "lignes": _lignes(df),
             "page": "Lignes en anomalie (données détaillées)"}
+
+
+SOURCE_NOTICE = ("ACPR, « Exigences en matière de qualité des données pour les organismes et groupes d'assurance "
+                 "soumis à la Directive Solvabilité 2 », version du 08/11/2023")
+
+
+def notice_acpr(recherche: str) -> dict:
+    """Points de la notice par numéros (« 48 », « 50-51 », « 16, 17 ») ou par mot ; texte exact, source citée."""
+    df = pd.read_csv(Path(__file__).parent / "referentiels" / "notice_acpr.csv", dtype={"point": int})
+    r = (recherche or "").strip()
+    nums: set[int] = set()
+    for morceau in re.split(r"[,;\s]+", r):
+        if m := re.fullmatch(r"(\d{1,2})\s*[-–à]\s*(\d{1,2})", morceau):
+            nums |= set(range(int(m.group(1)), int(m.group(2)) + 1))
+        elif morceau.isdigit():
+            nums.add(int(morceau))
+    sel = df[df["point"].isin(nums)] if nums else df[df["texte"].str.contains(re.escape(r), case=False)] if r else df.head(0)
+    return {"source": SOURCE_NOTICE, "nombre": len(sel), "points": _lignes(sel.head(12)),
+            "tronque": len(sel) > 12, "page": "Constats de l'ACPR"}
 
 
 def _compte(serie: pd.Series) -> dict:
@@ -421,6 +458,23 @@ def executer_outil(nom: str, entree: dict, contexte: dict) -> dict:
             d = d[texte.str.contains(re.escape(terme))]
         return {"campagne": c["campagne"], "nombre": len(d), "donnees": _lignes(d[cols]),
                 "page": "Lignage & dictionnaire"}
+
+    if nom == "glossaire":
+        from glossaire import chercher
+        res = chercher(entree.get("terme", ""))
+        return {"nombre": len(res), "termes": res[:40], "page": "Glossaire"}
+
+    if nom == "constats_acpr":
+        from constats_acpr import charger
+        df = charger()
+        f = (entree.get("filtre") or "").strip().lower()
+        if f:
+            df = df[df.apply(lambda r: f in " ".join(r.values).lower(), axis=1)]
+        return {"nombre": len(df), "avertissement": "Enquêtes déclaratives (rappel de l'ACPR) ; communiqué 2021 : "
+                "constats de contrôles sur place.", "constats": df.to_dict("records"), "page": "Constats de l'ACPR"}
+
+    if nom == "notice_acpr":
+        return notice_acpr(entree.get("recherche", ""))
 
     if nom == "notes_par_axe":
         axes = c.get("axes") or {}
@@ -599,6 +653,7 @@ NOMS_OUTILS = {
     "lignes_en_anomalie": "Lignes en anomalie", "variation_note": "Variation de la note",
     "controle_niveau2": "Contrôle de niveau 2", "lignage": "Lignage", "notes_par_axe": "Note par axe",
     "requete_sql": "Requête SQL (lecture seule)", "dictionnaire": "Dictionnaire des données",
+    "glossaire": "Glossaire", "constats_acpr": "Constats de l'ACPR", "notice_acpr": "Notice ACPR",
 }
 
 

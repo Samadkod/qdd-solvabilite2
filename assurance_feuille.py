@@ -133,12 +133,27 @@ EXTENSIONS = [
                   'sans effet sur la note (données non critiques, restitutions QRT).',
          prerequis='Recalcul exact du moteur (sans hypothèse, la note est retrouvée à 1e-12 près), sur une copie ; '
                    'la vraie correction reste celle de l’Atelier de résolution (tests/test_gain.py).', effort='—'),
-    dict(id='E25', statut='Plus tard', titre='Inventaire des tâches manuelles de l’équipe (prise de poste)',
-         pourquoi='Répondre à « qu’est-ce qui vous prend du temps chaque trimestre ? » : pour chaque tâche, sa '
-                  'fréquence, le temps passé, l’outil, et ce qui peut être automatisé, avec le temps gagné estimé et la '
-                  'fonction de l’application qui le couvre déjà (contrôles, relances, dossier de comité, preuves).',
-         prerequis='Gabarit vide dans l’application (aucune donnée inventée), rempli avec l’équipe après la prise de '
-                   'poste ; les données réelles restent en interne.', effort='Faible'),
+    dict(id='F33', statut='Fait', titre='Inventaire des tâches de l’équipe (gabarit de prise de poste)',
+         pourquoi='Page Mise en place en entreprise : un tableau vide à remplir avec l’équipe (tâche, qui, fréquence, '
+                  'heures, outil, automatisable, fonction de l’application qui la couvre) ; heures par an et heures '
+                  'récupérables calculées ; téléchargement CSV.',
+         prerequis='Aucune donnée inventée ni conservée par l’application ; les données réelles restent en interne.',
+         effort='—'),
+    dict(id='F34', statut='Fait', titre='Glossaire complet de l’application',
+         pourquoi='Page « Glossaire » (Documentation › Comprendre) avec recherche : les mots du métier et de l’outil, '
+                  'par catégorie, avec un lien vers la page où chacun sert. Source unique pour le guide et l’assistant.',
+         prerequis='Test d’exhaustivité : chaque mot employé par les pages doit être défini (tests/test_glossaire.py).',
+         effort='—'),
+    dict(id='F35', statut='Fait', titre='Assistant : notice ACPR, constats de l’ACPR et glossaire',
+         pourquoi='Trois consultations nouvelles : le texte exact des 74 points de la notice ACPR du 08/11/2023, les '
+                  'constats sourcés de l’ACPR, les définitions du glossaire. L’assistant cite le point ou la source et '
+                  'la page au lieu de répondre de mémoire.',
+         prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
+                   'questions réglementaires.', effort='—'),
+    dict(id='E27', statut='Plus tard', titre='Fiche de l’Atelier de résolution',
+         pourquoi='L’Atelier de résolution est difficile à prendre en main : une fiche comme celle de l’assistant (à '
+                  'quoi il sert, les étapes, ce qu’il fait et ne fait pas, un exemple pas à pas).',
+         prerequis='Demandée par le propriétaire le 27/11/2026.', effort='Faible'),
     dict(id='F32', statut='Fait', titre='Constats de l’ACPR et couverture par l’application',
          pourquoi='Page « Constats de l’ACPR » (Documentation › Comprendre) : 15 faiblesses que l’ACPR relève le plus '
                   'souvent (communiqué du 11/01/2021, enquêtes 2022 et 2024), chacune avec ses chiffres, sa source, sa '

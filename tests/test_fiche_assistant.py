@@ -13,10 +13,10 @@ def test_fiche_suit_le_code_de_l_assistant():
     c = contenu()
     assert c["modele"] == "Claude Opus 5.5" and a.MODELE == "claude-opus-5-5"
     assert c["budget"] == f"{a.BUDGET_VISITE:.2f} $".replace(".", ",")
-    assert [n for n, _ in c["outils"]] == [a.NOMS_OUTILS[o["name"]] for o in a.OUTILS] and len(c["outils"]) == 12
+    assert [n for n, _ in c["outils"]] == [a.NOMS_OUTILS[o["name"]] for o in a.OUTILS] and len(c["outils"]) == 15
     assert str(a.LIGNES_MAX) in c["fichiers"] and "PDF" in c["fichiers"]
     from assurance_feuille import tableau
-    assert nouveautes(tableau()) == ["F28", "F27", "F26"]  # les trois dernières livraisons de l'assistant
+    assert nouveautes(tableau()) == ["F35", "F28", "F27"]  # les trois dernières livraisons de l'assistant
 
 
 def test_page_fiche_sans_cle(monkeypatch):

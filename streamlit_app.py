@@ -30,6 +30,7 @@ from relances import afficher as afficher_relances
 from comite import afficher as afficher_comite
 from gain import afficher as afficher_gain
 from constats_acpr import afficher as afficher_constats_acpr
+from glossaire import afficher as afficher_glossaire
 from statuts import legende as legende_statuts, tableau
 from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
@@ -133,6 +134,7 @@ PAGES = {
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),
     "guide": ("Comprendre", "Guide terre à terre", ":material/explore:", "Le métier, les chiffres et le poste, sans jargon."),
+    "glossaire": ("Comprendre", "Glossaire", ":material/dictionary:", "Tous les mots du métier et de l'application, en clair."),
     "acpr": ("Comprendre", "Constats de l'ACPR", ":material/gavel:",
              "Ce que l'ACPR relève le plus souvent, sources à l'appui, et ce que l'application couvre."),
     "visite": ("Comprendre", "Visite de l'application", ":material/map:", "Chaque page en une ligne : à quoi elle sert, quand l'ouvrir."),
@@ -496,5 +498,6 @@ def page_code() -> None:
     "code": page_code,
     "visite": lambda: afficher_visite(PAGES, aller),
     "acpr": lambda: afficher_constats_acpr(c, aller, PAGES),
+    "glossaire": lambda: afficher_glossaire(aller, PAGES),
     "entreprise": afficher_passage_entreprise,
 }[page]()

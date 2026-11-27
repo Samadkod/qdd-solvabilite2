@@ -33,7 +33,7 @@ def contexte():
 
 def test_schemas_stricts_et_complets():
     noms = [o["name"] for o in OUTILS]
-    assert len(noms) == len(set(noms)) == 12
+    assert len(noms) == len(set(noms)) == 15
     for o in OUTILS:
         s = o["input_schema"]
         assert o["strict"] is True and s["additionalProperties"] is False
@@ -416,3 +416,18 @@ def test_dictionnaire_et_consignes_du_runbook(contexte):
     assert "un humain habilité décide" in a.SYSTEME and "résultat d'une consultation" in a.SYSTEME
     m = {"date": a.maintenant(), "texte": "ok", "consultations": []}
     assert f"modèle {a.MODELE}" in a.export_reponse(m, "q")
+
+
+
+def test_glossaire_constats_et_notice_acpr(contexte):
+    """L'assistant lit les sources réglementaires vérifiées plutôt que sa mémoire."""
+    import assistant_qdd as a
+    g = executer_outil("glossaire", {"terme": "antériorité"}, contexte)
+    assert g["nombre"] >= 1 and any(t["terme"] == "Antériorité" for t in g["termes"])
+    c = executer_outil("constats_acpr", {"filtre": "criticité"}, contexte)
+    assert c["nombre"] >= 1 and c["constats"][0]["page"] and "déclaratives" in c["avertissement"]
+    n = executer_outil("notice_acpr", {"recherche": "50-51"}, contexte)
+    assert [p["point"] for p in n["points"]] == [50, 51] and "08/11/2023" in n["source"]
+    assert executer_outil("notice_acpr", {"recherche": "48"}, contexte)["points"][0]["texte"].startswith(
+        "Le répertoire comprend au moins les attributs suivants")
+    assert "Ne cite jamais l'ACPR de mémoire" in a.SYSTEME
