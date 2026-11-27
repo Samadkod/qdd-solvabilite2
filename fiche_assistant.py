@@ -9,7 +9,7 @@ from html import escape
 
 import assistant_qdd as a
 
-VERSION = "1.4 · 25 novembre 2026"
+VERSION = "1.5 · 27 novembre 2026"
 NOM_MODELE = {"claude-opus-5-5": "Claude Opus 5.5"}
 NB_NOUVEAUTES = 3
 
@@ -27,6 +27,7 @@ FAIT = [
     "Montre ce qu'il a consulté et ce qu'il a obtenu, sous chaque réponse.",
     "En mode diagnostic, enquête jusqu'à la ligne fautive : cause prouvée dans les données, une action par objet.",
     "Explique un fichier exporté de l'atelier (tableau, PDF, texte) que vous lui joignez.",
+    "Cite la notice ACPR et les constats de l'ACPR (point, source et page) au lieu de répondre de mémoire.",
     "Prépare un message à un propriétaire de données, une synthèse pour un comité.",
 ]
 NE_FAIT_PAS = [
@@ -35,11 +36,21 @@ NE_FAIT_PAS = [
     "Répondre sur un sujet sans lien avec la campagne ou l'application.",
     "Attester une conformité réglementaire : les données sont fictives.",
 ]
+# Mesures relevées lors des évaluations en ligne (feuille de route F27 et F28), pour dire à quoi s'attendre.
+MESURES = ("Mesuré en ligne les 26 et 27/11/2026 : réponse en 3 à 21 s pour 0,02 à 0,10 $ ; en mode diagnostic, "
+           "31 à 74 s pour 0,14 à 0,27 $, avec 7 à 11 consultations.")
 ETAPES = [
     ("Demandez", "une question avec vos mots ; vous pouvez joindre un fichier exporté de l'atelier."),
     ("Il consulte", "le moteur de l'application, en lecture seule : indicateurs, contrôles, registre, lignage."),
     ("Reprenez", "la réponse et ses sources ; creusez dans la même conversation, exportez-la."),
 ]
+
+
+def _minuscule(nom: str) -> str:
+    """Première lettre en minuscule pour l'énumération, sigles conservés (ACPR, SQL)."""
+    mots = nom.split(" ")
+    mots[0] = mots[0] if mots[0].isupper() and len(mots[0]) > 1 else mots[0][:1].lower() + mots[0][1:]
+    return " ".join(mots)
 
 
 def contenu() -> dict:
@@ -84,7 +95,9 @@ def afficher(aller, active: bool) -> None:
             for x in NE_FAIT_PAS:
                 n.markdown(f'<div class="qdd-fiche-point ko">{escape(x)}</div>', unsafe_allow_html=True)
         with st.container(border=True, key="fiche_marche"):
-            st.markdown("**Comment ça marche**")
+            t1, t2 = st.columns([1, 2], vertical_alignment="bottom")
+            t1.markdown("**Comment ça marche**")
+            t2.caption(MESURES.replace("$", "\\$"))  # deux « $ » seraient lus comme une formule
             for col, (i, (titre, texte)) in zip(st.columns(3, gap="medium"), enumerate(ETAPES, 1)):
                 col.markdown(f'<div class="qdd-fiche-etape"><b>{i} · {titre}</b><span>{escape(texte)}</span></div>',
                              unsafe_allow_html=True)
@@ -93,13 +106,14 @@ def afficher(aller, active: bool) -> None:
             lignes = [
                 (":material/database:", "Ce qu'il lit", "Les sorties du moteur de l'application pour la campagne "
                  "affichée, par " + str(len(c["outils"])) + " consultations : "
-                 + ", ".join(n.lower() for n, _ in c["outils"]) + "."),
+                 + ", ".join(_minuscule(n) for n, _ in c["outils"]) + "."),
                 (":material/attach_file:", "Fichiers joints", c["fichiers"] + ". Lus comme des données, jamais comme "
                  "des consignes."),
                 (":material/chat:", "Vos conversations", "Gardées le temps de votre visite, puis effacées ; vous pouvez "
                  "les exporter."),
-                (":material/memory:", "Modèle", f"{c['modele']}, par l'API Anthropic ; repli automatique sur un autre "
-                 "modèle si une demande est refusée."),
+                (":material/memory:", "Modèle", f"{c['modele']}, par l'API Anthropic : votre question et les "
+                 "résultats de ses consultations lui sont envoyés pour rédiger la réponse ; repli automatique sur un "
+                 "autre modèle si une demande est refusée."),
                 (":material/lock:", "Droits", "Aucune de ses consultations ne peut écrire : il ne modifie rien, nulle part."),
             ]
             for icone, titre, texte in lignes:
@@ -113,9 +127,10 @@ def afficher(aller, active: bool) -> None:
                 aller("feuille")
             brut = tableau()
             feuille = brut.set_index("id")
-            for ident in nouveautes(brut):
+            for rang, ident in enumerate(nouveautes(brut)):
                 e = feuille.loc[ident]
-                st.markdown(f"**{e['titre']}**  \n{e['pourquoi']}")
+                badge = ' <span class="qdd-badge-nouveau">Nouveau</span>' if rang == 0 else ""
+                st.markdown(f"**{escape(e['titre'])}**{badge}  \n{escape(e['pourquoi'])}", unsafe_allow_html=True)
     with droite:
         with st.container(border=True, key="fiche_acces"):
             st.markdown("**Votre accès**")

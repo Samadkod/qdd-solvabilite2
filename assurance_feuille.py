@@ -15,7 +15,8 @@ EXTENSIONS = [
     dict(id='F28', statut='Fait', titre='Assistant activé et évalué sur ses réponses réelles',
          pourquoi='Clé enregistrée le 26/11/2026. 15 questions réelles vérifiées une à une contre le moteur et la base : '
                   '9 en mode normal (3 erreurs de comptage, corrigées par F24 puis revérifiées), 3 revérifiées, 3 en mode '
-                  'diagnostic (exactes). Verdict, hors sujet et tentative de contournement correctement traités.',
+                  'diagnostic (exactes). Verdict, hors sujet et tentative de contournement correctement traités ; '
+                  'réponses en 3 à 21 s pour 0,02 à 0,10 $.',
          prerequis='Coût total des évaluations : environ 1,50 $. À refaire après chaque changement des consignes ou des '
                    'consultations.', effort='—'),
     dict(id='F19', statut='Fait', titre='Assistant : fichier joint et jauge de consommation',
@@ -150,6 +151,12 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F39', statut='Fait', titre='Fiche de l’assistant enrichie (version 1.5)',
+         pourquoi='Sur le modèle des fiches d’agents d’entreprise : temps de réponse et coût mesurés en ligne affichés '
+                  'dans « Comment ça marche », capacité réglementaire (notice et constats ACPR), ce qui est envoyé au '
+                  'modèle, pastille « Nouveau » sur la dernière livraison ; sigles conservés dans la liste des '
+                  'consultations.',
+         prerequis='Mesures reprises des évaluations F27 et F28 et vérifiées par les tests.', effort='—'),
     dict(id='F38', statut='Fait', titre='Atelier de résolution : pièce justificative par ligne et import de fichier',
          pourquoi='Chaque ligne corrigée cite sa pièce justificative (obligatoire), reprise dans le scénario et dans '
                   'la fiche d’ajustement (notice ACPR, points 36-37). Pour beaucoup de lignes : un modèle CSV à '

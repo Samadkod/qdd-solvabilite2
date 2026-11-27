@@ -53,3 +53,4 @@ section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff;}
 .qdd-jauge:hover::after, .qdd-jauge:focus::after {background: #22323f; color: var(--qdd-encre);
   border: 1px solid #3a5063; box-shadow: 0 6px 18px -8px #000c;}
 .qdd-anneau b {color: var(--qdd-encre);}
+.qdd-badge-nouveau {color: #9cc4f5; background: #17304a;}

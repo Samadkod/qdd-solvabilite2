@@ -337,3 +337,7 @@ section[data-testid="stSidebar"] label p, section[data-testid="stSidebar"] [data
 
 /* Relais technique (relance au changement de thème, fermeture du menu sur téléphone) : jamais visible */
 .st-key-qdd_relais {display: none !important;}
+
+/* Fiche de l'assistant : pastille « Nouveau » sur la dernière livraison */
+.qdd-badge-nouveau {display: inline-block; margin-left: .45rem; padding: .05rem .5rem; border-radius: 999px;
+  font-size: .68rem; font-weight: 600; color: #1f5fad; background: #e7effa; vertical-align: 1px;}
