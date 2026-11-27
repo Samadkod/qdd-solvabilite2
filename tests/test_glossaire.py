@@ -52,3 +52,16 @@ def test_inventaire_gabarit_vide_et_calcul():
     r = calculer(d)
     assert len(r) == 2
     assert list(r["Heures par an"]) == [64.0, 36.0] and list(r["Heures récupérables par an"]) == [64.0, 18.0]
+
+
+def test_missions_du_poste_et_profil_coherents_avec_l_application():
+    import guide_terrain as g
+    arbre = ast.parse((RACINE / "streamlit_app.py").read_text(encoding="utf-8"))
+    pages = next(n.value for n in ast.walk(arbre)
+                 if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", None) == "PAGES")
+    titres = {k.value: v.elts[1].value for k, v in zip(pages.keys, pages.values)}
+    for bloc, mission, clair, cles, couverture, geste in g.MISSIONS:
+        assert set(cles) <= set(titres), mission
+        assert couverture in g.COUVERTURES_MISSION
+    assert {k: titres[k] for k in g.TITRES_PAGES} == g.TITRES_PAGES  # titres identiques à ceux du menu
+    assert all(c in g.COUVERTURES_MISSION for *_, c in g.PROFIL)

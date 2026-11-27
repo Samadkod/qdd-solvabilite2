@@ -20,48 +20,99 @@ DATE_PRISE_DE_POSTE = dt.date(2026, 11, 6)  # valeur par défaut, modifiable dan
 
 
 # missions de l'offre (reformulées) -> en clair, où les voir dans l'application, premier geste
+# Missions de l'offre (formulation reprise de l'annonce, sans le nom de l'employeur) : ce que cela veut dire, où le
+# voir (clés de pages), couverture par l'application, premier geste. Couverture : Couvert, Partiel, À développer.
 MISSIONS = [
-    ("Qualité & gouvernance", "Piloter le dispositif QDD et coordonner la résolution des anomalies",
+    ("Socle", "Structurer, fiabiliser et tracer les données qui alimentent les calculs Solvabilité 2",
+     "Savoir d'où vient chaque donnée, ce qu'elle devient et si elle est juste, jusqu'au calcul du SCR",
+     ["lignage", "donnees", "controles"], "Couvert",
+     "Repérer les données critiques réelles et leur trajet"),
+    ("Socle", "Garantir la fiabilité des reportings quantitatifs (QRT)",
+     "Vérifier que chaque état remis au régulateur reprend exactement sa source",
+     ["controles", "regles"], "Couvert",
+     "Lister les QRT remis et les contrôles qui existent sur chacun"),
+    ("Socle", "Relier les sources, le dictionnaire, le lignage et les contrôles",
+     "Un seul dispositif cohérent : chaque donnée a sa définition, son trajet et ses contrôles",
+     ["lignage", "regles", "acpr"], "Couvert",
+     "Vérifier que dictionnaire, cartographie et contrôles se référencent mutuellement"),
+    ("Qualité & gouvernance", "Piloter le dispositif QDD et coordonner la résolution des anomalies avec les équipes internes",
      "Savoir à tout moment quelles données sont fiables, et faire corriger les autres par les bons services",
-     "Synthèse · Anomalies (registre) · Lignes en anomalie",
-     "Tenir un registre où chaque anomalie a un propriétaire et une échéance"),
+     ["synthese", "anomalies", "relances", "resolution", "dossier"], "Couvert",
+     "Tenir un registre où chaque anomalie a un propriétaire et une échéance, et relancer chaque semaine"),
     ("Qualité & gouvernance", "Produire et maintenir dictionnaire, cartographie et lignage des flux, contrôles, reporting qualité",
-     "Les « cartes d'identité » des données, le plan des tuyaux entre les outils, la liste des vérifications",
-     "Lignage & dictionnaire · Règles de contrôle · dossier referentiels/",
+     "Les cartes d'identité des données, le plan des tuyaux entre les outils, la liste des vérifications, le tableau de bord",
+     ["lignage", "regles", "synthese", "dossier"], "Couvert",
      "Partir de l'existant et le mettre au format des référentiels du projet"),
     ("Qualité & gouvernance", "Concevoir, développer et automatiser les traitements de fiabilisation (SAS avancé, SQL)",
-     "Écrire des programmes qui vérifient les données tout seuls, à chaque arrêté",
-     "Documentation → Code SAS / SQL (02_controles.sas, sql/controles/)",
+     "Écrire des programmes qui vérifient les données tout seuls, à chaque arrêté, et tester les corrections",
+     ["code", "regles", "resolution", "verif_sas"], "Couvert",
      "Automatiser un premier contrôle aujourd'hui fait à la main"),
-    ("Qualité & gouvernance", "Sensibiliser les métiers et accompagner leurs contributions",
+    ("Qualité & gouvernance", "Sensibiliser les métiers aux enjeux data et accompagner leurs contributions",
      "Expliquer aux gestionnaires, comptables, actuaires pourquoi leurs données comptent et quoi corriger",
-     "Documentation → ce guide, D'où sortent les chiffres, Atelier (fiches)",
+     ["guide", "glossaire", "assistant", "relances"], "Couvert",
      "Préparer une présentation de 15 minutes « la QDD en clair »"),
-    ("Qualité & gouvernance", "Tenir le corpus documentaire et contribuer aux audits (ACPR, commissaires aux comptes)",
-     "Pouvoir prouver, documents à l'appui, comment chaque chiffre a été obtenu et contrôlé",
-     "Chargement & exécution (journal) · rapport Excel",
-     "Lister les documents existants et leur date de dernière mise à jour"),
-    ("Qualité & gouvernance", "Intégrer la QDD dans les projets de transformation et les groupes de travail IT",
+    ("Qualité & gouvernance", "Mettre à jour le corpus documentaire et contribuer aux audits internes et externes (ACPR, CAC)",
+     "Prouver, documents à l'appui, comment chaque chiffre a été obtenu, contrôlé et corrigé",
+     ["dossier", "acpr", "chargement"], "Couvert",
+     "Lister les documents existants, leur date de mise à jour et ce que l'ACPR a relevé"),
+    ("Qualité & gouvernance", "Intégrer les exigences QDD dans les projets de transformation digitale et les groupes de travail IT",
      "Quand un outil change, vérifier que les données restent justes avant, pendant et après",
-     "Lignage & dictionnaire (quels flux un projet touche)",
+     ["resolution", "lignage"], "Partiel",
      "Demander la liste des projets IT en cours qui touchent des données critiques"),
-    ("Optimisation & automatisation", "Analyser les processus et proposer des améliorations",
-     "Repérer ce qui est lent, manuel ou fragile, et proposer mieux",
-     "Synthèse (étapes sans contrôle) · Chargement & exécution (durées)",
-     "Chronométrer une clôture : où part le temps ?"),
+    ("Optimisation & automatisation", "Analyser les processus existants et proposer des améliorations (fiabilité, efficacité)",
+     "Repérer ce qui est lent, manuel ou fragile, chiffrer le temps perdu et proposer mieux",
+     ["entreprise", "chargement", "donnees"], "Couvert",
+     "Remplir l'inventaire des tâches de l'équipe et chronométrer une clôture"),
     ("Optimisation & automatisation", "Déployer les bonnes pratiques de développement et de documentation",
      "Code lisible, commenté, versionné, testé, rejouable par un collègue",
-     "Ce dépôt lui-même (tests, CLAUDE.md, README)",
+     ["code", "entreprise"], "Couvert",
      "Proposer une convention simple : nommage, en-tête de programme, journal"),
-    ("Optimisation & automatisation", "Appui expert SAS, SQL, Qlik Sense",
+    ("Optimisation & automatisation", "Apporter un appui expert sur SAS, SQL, Qlik Sense",
      "Être la personne qu'on vient voir quand un programme ou un tableau de bord coince",
-     "Documentation → Code SAS / SQL · app/chargement_qdd.qvs",
+     ["sas", "code", "assistant"], "Partiel",
      "Se former à Qlik Sense en s'appuyant sur Power BI (sous-onglet « Se former »)"),
-    ("Travaux actuariels", "Provisions techniques, Solvabilité 2, ORSA, tarification, sinistralité grave, réassurance, sensibilités",
-     "Fournir aux actuaires des données fiables et participer à leurs analyses",
-     "Note & données (sensibilités du SCR) · sous-onglet « L'assurance en clair »",
+    ("Travaux actuariels", "Provisions techniques, Solvabilité 2, analyses de sensibilité, réassurance",
+     "Fournir aux actuaires des données fiables sur les provisions, le SCR, les sensibilités et la cession",
+     ["donnees", "controles"], "Couvert",
      "Assister à une revue de provisions et noter quelles données y entrent"),
+    ("Travaux actuariels", "Études prospectives (ORSA), analyses tarifaires, sinistralité grave",
+     "Contribuer avec des données fiables aux projections, aux tarifs et au suivi des très gros sinistres",
+     ["guide"], "À développer",
+     "Demander quelles données alimentent l'ORSA, la tarification et le suivi des sinistres graves"),
+    ("Travaux actuariels", "Contribuer aux contrôles, analyses et documentation associées",
+     "Mettre les contrôles et leur documentation au service des travaux de l'actuariat",
+     ["regles", "dossier", "donnees"], "Couvert",
+     "Proposer un contrôle de cohérence sur un livrable actuariel existant"),
 ]
+
+# Compétences du profil demandé, et ce que l'application permet de montrer ou d'exercer.
+PROFIL = [
+    ("Développement SAS (macros, automatisations)", "Chaîne SAS complète, exécutée sur SAS OnDemand (59 valeurs sur 59), "
+     "13 exercices corrigés", "Couvert"),
+    ("SQL", "20 contrôles en SQL ANSI, requêtes des lignes en anomalie, requête SQL de l'assistant", "Couvert"),
+    ("Gouvernance des données : traçabilité / lignage", "Lignage par donnée, zones de risque, contrôles par flux", "Couvert"),
+    ("Gouvernance des données : catalogue, MDM", "Dictionnaire et référentiel des codes activité ; pas de tables de "
+     "correspondance maîtres (segments ↔ lignes d'activité Solvabilité 2)", "Partiel"),
+    ("Données assurantielles et Solvabilité 2", "Contrats, sinistres, placements, QRT, SCR simplifié, notice ACPR", "Couvert"),
+    ("Qlik Sense (ou autre outil de BI)", "Tableaux de bord Streamlit ; export et script Qlik écrits mais jamais exécutés",
+     "Partiel"),
+    ("Environnements hétérogènes (bases distantes, ODBC)", "Gabarit ODBC et DSN prévus dans la chaîne SAS, jamais "
+     "exécutés sur une base distante", "Partiel"),
+    ("Contextes audités / réglementés", "Preuves SHA-256, données en défaut conservées, document cadre, constats ACPR",
+     "Couvert"),
+    ("Travaux actuariels (provisions, ORSA, réassurance, tarification)", "Provisions, réassurance, sensibilités ; ORSA "
+     "et tarification absents", "Partiel"),
+    ("Rigueur, documentation, restitution", "Fiches, glossaire, dossier de comité, relances, feuille de route",
+     "Couvert"),
+]
+COUVERTURES_MISSION = ["Couvert", "Partiel", "À développer"]
+TITRES_PAGES = {"synthese": "Synthèse", "donnees": "Note & données", "controles": "Contrôles", "anomalies": "Anomalies",
+                "relances": "Relances", "lignes": "Lignes en anomalie", "regles": "Règles de contrôle",
+                "lignage": "Lignage & dictionnaire", "chargement": "Chargement & exécution",
+                "resolution": "Atelier de résolution", "dossier": "Dossier de campagne", "verif_sas": "Vérification SAS",
+                "assistant": "Assistant QDD", "guide": "Guide terre à terre", "glossaire": "Glossaire",
+                "acpr": "Constats de l'ACPR", "sas": "SAS pratique", "entreprise": "Mise en place en entreprise",
+                "code": "Code SAS / SQL"}
 
 from glossaire import GLOSSAIRE  # source unique : glossaire.py (page « Glossaire »)
 
@@ -321,9 +372,15 @@ def _chiffres(c: dict, var: pd.DataFrame | None) -> None:
 def _poste() -> None:
     st.header("Les missions du poste, une par une")
     st.markdown("Pour chaque mission de l'offre : ce que cela veut dire concrètement, où la voir dans "
-                "l'application, et un premier geste possible en arrivant.")
-    st.dataframe(pd.DataFrame(MISSIONS, columns=["Bloc", "Mission", "En clair", "Dans l'application",
-                                                 "Premier geste"]),
+                "l'application, ce qui est couvert, et un premier geste possible en arrivant.")
+    m = pd.DataFrame(MISSIONS, columns=["Bloc", "Mission", "En clair", "Pages", "Couverture", "Premier geste"])
+    m["Dans l'application"] = m["Pages"].map(lambda ks: " · ".join(TITRES_PAGES.get(k, k) for k in ks))
+    compte = m["Couverture"].value_counts()
+    st.caption(" · ".join(f"{compte.get(cv, 0)} {cv.lower()}" for cv in COUVERTURES_MISSION) + f" sur {len(m)} missions.")
+    st.dataframe(m[["Bloc", "Mission", "Couverture", "En clair", "Dans l'application", "Premier geste"]],
+                 hide_index=True, width="stretch")
+    st.markdown("**Les compétences du profil**")
+    st.dataframe(pd.DataFrame(PROFIL, columns=["Compétence demandée", "Ce que l'application montre", "Couverture"]),
                  hide_index=True, width="stretch")
 
     st.header("Le rôle en trois verbes")

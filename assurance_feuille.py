@@ -167,6 +167,34 @@ EXTENSIONS = [
          prerequis='Documents de l’ACPR lus en entier ; les 15 citations vérifiées mot pour mot dans les textes. Les '
                    'enquêtes sont déclaratives (rappel de l’ACPR) ; les constats propres à un organisme restent '
                    'confidentiels et internes.', effort='—'),
+    dict(id='E28', statut='Plus tard', titre='Évaluation QDD d’un projet informatique',
+         pourquoi='Mission « intégrer les exigences QDD dans les projets de transformation » et notice ACPR point 18 '
+                  '(le responsable QDD évalue le risque porté par les projets ; 41 % le font selon l’enquête 2024) : '
+                  'une grille par projet (données critiques touchées, flux et contrôles impactés via le lignage, '
+                  'recette des données, avis QDD).',
+         prerequis='Repose sur le lignage et l’analyse d’impact existants ; aucun calcul nouveau.', effort='Faible'),
+    dict(id='E29', statut='Plus tard', titre='Sinistralité grave : qualité des données des gros sinistres',
+         pourquoi='Mission « sinistralité grave » : isoler les sinistres au-dessus d’un seuil et vérifier leurs '
+                  'données une à une (dates, provision, règlements, segment), car une erreur sur un gros dossier '
+                  'pèse lourd dans les provisions.',
+         prerequis='Analyse hors note (aucune valeur de référence ne bouge) ; seuil de gravité à fixer avec '
+                   'l’actuariat.', effort='Moyen'),
+    dict(id='E30', statut='Plus tard', titre='Données de l’ORSA et de la tarification',
+         pourquoi='Missions « études prospectives (ORSA) » et « analyses tarifaires » : identifier les données qui les '
+                  'alimentent et leurs contrôles.',
+         prerequis='À cadrer à la prise de poste : les projections ORSA et les modèles de tarif n’existent pas dans '
+                   'la base fictive, et les inventer n’aurait pas de sens.', effort='Moyen'),
+    dict(id='E31', statut='Plus tard', titre='Tables de correspondance maîtres (MDM)',
+         pourquoi='Profil « catalogue, MDM » et notice ACPR point 62 (tables de correspondance entre branche, '
+                  'segmentation propre et ligne d’activité Solvabilité 2) : une table maître segment ↔ ligne '
+                  'd’activité S2, contrôlée et versionnée.',
+         prerequis='Petit référentiel et un contrôle de cohérence ; les codes activité ont déjà leur référentiel.',
+         effort='Faible'),
+    dict(id='E32', statut='Plus tard', titre='Lecture d’une base distante par ODBC',
+         pourquoi='Profil « environnements hétérogènes (bases distantes, ODBC) » : faire tourner la chaîne sur une '
+                  'base distante plutôt que sur des fichiers locaux.',
+         prerequis='Une base hébergée (par exemple la base Neon prévue pour E14) et un poste avec SAS et un pilote '
+                   'ODBC ; SAS OnDemand ne le permet pas forcément.', effort='Moyen'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '
