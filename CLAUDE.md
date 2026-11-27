@@ -13,7 +13,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Couche | Chemin | Statut |
 |---|---|---|
 | Version **production** | `sas/` (00 config → 07 export Qlik, 98 vérification, 99 exécution ; point d'entrée `lancer_qdd.sas` : `&RACINE` + contrôle des fichiers) | **Exécutée sur SAS OnDemand le 23/10/2026 (SAS 9.4M9) : 59 valeurs sur 59 égales à Python** (`WORK.VERIFICATION`, 0 écart) |
-| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 167 tests verts |
+| Référence testée | `qdd_s2/` (moteur, campagne, gouvernance, sensibilité, rapport Excel, export Qlik) | 170 tests verts |
 | Contrôles | `sql/controles/*.sql` (20, ANSI, sans CTE) + macros SAS équivalentes dans `sas/02_controles.sas` | Testés sur DuckDB |
 | Référentiels | `referentiels/` : dictionnaire (avec `origine` Interne / Externe, fournisseur, traitement), référentiel des contrôles (avec `risque_couvert`, `mode_realisation`, `mode_operatoire`, rédigés d'après le SQL de chaque contrôle), lignage (flux avec `origine`, fournisseur ; chemins), plan de campagne, historique. Colonnes ajoutées en fin de fichier : l'import SAS (`01_import_demo.sas`) les ignore | Source de vérité ; copie `sas/donnees_demo/` identique (`tests/test_conformite_notice.py`) |
 | Atelier HTML | `app/template.html` + `app/moteur.js` + `app/contenu.js` → `scripts/construire_appli.py` | Parité JS = Python testée |
@@ -23,6 +23,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 | Lignes en anomalie | `sql/lignes/C01…C10` (une ligne par objet fautif) + `lignes_anomalie.py` (lignes, regroupements, catalogue des règles) | Par contrôle et par maille, nombre de lignes = nombre d'anomalies du contrôle agrégé, sur N-1 et N (`tests/test_lignes_anomalie.py`) ; pas d'équivalent SAS |
 | Suivi des contrôles | `suivi_controles.py` (page Contrôles) : statut d'exécution (Exécuté, Saisi hors outil, Non réalisé, Échec technique) séparé du résultat, dernière réalisation, prochaine échéance (`qdd_s2.anteriorite.prochaine_echeance`), durée au rejeu, tendance sur les campagnes (échelle commune 85-100 %), filtres, avancement de la campagne, accès aux lignes en anomalie | Échéance passée ⇔ antériorité > 0 sur les 3 campagnes ; compteurs = moteur (`tests/test_suivi_controles.py`) ; pas d'équivalent SAS |
 | Relances | `relances.py` (page « Relances », Pilotage QDD) : par responsable, anomalies non clôturées (échéance dépassée, sous 30 jours, à venir, comparée à la date d'arrêté) et points de contrôle à refaire (antériorité > 0), message prêt à copier ou télécharger, export CSV ; rien n'est envoyé par l'application | Comptes égaux au moteur et aux tuiles de la Synthèse, message en français (`tests/test_relances.py`) ; pas d'équivalent SAS |
+| Dossier de comité | `comite.py` (en haut de la page Dossier de campagne) : Markdown puis PDF (`export_pdf.py`, en-tête et pied propres) : indicateurs, variation depuis N-1, données hors tolérance, QRT non conformes, contrôles non refaits, qui doit agir (relances), niveau 2, points à arbitrer tirés de règles écrites, lignes de décision à remplir, empreinte SHA-256 des données en défaut | Chiffres = moteur, points à arbitrer, PDF sans glyphe manquant (`tests/test_comite.py`) ; décisions et compte rendu laissés au comité ; pas d'équivalent SAS |
 | Contrôle de niveau 2 | `qdd_s2/niveau2.py` (page Contrôles, `output/controle_niveau2.csv`, dossier de campagne) : 7 constats à règle écrite (référentiel complet, contrôles dans leur périodicité, contrôles jamais en anomalie = « À revoir », données critiques contrôlées, critères E/X/P par donnée critique, zones de risque couvertes, données externes documentées et contrôlées) ; vert ou orange, jamais de rouge ni de score inventé | Valeurs de N testées et concordance avec le moteur (`tests/test_conformite_notice.py`) ; pas d'équivalent SAS |
 | Données en défaut conservées | `archives_defaut.py` + `scripts/archiver_donnees_en_defaut.py` → `archives/donnees_en_defaut/` (lignes en anomalie figées par campagne, manifeste SHA-256, jamais réécrites) ; fiche d'ajustement (`operations_qdd/correction.py`, `fiche_ajustement`) dans l'Atelier de résolution et le dossier | Archive = lignes recalculées sur une base régénérée, au bit près ; écrasement refusé ; pas d'équivalent SAS |
 | Document cadre | `qdd_s2/document_cadre.py` → `output/document_cadre.md` et Dossier de campagne : périmètre, critères, criticité, tolérance, instruments, depuis les référentiels et les paramètres ; rôles, comitologie, validation « À compléter par l'organisme » | Chiffres = moteur (`tests/test_conformite_notice.py`) ; pas d'équivalent SAS |
@@ -35,7 +36,7 @@ Ce fichier est lu automatiquement par Claude Code. Il donne le contexte, les rè
 pip install -r requirements.txt
 python scripts/generer_donnees_btp.py      # base fictive
 python -m qdd_s2                           # campagnes N-2, N-1 et N -> output/ (Excel, JSON, registre, journal, Qlik)
-python -m pytest -q                        # 167 tests, tous doivent passer
+python -m pytest -q                        # 170 tests, tous doivent passer
 python scripts/lint_sas.py                 # vérification statique du SAS (doit afficher « Lint SAS OK »)
 python scripts/construire_appli.py         # régénère l'atelier HTML (après python -m qdd_s2)
 streamlit run streamlit_app.py
@@ -77,7 +78,7 @@ Ordre des points de contrôle : fixé dans `executer_controle` (tri par maille) 
 
 ## Ce qui n'est PAS vérifié
 - Profondeur d'historique (notice QDD, point 34) : non testée. La base fictive n'a qu'une diagonale de paiements par arrêté (11 années de survenance, pas d'années de développement) : une étude de sensibilité de la profondeur n'aurait pas de sens sans fabriquer des triangles.
-- Compte-rendu de comité de pilotage : non produit (gabarit sans calcul nouveau ; relevé de décisions humain).
+- Compte-rendu de comité de pilotage : non produit (relevé de décisions humain). Le dossier préparatoire, lui, est généré (`comite.py`).
 - Exécution SAS : **vérifiée** sur SAS OnDemand le 23/10/2026 (`lancer_qdd.sas`) : 59/59. Une première exécution avait donné 44/59 (relances SCR absentes pour N-2, corrigé). Écarts résiduels : < 1e-8 sur les notes, jusqu'à 3,6e-7 sur les étapes de la variation (sous la tolérance de 1e-6, origine non analysée). Exercices : 6 sur 13 vérifiés (les autres n'imprimaient rien ; bloc E99 ajouté pour les afficher).
 - Script Qlik `app/chargement_qdd.qvs` et gabarit ODBC : jamais exécutés.
 - SCR : formule standard simplifiée, non réglementaire. Corrélations entre segments illustratives.

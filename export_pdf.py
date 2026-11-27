@@ -37,10 +37,14 @@ def _cellules(ligne: str) -> list[str]:
     return [c.strip() for c in ligne.strip().strip("|").split("|")]
 
 
+ENTETE = "ATELIER QDD · ASSISTANT QDD"
+PIED = "Données 100 % fictives · réponse générée par l'assistant à partir du moteur de l'application"
+
+
 class _Pdf(FPDF):
-    def __init__(self, titre: str):
+    def __init__(self, titre: str, entete: str = ENTETE, pied: str = PIED):
         super().__init__(format="A4")
-        self.titre_doc = titre
+        self.titre_doc, self.entete, self.pied = titre, entete, pied
         for style, fichier in (("", "Regular"), ("B", "Bold"), ("I", "Italic"), ("BI", "BoldItalic")):
             self.add_font("Liberation", style, POLICES / f"LiberationSans-{fichier}.ttf")
         self.set_margins(18, 18, 18)
@@ -51,7 +55,7 @@ class _Pdf(FPDF):
     def header(self):
         self.set_font("Liberation", "B", 8)
         self.set_text_color(*MARINE)
-        self.cell(0, 5, "ATELIER QDD · ASSISTANT QDD", new_x="LMARGIN", new_y="NEXT")
+        self.cell(0, 5, self.entete, new_x="LMARGIN", new_y="NEXT")
         self.set_draw_color(*MARINE)
         self.set_line_width(0.6)
         self.line(self.l_margin, self.get_y() + 1, self.w - self.r_margin, self.get_y() + 1)
@@ -61,15 +65,14 @@ class _Pdf(FPDF):
         self.set_y(-12)
         self.set_font("Liberation", "", 7.5)
         self.set_text_color(*GRIS)
-        self.cell(0, 5, "Données 100 % fictives · réponse générée par l'assistant à partir du moteur de l'application",
-                  align="L")
+        self.cell(0, 5, self.pied, align="L")
         self.set_x(self.l_margin)
         self.cell(0, 5, f"Page {self.page_no()}/{{nb}}", align="R")
 
 
-def pdf_depuis_markdown(md: str, titre: str = "Assistant QDD") -> bytes:
-    """Met en page le Markdown d'un export de l'assistant ; renvoie les octets du PDF."""
-    pdf = _Pdf(titre)
+def pdf_depuis_markdown(md: str, titre: str = "Assistant QDD", entete: str = ENTETE, pied: str = PIED) -> bytes:
+    """Met en page le Markdown d'un export (assistant, dossier de comité) ; renvoie les octets du PDF."""
+    pdf = _Pdf(titre, entete, pied)
     pdf.alias_nb_pages()
     pdf.add_page()
     largeur = pdf.w - pdf.l_margin - pdf.r_margin

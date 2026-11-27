@@ -28,7 +28,7 @@ USAGES = {
     "resolution": ("Proposer une correction sur une copie des données, relancer les 20 contrôles, faire valider "
                    "par une autre personne, exporter la preuve. La campagne de référence n'est jamais modifiée.",
                    "Pour montrer comment une anomalie se corrige et se prouve."),
-    "dossier": ("Le dossier de preuves de la campagne : résultats, règles, journal, pièces manquantes, à télécharger "
+    "dossier": ("Le dossier de comité en un clic (PDF : où en est-on, qui doit agir, points à arbitrer), puis le dossier de preuves de la campagne : résultats, règles, journal, pièces manquantes, à télécharger "
                 "en un seul fichier.", "Pour préparer un audit ou une revue de clôture."),
     "verif_sas": ("Le résultat de la chaîne SAS comparé valeur par valeur au moteur Python.", "Pour prouver que "
                   "la version SAS calcule juste."),

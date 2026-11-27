@@ -116,14 +116,14 @@ EXTENSIONS = [
                   '0,16 $ en sortie par tour).',
          prerequis='Côté console Anthropic (propriétaire) : plafond de dépense mensuel et rechargement automatique '
                    'désactivé, seul vrai plafond entre les visites.', effort='—'),
-    dict(id='E23', statut='Plus tard', titre='Dossier de comité en un clic (PDF)',
-         pourquoi='Le document à apporter en comité, produit par le moteur : note et variation, données critiques '
-                  'hors tolérance, restitutions QRT, anomalies ouvertes par responsable, contrôles en retard, points à '
-                  'arbitrer, avec la date et l’empreinte SHA-256 du dossier de preuves. Évite de le refaire à la main '
-                  'chaque trimestre.',
-         prerequis='Assemble l’existant (indicateurs, variation, registre, contrôle de niveau 2, export PDF, '
-                   'manifeste). Les décisions du comité restent humaines : le compte rendu n’est pas généré.',
-         effort='Moyen'),
+    dict(id='F30', statut='Fait', titre='Dossier de comité en un clic (PDF)',
+         pourquoi='En haut de la page Dossier de campagne : le document à apporter en comité, produit par le moteur '
+                  'pour la campagne affichée. Où en est-on, pourquoi la note a bougé, données hors tolérance, '
+                  'restitutions QRT non conformes, contrôles non refaits, qui doit agir, contrôle de niveau 2, points à '
+                  'arbitrer (7 sur la campagne N, tirés de règles écrites), lignes de décision à remplir en séance, '
+                  'empreinte SHA-256 des données en défaut. PDF ou Markdown.',
+         prerequis='Chiffres égaux au moteur (tests/test_comite.py). Les décisions et le compte rendu restent au '
+                   'comité : le dossier les prépare, il ne les écrit pas.', effort='—'),
     dict(id='E24', statut='Plus tard', titre='Gain de note avant correction',
          pourquoi='Avant de corriger, savoir ce que chaque correction rapporte : pour chaque point de contrôle en '
                   'anomalie, la note si ce point était corrigé et le changement de statut de la donnée. Exemple : les '

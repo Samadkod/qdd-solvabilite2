@@ -27,6 +27,7 @@ from suivi_controles import afficher_suivi
 from assistant_qdd import afficher as afficher_assistant, cle_api
 from fiche_assistant import afficher as afficher_fiche_assistant
 from relances import afficher as afficher_relances
+from comite import afficher as afficher_comite
 from statuts import legende as legende_statuts, tableau
 from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
@@ -468,7 +469,7 @@ def page_code() -> None:
 
 {
     "resolution": lambda: afficher_resolution(c, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant}),
-    "dossier": lambda: afficher_dossier(c, prev, *_contexte(c, prev), xlsx, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant}, ouvert=True),
+    "dossier": lambda: afficher_comite(c, prev, var if k == len(camps) - 1 else None) or afficher_dossier(c, prev, *_contexte(c, prev), xlsx, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant}, ouvert=True),
     "synthese": page_synthese,
     "chargement": page_chargement,
     "verif_sas": afficher_verification_sas,
