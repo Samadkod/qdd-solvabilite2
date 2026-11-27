@@ -150,6 +150,14 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F38', statut='Fait', titre='Atelier de résolution : pièce justificative par ligne et import de fichier',
+         pourquoi='Chaque ligne corrigée cite sa pièce justificative (obligatoire), reprise dans le scénario et dans '
+                  'la fiche d’ajustement (notice ACPR, points 36-37). Pour beaucoup de lignes : un modèle CSV à '
+                  'télécharger (identifiant, valeur actuelle, nouvelle valeur, pièce), puis l’import remplit le '
+                  'tableau ; identifiants inconnus, valeurs illisibles et doublons sont signalés.',
+         prerequis='La pièce est une référence écrite (nature, numéro, date), pas un fichier déposé : l’application '
+                   'ne lit pas le contenu des documents. Parcours vérifié dans l’écran et dans les tests.',
+         effort='—'),
     dict(id='F37', statut='Fait', titre='Atelier de résolution : une valeur par ligne dans une même déclaration',
          pourquoi='Remarque du propriétaire : avec « tous les objets », une seule valeur s’appliquait à toutes les '
                   'lignes ; ligne par ligne, chaque scénario repartait de la base d’origine et l’autre ligne restait '
@@ -202,6 +210,11 @@ EXTENSIONS = [
                   'base distante plutôt que sur des fichiers locaux.',
          prerequis='Une base hébergée (par exemple la base Neon prévue pour E14) et un poste avec SAS et un pilote '
                    'ODBC ; SAS OnDemand ne le permet pas forcément.', effort='Moyen'),
+    dict(id='E33', statut='Plus tard', titre='Atelier de résolution : enchaîner les corrections',
+         pourquoi='Partir d’un scénario validé pour en déclarer un autre sur la même copie (par exemple C05 puis C02), '
+                  'quand plusieurs défauts touchent la même campagne.',
+         prerequis='Chaque scénario repart aujourd’hui de la base d’origine ; il faudrait chaîner les copies et leurs '
+                   'preuves.', effort='Moyen'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

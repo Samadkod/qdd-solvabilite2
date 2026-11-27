@@ -69,3 +69,32 @@ def test_une_valeur_par_ligne_dans_une_meme_declaration_se_valide():
     co.rejouer(seul, cfg.base, c["params"])
     assert seul["statut"] == "Recontrôle bloquant"
     assert any("encore en anomalie sur la cible" in b for b in seul["preuve"]["blocages"])
+
+
+
+def test_piece_par_ligne_et_fichier_de_corrections():
+    """Piste 1 : une pièce justificative par ligne, reprise dans la fiche d'ajustement ; import d'un fichier CSV."""
+    import pandas as pd
+    cfg = Config()
+    camps, _ = lancer_campagnes(cfg)
+    r = camps[-1]
+    ev = r.evaluation
+    c = {"campagne": r.campagne, "date": r.date_arrete, "controles": ev.controles, "params": ev.params,
+         "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"})}
+    valides = co.candidats(cfg.base, c["date"], "C05", "AUTO_FLOTTE")
+    modele = co.modele_corrections(valides).decode("utf-8-sig")
+    assert modele.splitlines()[0] == "identifiant;valeur_actuelle;nouvelle_valeur;piece"
+    a, b = valides["objet"].tolist()
+    fichier = ("identifiant;nouvelle_valeur;piece\n"
+               f"{a};500,00;Rapport d'expert n° 2026-114\n{b};0;Courrier gestionnaire du 12/10/2026\n").encode()
+    lu, erreurs = co.lire_corrections(fichier, valides)
+    assert not erreurs and lu.set_index("objet")["nouvelle"].to_dict() == {a: 500.0, b: 0.0}
+    mauvais = f"identifiant,nouvelle_valeur\nXXX,1\n{a},abc\n{b},2\n{b},3\n".encode()
+    _, erreurs = co.lire_corrections(mauvais, valides)
+    assert len(erreurs) == 3 and any("XXX" in e for e in erreurs) and any("en double" in e for e in erreurs)
+    meth = {"methode_ecart": cfg.methode_ecart, "ponderation_montant": cfg.ponderation_montant}
+    cfgr = {"role_correction": "Propriétaire", "role_validation": "QDD", "separation": True}
+    rec = co.declarer(c, cfg.base, "C05", "AUTO_FLOTTE", lu.to_dict("records"), "Alice", "Dossiers revus", cfgr, meth)
+    assert [e["piece"] for e in rec["edits"]] == ["Rapport d'expert n° 2026-114", "Courrier gestionnaire du 12/10/2026"]
+    fiche = co.fiche_ajustement(rec)
+    assert "(pièce : Rapport d'expert n° 2026-114)" in fiche["Valeurs ajustées"]

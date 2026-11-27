@@ -80,7 +80,10 @@ def declarer(c: dict, base: Path | str, code: str, maille: str, edits: list[dict
             raise ValueError('Valeur invalide : montant fini ≥ 0, et prime acquise ≤ prime émise.')
         if valeur == float(row.ancienne):
             raise ValueError('La valeur proposée ne change pas la donnée.')
-        nettoyes.append({'objet': str(e['objet']), 'ancienne': float(row.ancienne), 'nouvelle': valeur})
+        ligne = {'objet': str(e['objet']), 'ancienne': float(row.ancienne), 'nouvelle': valeur}
+        if str(e.get('piece') or '').strip():
+            ligne['piece'] = str(e['piece']).strip()  # référence de la pièce justificative de cette ligne
+        nettoyes.append(ligne)
     if not config.get('role_correction', '').strip() or not config.get('role_validation', '').strip():
         raise ValueError('Les deux rôles doivent être nommés.')
     return {'schema': 1, 'id': str(uuid.uuid4()), 'campagne': c['campagne'], 'date': str(c['date']),
@@ -235,7 +238,8 @@ def fiche_ajustement(dossier: dict) -> dict:
         arch['sha256'] if arch else '',
         'Correction de valeur objet par objet sur une copie de la base, puis recontrôle des 20 règles ; la base de '
         'référence et l’archive des données en défaut ne sont pas modifiées.',
-        ' ; '.join(f"{e['objet']} : {e['ancienne']:.2f} → {e['nouvelle']:.2f}" for e in dossier['edits']),
+        ' ; '.join(f"{e['objet']} : {e['ancienne']:.2f} → {e['nouvelle']:.2f}"
+                   + (f" (pièce : {e['piece']})" if e.get('piece') else '') for e in dossier['edits']),
         dossier['justification'],
         f"{dossier['auteur']} ({conf.get('role_correction', '')})",
         f"{val['acteur']} ({val.get('role', '')})" if val else 'Non validé',
@@ -248,3 +252,49 @@ def fiche_ajustement(dossier: dict) -> dict:
 
 def fiches_ajustement(scenarios: list[dict]) -> pd.DataFrame:
     return pd.DataFrame([fiche_ajustement(s) for s in scenarios], columns=COLONNES_FICHE)
+
+
+# --------------------------------------------------------------------- fichier de corrections (beaucoup de lignes)
+COLONNES_FICHIER = ['identifiant', 'valeur_actuelle', 'nouvelle_valeur', 'piece']
+
+
+def modele_corrections(valides: pd.DataFrame) -> bytes:
+    """Le fichier à remplir : une ligne par identifiant modifiable, valeur actuelle rappelée, colonnes vides à saisir."""
+    m = pd.DataFrame({'identifiant': valides['objet'], 'valeur_actuelle': valides['ancienne'].round(2),
+                      'nouvelle_valeur': '', 'piece': ''})
+    return m.to_csv(index=False, sep=';', decimal=',').encode('utf-8-sig')
+
+
+def lire_corrections(contenu: bytes, valides: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    """Lit un fichier de corrections (CSV, séparateur ; ou ,) : renvoie identifiant, nouvelle valeur, pièce, et la
+    liste des erreurs (identifiant inconnu, valeur absente ou illisible, doublon). Rien n'est appliqué ici."""
+    import io
+    texte = contenu.decode('utf-8-sig', errors='replace')
+    sep = ';' if texte.count(';') >= texte.count(',') else ','
+    df = pd.read_csv(io.StringIO(texte), sep=sep, dtype=str, keep_default_na=False)
+    df.columns = [str(c).strip().lower() for c in df.columns]
+    manquantes = [c for c in ('identifiant', 'nouvelle_valeur') if c not in df.columns]
+    if manquantes:
+        return pd.DataFrame(columns=['objet', 'nouvelle', 'piece']), [f"Colonne absente : {', '.join(manquantes)}."]
+    erreurs, lignes = [], []
+    connus = set(valides['objet'].astype(str))
+    for i, r in enumerate(df.itertuples(index=False), start=2):
+        ident = str(r.identifiant).strip()
+        brut = str(r.nouvelle_valeur).strip().replace(' ', '').replace(',', '.')
+        if not ident and not brut:
+            continue
+        if ident not in connus:
+            erreurs.append(f"Ligne {i} : identifiant {ident or '(vide)'} absent des lignes en anomalie de ce segment.")
+            continue
+        try:
+            valeur = float(brut)
+        except ValueError:
+            erreurs.append(f"Ligne {i} ({ident}) : nouvelle valeur absente ou illisible.")
+            continue
+        lignes.append({'objet': ident, 'nouvelle': valeur,
+                       'piece': str(getattr(r, 'piece', '') or '').strip()})
+    out = pd.DataFrame(lignes, columns=['objet', 'nouvelle', 'piece'])
+    doublons = out.loc[out['objet'].duplicated(), 'objet'].unique().tolist()
+    if doublons:
+        erreurs.append(f"Identifiant(s) en double dans le fichier : {', '.join(doublons)}.")
+    return out.drop_duplicates('objet'), erreurs

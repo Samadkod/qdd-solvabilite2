@@ -8,8 +8,8 @@ from __future__ import annotations
 from operations_qdd.correction import ESSAIS_VALIDABLES, candidats
 
 ETAPES = [
-    ("Proposer", "Choisir la règle (C05 ou C02) et le segment ; dans le tableau, une nouvelle valeur par ligne (celle "
-                 "de sa pièce source), votre nom et la justification, puis « Déclarer la correction »."),
+    ("Proposer", "Choisir la règle (C05 ou C02) et le segment ; dans le tableau, une nouvelle valeur et une pièce "
+                 "justificative par ligne (ou un fichier CSV importé), votre nom, puis « Déclarer la correction »."),
     ("Recontrôler", "« Relancer les 20 contrôles sur la copie » : les 20 règles SQL tournent réellement sur une copie de "
                     "la base corrigée ; l'atelier compare chaque point avant et après."),
     ("Valider", "Une autre personne saisit son nom et valide. Le même nom que le correcteur est refusé (séparation des "
@@ -73,10 +73,11 @@ def afficher(c: dict, base) -> None:
                             f"{'s' if len(df) > 1 else ''} à provision négative** en flottes auto : {lignes}.")
             st.markdown(
                 "1. **Étape 1** : règle **C05 · Provision négative**, segment **Flottes auto**.\n"
-                "2. **Étape 2** : dans le tableau, une **nouvelle valeur pour chaque sinistre** (par exemple 500 € pour "
-                "l'un, 0 € pour l'autre : en réel, la valeur de chaque dossier vient de sa pièce source), votre nom, une "
-                "justification, cocher la confirmation, puis **Déclarer la correction**. Toutes les lignes sont "
-                "corrigées dans la même déclaration.\n"
+                "2. **Étape 2** : dans le tableau, pour chaque sinistre, une **nouvelle valeur** (par exemple 500 € pour "
+                "l'un, 0 € pour l'autre) et sa **pièce justificative** (par exemple « Rapport d'expert n° 2026-114 "
+                "du 12/10/2026 », fictif ici) ; votre nom, une justification d'ensemble, cocher la confirmation, puis "
+                "**Déclarer la correction**. Toutes les lignes sont corrigées dans la même déclaration. Beaucoup de "
+                "lignes : téléchargez le modèle CSV, remplissez-le, importez-le.\n"
                 "3. **Étape 3** : **Relancer les 20 contrôles sur la copie**. Attendu : C05 · Flottes auto passe à "
                 "100 % (0 anomalie) et aucun blocage ; l'état devient « Recontrôle réussi · à valider ».\n"
                 "4. **Étape 4** : saisir **un autre nom** que le correcteur, un commentaire, puis **Valider dans le bac "

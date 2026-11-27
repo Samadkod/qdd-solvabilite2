@@ -6,7 +6,8 @@ from html import escape
 import pandas as pd
 import streamlit as st
 from .diagnostic import diagnostic, impact
-from .correction import ESSAIS_VALIDABLES, REGLES, candidats, declarer, fiches_ajustement, rejouer, valider
+from .correction import (ESSAIS_VALIDABLES, REGLES, candidats, declarer, fiches_ajustement, lire_corrections,
+                         modele_corrections, rejouer, valider)
 from .evidence import completude, dossier_zip, json_bytes
 from explications import MODALITES
 from statuts import tableau
@@ -176,14 +177,36 @@ def afficher_resolution(c, base, methode):
             st.info(f'{len(df) - len(valides)} ligne(s) en anomalie ne sont pas modifiables (identifiant dupliqué) : il '
                     'restera des lignes fautives sur la cible, et la validation sera bloquée.', icon=':material/info:')
         etape(2, 'Proposer une correction justifiée')
-        st.caption('Une valeur par ligne : chaque identifiant reçoit sa propre valeur, tirée de sa pièce source. Toutes '
-                   'les lignes du segment sont corrigées dans une seule déclaration : c\'est ce qui permet la validation. '
-                   'Décocher une ligne la laisse en anomalie, et la validation sera alors bloquée.')
+        st.caption('Une valeur et une pièce justificative par ligne : chaque identifiant reçoit sa propre valeur, tirée '
+                   'de sa pièce. Toutes les lignes du segment sont corrigées dans une seule déclaration : c\'est ce qui '
+                   'permet la validation. Décocher une ligne la laisse en anomalie, et la validation sera alors bloquée.')
         grille = valides[[k for k in ('objet', 'ancienne', 'plafond') if k in valides]].copy()
         grille.insert(0, 'corriger', True)
         grille['nouvelle'] = 0.0
+        grille['piece'] = ''
+        cle_grille = f'qdd_grille_{code}_{maille}'
+        with st.expander('Beaucoup de lignes ? Importer un fichier de corrections (CSV)', icon=':material/upload_file:'):
+            st.caption('Téléchargez le modèle (une ligne par identifiant, valeur actuelle rappelée), remplissez '
+                       '« nouvelle_valeur » et « piece », puis déposez-le : le tableau ci-dessous se remplit, vous '
+                       'relisez avant de déclarer.')
+            st.download_button('Télécharger le modèle', modele_corrections(valides),
+                               file_name=f'corrections_{code}_{maille}.csv', mime='text/csv',
+                               icon=':material/download:', key=f'qdd_modele_{code}_{maille}')
+            fichier = st.file_uploader('Fichier de corrections', type=['csv'], key=f'qdd_import_{code}_{maille}')
+            if fichier is not None:
+                lu, erreurs = lire_corrections(fichier.getvalue(), valides)
+                for e in erreurs:
+                    st.error(e)
+                if len(lu):
+                    par_id = lu.set_index('objet')
+                    grille['corriger'] = grille['objet'].isin(par_id.index)
+                    grille['nouvelle'] = grille['objet'].map(par_id['nouvelle']).fillna(0.0)
+                    grille['piece'] = grille['objet'].map(par_id['piece']).fillna('')
+                    cle_grille += f'_{fichier.file_id}'
+                    st.success(f'{len(lu)} ligne(s) reprise(s) du fichier ; les identifiants absents du fichier sont '
+                               'décochés.')
         with st.form('qdd_declaration'):
-            saisie = st.data_editor(grille, hide_index=True, width='stretch', key=f'qdd_grille_{code}_{maille}',
+            saisie = st.data_editor(grille, hide_index=True, width='stretch', key=cle_grille,
                                     disabled=[k for k in ('objet', 'ancienne', 'plafond') if k in grille],
                                     column_config={
                                         'corriger': st.column_config.CheckboxColumn('Corriger'),
@@ -191,11 +214,15 @@ def afficher_resolution(c, base, methode):
                                         'ancienne': st.column_config.NumberColumn('Valeur actuelle (€)', format='%.2f'),
                                         'plafond': st.column_config.NumberColumn('Plafond : prime émise (€)', format='%.2f'),
                                         'nouvelle': st.column_config.NumberColumn('Nouvelle valeur (€)', min_value=0.0,
-                                                                                  step=1.0, format='%.2f')})
+                                                                                  step=1.0, format='%.2f'),
+                                        'piece': st.column_config.TextColumn(
+                                            'Pièce justificative', help='Référence du document qui prouve la valeur : '
+                                            'nature, numéro ou date (ex. « Rapport d\'expert n° 2026-114 du '
+                                            '12/10/2026 »). Fictive ici.')})
             auteur = st.text_input('Correcteur (nom déclaré)')
             st.caption('Zéro est une proposition pédagogique, pas une valeur métier prouvée. En entreprise, chaque '
                        'valeur doit être justifiée par une pièce source.')
-            justification = st.text_area('Justification / référence des pièces (fictive ici)')
+            justification = st.text_area('Justification d\'ensemble (pourquoi ces corrections)')
             confirme = st.checkbox('Je confirme cette proposition sur la copie fictive uniquement')
             submitted = st.form_submit_button('Déclarer la correction', type='primary')
         if submitted:
@@ -203,8 +230,13 @@ def afficher_resolution(c, base, methode):
                 if not confirme:
                     raise ValueError('Confirmer le périmètre fictif avant de déclarer.')
                 choix_lignes = saisie[saisie['corriger'].astype(bool)]
+                sans_piece = [r.objet for r in choix_lignes.itertuples() if not str(r.piece or '').strip()]
+                if sans_piece:
+                    raise ValueError('Pièce justificative manquante pour : ' + ', '.join(sans_piece)
+                                     + '. Chaque valeur corrigée doit citer sa pièce (notice ACPR, points 36-37).')
                 config = {'role_correction': role_correction, 'role_validation': role_validation, 'separation': separation}
-                edits = [{'objet': r.objet, 'nouvelle': float(r.nouvelle)} for r in choix_lignes.itertuples()]
+                edits = [{'objet': r.objet, 'nouvelle': float(r.nouvelle), 'piece': str(r.piece).strip()}
+                         for r in choix_lignes.itertuples()]
                 record = declarer(c, base, code, maille, edits, auteur, justification, config, methode)
                 st.session_state.setdefault('qdd_scenarios', []).append(record)
                 st.session_state['qdd_scenario_choix'] = record['id']
@@ -232,7 +264,8 @@ def afficher_resolution(c, base, methode):
     ed = pd.DataFrame(record['edits'])
     st.dataframe(ed.assign(ancienne=ed['ancienne'].map(_euros), nouvelle=ed['nouvelle'].map(_euros)),
                  hide_index=True, width='stretch',
-                 column_config={'objet': 'Identifiant', 'ancienne': 'Valeur avant', 'nouvelle': 'Valeur proposée'})
+                 column_config={'objet': 'Identifiant', 'ancienne': 'Valeur avant', 'nouvelle': 'Valeur proposée',
+                                'piece': 'Pièce justificative'})
     if record['statut'] != 'Validée dans le bac à sable':
         if st.button('Relancer les 20 contrôles sur la copie', key='qdd_rejouer', type='primary'):
             try:
