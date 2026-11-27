@@ -111,6 +111,8 @@ def afficher_resolution(c, base, methode):
                     f'<h2>{escape(titre)}</h2></div>', unsafe_allow_html=True)
 
     st.caption('Bac à sable · données fictives · campagne historique inchangée')
+    from fiche_atelier import afficher as afficher_fiche
+    afficher_fiche(c, base)
     scenarios = scenarios_contexte(c, methode)
     choix = st.session_state.get('qdd_scenario_choix')
     courant = next((s for s in scenarios if s['id'] == choix), scenarios[-1] if scenarios else None)
@@ -133,11 +135,6 @@ def afficher_resolution(c, base, methode):
                        "volontaires (dates C06, règlements R04, état S.05.01 Q04) touchent les mêmes données et ne "
                        "sont réglés qu'à la campagne suivante. Pour l'essai complet, choisir la campagne **N** "
                        "en haut du menu.", icon=':material/info:')
-    with st.expander('Premier essai : quelle valeur saisir ?', expanded=False):
-        st.markdown('**Campagne N → C05 → AUTO_FLOTTE → tous les objets modifiables.** '
-                    'Pour un exercice fictif, proposer **0 €**, puis déclarer et recontrôler.')
-        st.caption('Zéro permet de tester la règle « provision ≥ 0 ». Ce n’est pas une valeur métier prouvée : '
-                   'en situation réelle, utiliser une pièce source et l’avis du propriétaire de la donnée.')
     with st.expander('Périmètre et limites du bac à sable', expanded=False):
         st.warning('Session volatile : exporter les preuves avant de quitter. Aucune écriture dans la base '
                    'ou le registre de référence. Noms et rôles déclaratifs, sans droits réels.')
