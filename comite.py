@@ -81,7 +81,30 @@ def points_a_arbitrer(c: dict) -> list[str]:
     return points
 
 
-def markdown_comite(c: dict, prev: dict | None = None, var: pd.DataFrame | None = None, genere_le=None) -> str:
+def _section_gains(gains: pd.DataFrame | None, par_donnee: pd.DataFrame | None) -> list[str]:
+    """Ce que rapporteraient les corrections (gain.py) : par donnée hors tolérance, puis les 5 meilleurs points."""
+    if gains is None or gains.empty:
+        return []
+    l = ["## 8. Ce que rapporteraient les corrections", "",
+         "*Recalcul du moteur sur une copie : « refait » = même résultat sans pénalité de retard ; « corrigé » = "
+         "résultat porté à 100 %.*", ""]
+    if par_donnee is not None and len(par_donnee):
+        l += _table(["Donnée", "Hypothèse", "Statut de la donnée", "Note QDD après", "Gain"],
+                    [[r.donnee, r.hypothese, f"{r.statut_avant} → {r.statut_apres}" if r.statut_avant != "—" else "—",
+                      _pct(r.note_apres), _pts(r.gain_points / 100)] for r in par_donnee.itertuples()])
+    top = gains[gains["gain_points"] > 0.005].head(5)
+    l += _table(["Point", "Hypothèse", "Gain", "Responsable"],
+                [[r.point.replace("|", " · "), r.hypothese, _pts(r.gain_points / 100), r.responsable]
+                 for r in top.itertuples()])
+    nuls = gains[(gains["gain_points"] <= 0.005) & (gains["hypothese"] == "Corrigé et refait")]["point"].nunique()
+    if nuls:
+        l += [f"{nuls} points corrigés ne changeraient pas la note (données non critiques ou restitutions QRT, hors "
+              "note) : à traiter quand même, sans en attendre d'effet sur la note.", ""]
+    return l
+
+
+def markdown_comite(c: dict, prev: dict | None = None, var: pd.DataFrame | None = None, genere_le=None,
+                    gains: pd.DataFrame | None = None, par_donnee: pd.DataFrame | None = None) -> str:
     """Le dossier de comité en Markdown (mis en page en PDF par export_pdf)."""
     ind, g, d, ct = c["ind"], c["gouv"], c["donnees"], c["controles"]
     genere_le = pd.Timestamp.now() if genere_le is None else pd.Timestamp(genere_le)
@@ -145,10 +168,13 @@ def markdown_comite(c: dict, prev: dict | None = None, var: pd.DataFrame | None 
         l += ["## 7. Contrôle de niveau 2", ""]
         l += _table(["Constat", "Valeur", "Appréciation"],
                     [[r.indicateur, r.valeur, STATUTS.get(r.statut, r.statut)] for r in n2.itertuples()])
-    l += ["## 8. Points à arbitrer", "",
+    gains_md = _section_gains(gains, par_donnee)
+    l += gains_md
+    n_arb, n_dec = (9, 10) if gains_md else (8, 9)
+    l += [f"## {n_arb}. Points à arbitrer", "",
           "*Proposés par l'application à partir des règles du dispositif ; la décision revient au comité.*", ""]
     l += [f"{i}. {p}" for i, p in enumerate(points_a_arbitrer(c), 1)] or ["Aucun."]
-    l += ["", "## 9. Décisions du comité", "", "*À compléter en séance.*", ""]
+    l += ["", f"## {n_dec}. Décisions du comité", "", "*À compléter en séance.*", ""]
     l += [f"{i}. Décision : {'.' * 60}  Responsable : {'.' * 28}  Échéance : {'.' * 14}"
           for i in range(1, 5)] + [""]
     emp = _empreinte(c["campagne"])
@@ -180,7 +206,14 @@ def afficher(c: dict, prev: dict | None, var: pd.DataFrame | None) -> None:
         g.markdown("**Dossier de comité** · note et variation, données hors tolérance, restitutions QRT, contrôles "
                    "en retard, qui doit agir, niveau 2, points à arbitrer, preuves. Généré par le moteur pour la "
                    "campagne affichée.")
-        md = markdown_comite(c, prev, var, genere_le=pd.Timestamp.now().normalize())  # stable dans la journée
+        from gain import par_donnee, simulations
+
+        @st.cache_data(show_spinner="Préparation du dossier de comité…", max_entries=12)
+        def _gains(campagne: str, _c: dict, _p, cle: str):
+            return simulations(_c, _p), par_donnee(_c, _p)
+        gains, pdn = _gains(c["campagne"], c, c["params"], repr(c["params"])) if c.get("params") else (None, None)
+        md = markdown_comite(c, prev, var, genere_le=pd.Timestamp.now().normalize(), gains=gains,
+                             par_donnee=pdn)  # date du jour : contenu stable dans la journée
         titre = f"Comité QDD — campagne {c['campagne']}"
         b1, b2 = d.columns(2)
         b1.download_button("PDF", pdf_comite(md, titre), file_name=f"dossier_comite_{c['campagne']}.pdf",

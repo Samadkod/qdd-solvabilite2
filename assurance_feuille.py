@@ -124,14 +124,15 @@ EXTENSIONS = [
                   'empreinte SHA-256 des données en défaut. PDF ou Markdown.',
          prerequis='Chiffres égaux au moteur (tests/test_comite.py). Les décisions et le compte rendu restent au '
                    'comité : le dossier les prépare, il ne les écrit pas.', effort='—'),
-    dict(id='E24', statut='Plus tard', titre='Gain de note avant correction',
-         pourquoi='Avant de corriger, savoir ce que chaque correction rapporte : pour chaque point de contrôle en '
-                  'anomalie, la note si ce point était corrigé et le changement de statut de la donnée. Exemple : les '
-                  '89 lignes de C10 portent sur le code activité, donnée non critique : les corriger ne change pas la '
-                  'note ; corriger C07 ou R04 RC décennale, si. Transforme la liste d’anomalies en arbitrage chiffré.',
-         prerequis='Recalcul par le moteur avec le résultat du point porté à 100 % (hypothèse affichée), sans '
-                   'toucher la base ; l’Atelier de résolution reste le seul chemin d’une vraie correction.',
-         effort='Moyen'),
+    dict(id='F31', statut='Fait', titre='Gain de note avant correction',
+         pourquoi='Page Note & données et dossier de comité : pour chaque point imparfait ou en retard, la note '
+                  'recalculée par le moteur s’il était refait (même résultat, sans pénalité) ou corrigé (100 %), et '
+                  'par donnée hors tolérance ce qu’il faut pour qu’elle repasse conforme. Campagne N : premier levier '
+                  'R03 RC décennale (+1,06 pt) ; refaire C07 suffit à remettre la date de survenance conforme ; '
+                  'la RC décennale ne redevient conforme qu’une fois ses points corrigés (+1,58 pt) ; 24 corrections '
+                  'sans effet sur la note (données non critiques, restitutions QRT).',
+         prerequis='Recalcul exact du moteur (sans hypothèse, la note est retrouvée à 1e-12 près), sur une copie ; '
+                   'la vraie correction reste celle de l’Atelier de résolution (tests/test_gain.py).', effort='—'),
     dict(id='E25', statut='Plus tard', titre='Inventaire des tâches manuelles de l’équipe (prise de poste)',
          pourquoi='Répondre à « qu’est-ce qui vous prend du temps chaque trimestre ? » : pour chaque tâche, sa '
                   'fréquence, le temps passé, l’outil, et ce qui peut être automatisé, avec le temps gagné estimé et la '

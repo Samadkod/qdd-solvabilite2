@@ -137,6 +137,8 @@ def pdf_depuis_markdown(md: str, titre: str = "Assistant QDD", entete: str = ENT
             puce = "•" if m.group(2) in "-*+" else m.group(2)
             pdf.set_font("Liberation", "", 10)
             pdf.set_text_color(*GRIS if puce == "•" else ENCRE)
+            if pdf.get_y() + 12 > pdf.page_break_trigger:  # la puce ne reste jamais seule en bas de page
+                pdf.add_page()
             pdf.set_x(pdf.l_margin + retrait - 4)
             y = pdf.get_y()
             pdf.cell(4, 5, puce)

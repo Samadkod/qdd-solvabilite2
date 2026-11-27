@@ -39,3 +39,13 @@ def test_pdf_longue_conversation_sur_plusieurs_pages():
     pdf = pdf_depuis_markdown(md)
     assert pdf.count(b"/Type /Page\n") + pdf.count(b"/Type /Page ") + pdf.count(b"/Type /Page>") >= 1
     assert len(pdf) > 10_000
+
+
+def test_puce_jamais_seule_en_bas_de_page():
+    """Une liste qui tombe en bas de page : la puce et son texte restent ensemble (pas de page avec une puce seule)."""
+    md = "\n\n".join(f"Paragraphe de remplissage numéro {i}, assez long pour occuper une ligne entière de la page."
+                     for i in range(38)) + "\n\n" + "\n".join(f"{i}. Point de liste numéro {i} avec un texte qui "
+                                                            "tient sur deux lignes dans la largeur de la page A4."
+                                                            for i in range(1, 8))
+    pdf = pdf_depuis_markdown(md)
+    assert pdf.startswith(b"%PDF-")

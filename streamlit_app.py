@@ -28,6 +28,7 @@ from assistant_qdd import afficher as afficher_assistant, cle_api
 from fiche_assistant import afficher as afficher_fiche_assistant
 from relances import afficher as afficher_relances
 from comite import afficher as afficher_comite
+from gain import afficher as afficher_gain
 from statuts import legende as legende_statuts, tableau
 from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
@@ -360,6 +361,8 @@ def page_donnees() -> None:
             "Les colonnes *s_choc_…* refont le calcul avec d'autres chocs (−15 %, +5 %, +30 %) : si elles restent "
             "proches, la sensibilité est fiable (*lineaire* = vrai). Au-delà de 10 % d'écart (*non_linearite*), "
             "il faut la manier avec prudence.")
+    st.divider()
+    afficher_gain(c, c["params"])
     st.download_button("Rapport Excel de la campagne", xlsx, icon=":material/download:", file_name="rapport_qdd.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 

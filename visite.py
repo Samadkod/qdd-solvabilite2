@@ -6,7 +6,7 @@ USAGES = {
     "synthese": ("La note de la campagne, les contrôles, les anomalies, le chargement : tout en tuiles, avec "
                  "l'évolution depuis la campagne précédente.", "En premier, à chaque campagne ; c'est l'écran à montrer."),
     "donnees": ("Chaque donnée critique : sa note, son minimum exigé, son statut ; pourquoi la note globale a "
-                "bougé (cascade) ; la note par segment, étape, critère, responsable.", "Pour expliquer un rouge ou "
+                "bougé (cascade) ; la note par segment, étape, critère, responsable ; le gain de note de chaque correction avant de la faire.", "Pour expliquer un rouge ou "
                 "une baisse de note."),
     "controles": ("La liste de suivi des points de contrôle : exécuté ou non, résultat, échéance, tendance, "
                   "durée ; clic sur une ligne pour voir ses lignes en anomalie.", "Pendant la campagne, pour "
