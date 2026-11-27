@@ -139,13 +139,15 @@ EXTENSIONS = [
                   'fonction de l’application qui le couvre déjà (contrôles, relances, dossier de comité, preuves).',
          prerequis='Gabarit vide dans l’application (aucune donnée inventée), rempli avec l’équipe après la prise de '
                    'poste ; les données réelles restent en interne.', effort='Faible'),
-    dict(id='E26', statut='À vérifier', titre='Points de la notice ACPR les plus souvent relevés',
-         pourquoi='Répondre à « sur quoi l’ACPR met-elle de mauvaises appréciations ? » : rattacher chaque point de '
-                  'la notice QDD à ce que l’application couvre (preuve, page) et à ce qui manque, en priorisant les '
-                  'faiblesses que l’ACPR signale publiquement.',
-         prerequis='Sources publiques à rassembler et citer (notice ACPR, rapports et publications de l’ACPR, mémoire '
-                   'de C. Motard) ; aucune faiblesse affirmée sans source. Les constats propres à l’entreprise '
-                   '(rapports de contrôle) restent confidentiels et internes.', effort='Moyen'),
+    dict(id='F32', statut='Fait', titre='Constats de l’ACPR et couverture par l’application',
+         pourquoi='Page « Constats de l’ACPR » (Documentation › Comprendre) : 15 faiblesses que l’ACPR relève le plus '
+                  'souvent (communiqué du 11/01/2021, enquêtes 2022 et 2024), chacune avec ses chiffres, sa source, sa '
+                  'page et une citation exacte, le point de la notice du 08/11/2023 concerné, ce que l’application '
+                  'couvre (9 couverts, 5 partiels, 1 hors application) et ce qui reste à faire en entreprise ; chiffres '
+                  'de la campagne lus dans le moteur ; grille téléchargeable.',
+         prerequis='Documents de l’ACPR lus en entier ; les 15 citations vérifiées mot pour mot dans les textes. Les '
+                   'enquêtes sont déclaratives (rappel de l’ACPR) ; les constats propres à un organisme restent '
+                   'confidentiels et internes.', effort='—'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

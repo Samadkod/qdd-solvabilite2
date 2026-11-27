@@ -16,6 +16,9 @@ USAGES = {
     "relances": ("Pour chaque responsable : ses anomalies échues ou proches de l'échéance et ses contrôles à "
                  "refaire, avec le message prêt à copier ou télécharger.", "Chaque semaine de campagne, pour faire "
                  "agir les propriétaires."),
+    "acpr": ("Les faiblesses que l'ACPR relève le plus souvent (enquêtes 2022 et 2024, communiqué 2021), chaque "
+             "constat sourcé et cité, face à ce que l'application couvre et à ce qui reste à faire.", "Avant un "
+             "comité, un audit ou à la prise de poste, pour situer le dispositif."),
     "lignes": ("Les lignes fautives elles-mêmes (contrat, sinistre, titre), avec un message en clair, et leurs "
                "regroupements.", "Pour transmettre à un propriétaire exactement quoi corriger."),
     "regles": ("Le catalogue des 20 contrôles : ce que chacun vérifie, sa famille, son responsable.",

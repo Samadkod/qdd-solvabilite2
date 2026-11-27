@@ -29,6 +29,7 @@ from fiche_assistant import afficher as afficher_fiche_assistant
 from relances import afficher as afficher_relances
 from comite import afficher as afficher_comite
 from gain import afficher as afficher_gain
+from constats_acpr import afficher as afficher_constats_acpr
 from statuts import legende as legende_statuts, tableau
 from langue import LANGUES, t
 from verification_sas import afficher as afficher_verification_sas
@@ -132,6 +133,8 @@ PAGES = {
                 "Ce qui reste à faire, ce qui attend une décision, et ce qui a été fait."),
     "comprendre": ("Comprendre", "D'où sortent les chiffres", ":material/calculate:", "Le calcul pas à pas, sur les vrais chiffres."),
     "guide": ("Comprendre", "Guide terre à terre", ":material/explore:", "Le métier, les chiffres et le poste, sans jargon."),
+    "acpr": ("Comprendre", "Constats de l'ACPR", ":material/gavel:",
+             "Ce que l'ACPR relève le plus souvent, sources à l'appui, et ce que l'application couvre."),
     "visite": ("Comprendre", "Visite de l'application", ":material/map:", "Chaque page en une ligne : à quoi elle sert, quand l'ouvrir."),
     "sas": ("Se former", "SAS pratique", ":material/school:", "13 exercices progressifs, corrigés, avec le résultat attendu."),
     "atelier": ("Se former", "Atelier QDD", ":material/quiz:", "Résolution fictive et atelier de révision conservé."),
@@ -492,5 +495,6 @@ def page_code() -> None:
     "atelier": page_atelier,
     "code": page_code,
     "visite": lambda: afficher_visite(PAGES, aller),
+    "acpr": lambda: afficher_constats_acpr(c, aller, PAGES),
     "entreprise": afficher_passage_entreprise,
 }[page]()

@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 
 APP = Path(__file__).resolve().parents[1] / "streamlit_app.py"
 ATELIER = ["synthese", "donnees", "controles", "anomalies", "relances", "lignes", "regles", "lignage", "chargement", "resolution", "dossier", "verif_sas", "assistant", "fiche_assistant", "feuille"]
-DOCUMENTATION = ["comprendre", "guide", "visite", "sas", "atelier", "entreprise", "code"]
+DOCUMENTATION = ["comprendre", "guide", "acpr", "visite", "sas", "atelier", "entreprise", "code"]
 PAGES = ATELIER + DOCUMENTATION
 
 
