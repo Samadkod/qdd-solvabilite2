@@ -150,6 +150,13 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F37', statut='Fait', titre='Atelier de résolution : une valeur par ligne dans une même déclaration',
+         pourquoi='Remarque du propriétaire : avec « tous les objets », une seule valeur s’appliquait à toutes les '
+                  'lignes ; ligne par ligne, chaque scénario repartait de la base d’origine et l’autre ligne restait '
+                  'fautive, donc la validation était impossible. Désormais un tableau donne à chaque identifiant sa '
+                  'propre valeur dans une seule déclaration (exemple : 500 € et 0 €), qui va jusqu’à la validation.',
+         prerequis='Parcours vérifié dans l’écran et dans les tests (tests/test_fiche_atelier.py) ; la fiche de '
+                   'l’atelier est mise à jour.', effort='—'),
     dict(id='F36', statut='Fait', titre='Fiche de l’Atelier de résolution',
          pourquoi='En haut de l’Atelier de résolution : à quoi il sert, les 4 étapes (proposer, recontrôler, valider, '
                   'exporter), un exemple pas à pas sur les vraies lignes de la campagne (C05 · Flottes auto : 2 '

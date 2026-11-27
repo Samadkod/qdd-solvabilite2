@@ -172,29 +172,39 @@ def afficher_resolution(c, base, methode):
     })
     valides = df[df.modifiable]
     if not valides.empty:
-        portee = st.radio('Périmètre de correction', ['Un objet', 'Tous les objets modifiables du segment'],
-                          index=1, horizontal=True, key='qdd_portee')
-        objet = st.selectbox('Objet ciblé', valides.objet.tolist(), key=f'qdd_objet_{code}_{maille}') if portee == 'Un objet' else None
-        cible = valides[valides.objet == objet] if objet else valides
-        st.caption(f'{len(cible)} objet(s). Les identifiants dupliqués sont exclus et peuvent empêcher la validation.')
-        if len(cible) < len(df):
-            st.info(f'{len(df) - len(cible)} ligne(s) en anomalie ne seront pas corrigées : il restera des lignes '
-                    'fautives sur la cible, et la validation sera bloquée.', icon=':material/info:')
+        if len(valides) < len(df):
+            st.info(f'{len(df) - len(valides)} ligne(s) en anomalie ne sont pas modifiables (identifiant dupliqué) : il '
+                    'restera des lignes fautives sur la cible, et la validation sera bloquée.', icon=':material/info:')
         etape(2, 'Proposer une correction justifiée')
+        st.caption('Une valeur par ligne : chaque identifiant reçoit sa propre valeur, tirée de sa pièce source. Toutes '
+                   'les lignes du segment sont corrigées dans une seule déclaration : c\'est ce qui permet la validation. '
+                   'Décocher une ligne la laisse en anomalie, et la validation sera alors bloquée.')
+        grille = valides[[k for k in ('objet', 'ancienne', 'plafond') if k in valides]].copy()
+        grille.insert(0, 'corriger', True)
+        grille['nouvelle'] = 0.0
         with st.form('qdd_declaration'):
+            saisie = st.data_editor(grille, hide_index=True, width='stretch', key=f'qdd_grille_{code}_{maille}',
+                                    disabled=[k for k in ('objet', 'ancienne', 'plafond') if k in grille],
+                                    column_config={
+                                        'corriger': st.column_config.CheckboxColumn('Corriger'),
+                                        'objet': st.column_config.TextColumn('Identifiant'),
+                                        'ancienne': st.column_config.NumberColumn('Valeur actuelle (€)', format='%.2f'),
+                                        'plafond': st.column_config.NumberColumn('Plafond : prime émise (€)', format='%.2f'),
+                                        'nouvelle': st.column_config.NumberColumn('Nouvelle valeur (€)', min_value=0.0,
+                                                                                  step=1.0, format='%.2f')})
             auteur = st.text_input('Correcteur (nom déclaré)')
-            nouvelle = st.number_input('Nouvelle valeur (€), commune aux objets sélectionnés', min_value=0.0, value=0.0, step=1.0)
             st.caption('Zéro est une proposition pédagogique, pas une valeur métier prouvée. En entreprise, chaque '
-                       'valeur doit être justifiée par une pièce source ; une correction de masse peut être inadaptée.')
-            justification = st.text_area('Justification / référence de la pièce (fictive ici)')
+                       'valeur doit être justifiée par une pièce source.')
+            justification = st.text_area('Justification / référence des pièces (fictive ici)')
             confirme = st.checkbox('Je confirme cette proposition sur la copie fictive uniquement')
             submitted = st.form_submit_button('Déclarer la correction', type='primary')
         if submitted:
             try:
                 if not confirme:
                     raise ValueError('Confirmer le périmètre fictif avant de déclarer.')
+                choix_lignes = saisie[saisie['corriger'].astype(bool)]
                 config = {'role_correction': role_correction, 'role_validation': role_validation, 'separation': separation}
-                edits = [{'objet': r.objet, 'nouvelle': nouvelle} for r in cible.itertuples()]
+                edits = [{'objet': r.objet, 'nouvelle': float(r.nouvelle)} for r in choix_lignes.itertuples()]
                 record = declarer(c, base, code, maille, edits, auteur, justification, config, methode)
                 st.session_state.setdefault('qdd_scenarios', []).append(record)
                 st.session_state['qdd_scenario_choix'] = record['id']

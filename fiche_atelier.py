@@ -8,8 +8,8 @@ from __future__ import annotations
 from operations_qdd.correction import ESSAIS_VALIDABLES, candidats
 
 ETAPES = [
-    ("Proposer", "Choisir la règle (C05 ou C02), le segment et les lignes à corriger, saisir la nouvelle valeur, "
-                 "votre nom et la justification (la pièce source), puis « Déclarer la correction »."),
+    ("Proposer", "Choisir la règle (C05 ou C02) et le segment ; dans le tableau, une nouvelle valeur par ligne (celle "
+                 "de sa pièce source), votre nom et la justification, puis « Déclarer la correction »."),
     ("Recontrôler", "« Relancer les 20 contrôles sur la copie » : les 20 règles SQL tournent réellement sur une copie de "
                     "la base corrigée ; l'atelier compare chaque point avant et après."),
     ("Valider", "Une autre personne saisit son nom et valide. Le même nom que le correcteur est refusé (séparation des "
@@ -32,7 +32,9 @@ NE_FAIT_PAS = [
 BLOCAGES = [
     ("La donnée n'est pas critique", "Elle n'a pas de seuil QDD : le scénario peut être recontrôlé, jamais validé."),
     ("Des lignes fautives restent sur la cible", "Toutes les lignes en anomalie du segment doivent être corrigées "
-                                                 "(choisir « Tous les objets modifiables du segment »)."),
+                                                 "dans la même déclaration (chacune avec sa propre valeur) : une "
+                                                 "déclaration par ligne ne suffit pas, chaque scénario part de la "
+                                                 "base d'origine."),
     ("Un autre contrôle de la même donnée reste sous son seuil", "La validation exige que la donnée corrigée soit "
                                                                  "conforme sur tous ses contrôles, pas seulement sur "
                                                                  "la règle corrigée : l'autre défaut est à traiter à part."),
@@ -70,11 +72,11 @@ def afficher(c: dict, base) -> None:
                 st.markdown(f"Sur la campagne {c['campagne']}, le contrôle C05 trouve **{len(df)} sinistre"
                             f"{'s' if len(df) > 1 else ''} à provision négative** en flottes auto : {lignes}.")
             st.markdown(
-                "1. **Étape 1** : règle **C05 · Provision négative**, segment **Flottes auto**, périmètre **Tous les "
-                "objets modifiables du segment**.\n"
-                "2. **Étape 2** : nouvelle valeur **0 €** (pédagogique : en réel, la valeur vient d'une pièce source et "
-                "du propriétaire de la donnée), votre nom, une justification, cocher la confirmation, puis **Déclarer "
-                "la correction**.\n"
+                "1. **Étape 1** : règle **C05 · Provision négative**, segment **Flottes auto**.\n"
+                "2. **Étape 2** : dans le tableau, une **nouvelle valeur pour chaque sinistre** (par exemple 500 € pour "
+                "l'un, 0 € pour l'autre : en réel, la valeur de chaque dossier vient de sa pièce source), votre nom, une "
+                "justification, cocher la confirmation, puis **Déclarer la correction**. Toutes les lignes sont "
+                "corrigées dans la même déclaration.\n"
                 "3. **Étape 3** : **Relancer les 20 contrôles sur la copie**. Attendu : C05 · Flottes auto passe à "
                 "100 % (0 anomalie) et aucun blocage ; l'état devient « Recontrôle réussi · à valider ».\n"
                 "4. **Étape 4** : saisir **un autre nom** que le correcteur, un commentaire, puis **Valider dans le bac "

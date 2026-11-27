@@ -43,3 +43,29 @@ def test_fiche_alignee_sur_le_code():
                   "encore dégradé"):
         assert motif in code  # les 4 motifs expliqués par la fiche existent bien dans le recontrôle
     assert len(BLOCAGES) == 4 and set(co.REGLES) == {"C02", "C05"}
+
+
+
+def test_une_valeur_par_ligne_dans_une_meme_declaration_se_valide():
+    """Demande du propriétaire : 500 € pour un sinistre, 0 € pour l'autre, dans une seule déclaration."""
+    cfg = Config()
+    camps, _ = lancer_campagnes(cfg)
+    r = camps[-1]
+    ev = r.evaluation
+    c = {"campagne": r.campagne, "date": r.date_arrete, "controles": ev.controles, "params": ev.params,
+         "donnees": ev.donnees.reset_index().rename(columns={"index": "donnee_id"})}
+    objets = list(co.candidats(cfg.base, c["date"], "C05", "AUTO_FLOTTE")["objet"])
+    edits = [{"objet": objets[0], "nouvelle": 500.0}, {"objet": objets[1], "nouvelle": 0.0}]
+    meth = {"methode_ecart": cfg.methode_ecart, "ponderation_montant": cfg.ponderation_montant}
+    cfgr = {"role_correction": "Propriétaire", "role_validation": "QDD", "separation": True}
+    rec = co.declarer(c, cfg.base, "C05", "AUTO_FLOTTE", edits, "Alice", "Pièces fictives", cfgr, meth)
+    assert [e["nouvelle"] for e in rec["edits"]] == [500.0, 0.0]
+    co.rejouer(rec, cfg.base, c["params"])
+    assert rec["statut"] == "Recontrôle réussi · à valider"
+    co.valider(rec, "Bob", "QDD", "ok")
+    assert rec["statut"] == "Validée dans le bac à sable"
+    # une seule ligne corrigée : l'autre reste fautive, la validation est bloquée (d'où la saisie ligne par ligne)
+    seul = co.declarer(c, cfg.base, "C05", "AUTO_FLOTTE", edits[:1], "Alice", "Pièce fictive", cfgr, meth)
+    co.rejouer(seul, cfg.base, c["params"])
+    assert seul["statut"] == "Recontrôle bloquant"
+    assert any("encore en anomalie sur la cible" in b for b in seul["preuve"]["blocages"])
