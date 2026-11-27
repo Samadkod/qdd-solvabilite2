@@ -57,7 +57,7 @@ MISSIONS = [
      "Lister les documents existants, leur date de mise à jour et ce que l'ACPR a relevé"),
     ("Qualité & gouvernance", "Intégrer les exigences QDD dans les projets de transformation digitale et les groupes de travail IT",
      "Quand un outil change, vérifier que les données restent justes avant, pendant et après",
-     ["resolution", "lignage"], "Partiel",
+     ["projet", "lignage", "resolution"], "Couvert",
      "Demander la liste des projets IT en cours qui touchent des données critiques"),
     ("Optimisation & automatisation", "Analyser les processus existants et proposer des améliorations (fiabilité, efficacité)",
      "Repérer ce qui est lent, manuel ou fragile, chiffrer le temps perdu et proposer mieux",
@@ -108,7 +108,7 @@ PROFIL = [
 COUVERTURES_MISSION = ["Couvert", "Partiel", "À développer"]
 TITRES_PAGES = {"synthese": "Synthèse", "donnees": "Note & données", "controles": "Contrôles", "anomalies": "Anomalies",
                 "relances": "Relances", "lignes": "Lignes en anomalie", "regles": "Règles de contrôle",
-                "lignage": "Lignage & dictionnaire", "chargement": "Chargement & exécution",
+                "lignage": "Lignage & dictionnaire", "chargement": "Chargement & exécution", "projet": "Avis QDD sur un projet",
                 "resolution": "Atelier de résolution", "dossier": "Dossier de campagne", "verif_sas": "Vérification SAS",
                 "assistant": "Assistant QDD", "guide": "Guide terre à terre", "glossaire": "Glossaire",
                 "acpr": "Constats de l'ACPR", "sas": "SAS pratique", "entreprise": "Mise en place en entreprise",

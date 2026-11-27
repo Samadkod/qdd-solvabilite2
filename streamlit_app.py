@@ -44,6 +44,7 @@ from guide_terrain import afficher_guide
 from assurance_style import appliquer_style, bandeau, comportement_interface, couleur_texte, entete_page
 from chargement import SEUIL_VARIATION, execution as executer_controles, volumetrie
 from assurance_feuille import afficher_feuille_de_route
+from evaluation_projet import afficher as afficher_avis_projet
 from operations_qdd.ui import afficher_diagnostic, afficher_impact, afficher_resolution, afficher_dossier
 from lignes_anomalie import afficher_lignes, afficher_regles, lignes as lignes_en_anomalie, referentiel
 from synthese import tuiles
@@ -122,6 +123,8 @@ PAGES = {
                 "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée."),
     "chargement": ("Exploitation", "Chargement & exécution", ":material/settings:",
                    "Les données sont-elles bien arrivées, et chaque contrôle a-t-il pu tourner ?"),
+    "projet": ("Exploitation", "Avis QDD sur un projet", ":material/rocket_launch:",
+               "Ce qu'un projet informatique touche dans le dispositif QDD, et ce que sa recette doit prouver."),
     "resolution": ("Exploitation", "Atelier de résolution", ":material/build:", "Correction sur copie, recontrôle réel et validation déclarative sur données fictives."),
     "dossier": ("Exploitation", "Dossier de campagne", ":material/folder:", "Preuves, résultats, règles et pièces manquantes de la campagne."),
     "verif_sas": ("Exploitation", "Vérification SAS", ":material/verified:",
@@ -480,6 +483,7 @@ def page_code() -> None:
     "dossier": lambda: afficher_comite(c, prev, var if k == len(camps) - 1 else None) or afficher_dossier(c, prev, *_contexte(c, prev), xlsx, base_fictive(), {"methode_ecart": ecart, "ponderation_montant": montant}, ouvert=True),
     "synthese": page_synthese,
     "chargement": page_chargement,
+    "projet": lambda: afficher_avis_projet(c),
     "verif_sas": afficher_verification_sas,
     "feuille": afficher_feuille_de_route,
     "relances": lambda: afficher_relances(c),

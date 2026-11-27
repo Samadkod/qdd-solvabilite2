@@ -26,6 +26,7 @@ EN = {
         "For each owner: what is theirs to act on, and a ready-to-send message.",
     "Lignes en anomalie": "Failing rows", "Règles de contrôle": "Control rules",
     "Lignage & dictionnaire": "Lineage & data dictionary", "Chargement & exécution": "Loading & execution",
+    "Avis QDD sur un projet": "DQ opinion on a project",
     "Atelier de résolution": "Resolution workshop", "Dossier de campagne": "Campaign evidence file",
     "Vérification SAS": "SAS verification", "Feuille de route": "Roadmap",
     "D'où sortent les chiffres": "Where the figures come from", "Guide terre à terre": "Plain-language guide",
@@ -45,6 +46,8 @@ EN = {
         "The catalogue of the 20 controls: family, message, owner, status in the campaign.",
     "Le trajet des données, les étapes sans contrôle, la carte d'identité de chaque donnée.":
         "How data flows, the steps without controls, and each data item's ID card.",
+    "Ce qu'un projet informatique touche dans le dispositif QDD, et ce que sa recette doit prouver.":
+        "What an IT project touches in the data quality framework, and what its testing must prove.",
     "Les données sont-elles bien arrivées, et chaque contrôle a-t-il pu tourner ?":
         "Did the data arrive in full, and could every control run?",
     "Correction sur copie, recontrôle réel et validation déclarative sur données fictives.":

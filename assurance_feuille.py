@@ -151,6 +151,14 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F41', statut='Fait', titre='Avis QDD sur un projet informatique',
+         pourquoi='Mission « intégrer les exigences QDD dans les projets de transformation » et notice ACPR point 18 '
+                  '(le responsable QDD évalue le risque porté par les projets ; 41 % le font selon l’enquête 2024, '
+                  'n°167 p. 8). On déclare les systèmes ou flux touchés ; la grille se déduit du lignage et de la '
+                  'campagne : données critiques, contrôles à rejouer, étapes sans contrôle, états QRT, données '
+                  'externes ; niveau de risque par règles écrites, exigences de recette, fiche d’avis en PDF. '
+                  'L’avis reste humain.',
+         prerequis='Lignage, répertoire et référentiel des contrôles existants ; aucun calcul nouveau.', effort='—'),
     dict(id='F40', statut='Fait', titre='Évaluation réglementaire de l’assistant et corrections des constats ACPR',
          pourquoi='Sept questions posées en ligne le 27/11/2026 (notice, constats, glossaire, question piège, '
                   'conformité ; 0,46 $) : citations de la notice exactes, chiffres de la campagne justes, pas '
@@ -198,12 +206,6 @@ EXTENSIONS = [
          prerequis='Documents de l’ACPR lus en entier ; les 15 citations vérifiées mot pour mot dans les textes. Les '
                    'enquêtes sont déclaratives (rappel de l’ACPR) ; les constats propres à un organisme restent '
                    'confidentiels et internes.', effort='—'),
-    dict(id='E28', statut='Plus tard', titre='Évaluation QDD d’un projet informatique',
-         pourquoi='Mission « intégrer les exigences QDD dans les projets de transformation » et notice ACPR point 18 '
-                  '(le responsable QDD évalue le risque porté par les projets ; 41 % le font selon l’enquête 2024) : '
-                  'une grille par projet (données critiques touchées, flux et contrôles impactés via le lignage, '
-                  'recette des données, avis QDD).',
-         prerequis='Repose sur le lignage et l’analyse d’impact existants ; aucun calcul nouveau.', effort='Faible'),
     dict(id='E29', statut='Plus tard', titre='Sinistralité grave : qualité des données des gros sinistres',
          pourquoi='Mission « sinistralité grave » : isoler les sinistres au-dessus d’un seuil et vérifier leurs '
                   'données une à une (dates, provision, règlements, segment), car une erreur sur un gros dossier '

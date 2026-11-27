@@ -30,6 +30,9 @@ USAGES = {
                 "comptes) ou pour trouver un trou de contrôle."),
     "chargement": ("Les tables sont-elles arrivées, avec un volume normal ; chaque requête de contrôle a-t-elle "
                    "tourné.", "Avant de lire les résultats : une table vide fausse tout le reste."),
+    "projet": ("Déclarer ce qu'un projet informatique touche (systèmes, flux) : données critiques, contrôles à "
+               "rejouer, étapes sans contrôle, états QRT, niveau de risque par règles écrites, exigences de recette "
+               "et fiche d'avis QDD en PDF.", "Quand un projet change un outil ou un flux (notice ACPR, point 18)."),
     "resolution": ("Proposer une correction sur une copie des données, relancer les 20 contrôles, faire valider "
                    "par une autre personne, exporter la preuve. La campagne de référence n'est jamais modifiée.",
                    "Pour montrer comment une anomalie se corrige et se prouve."),

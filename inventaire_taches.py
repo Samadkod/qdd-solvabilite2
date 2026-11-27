@@ -23,6 +23,7 @@ FONCTIONS = {
     "Gain de note avant correction": "donnees",
     "Contrôles de chargement (niveau 0)": "chargement",
     "Lignage et dictionnaire": "lignage",
+    "Avis QDD sur un projet informatique": "projet",
     "Assistant (questions, diagnostic)": "assistant",
     "Aucune pour l'instant": "",
 }
