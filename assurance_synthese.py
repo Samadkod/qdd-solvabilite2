@@ -87,11 +87,17 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
     classe = "ko" if not conforme else ("reserve" if reserves else "ok")
     etat = ("Objectif global non atteint" if not conforme else
             "Objectif global atteint, avec réserves" if reserves else "Objectif global atteint")
-    ligne_reserves = f'<div class="qdd-verdict-reserves">{escape(reserves)}</div>' if reserves else ""
+    # Pas de ligne de plus : les réserves remplacent la phrase générique de droite (les tuiles suivent juste dessous).
+    if langue() == "en":
+        phrase = (f"but {escape(reserves.replace(' · ', ' and '))}: see the attention points below." if reserves and conforme else
+                  escape(tr("La note agrégée ne remplace pas la revue des risques individuels.")))
+    else:
+        phrase = (f"mais {escape(reserves.replace(' · ', ' et '))} : voir les points de vigilance ci-dessous." if reserves and conforme else
+                  escape(tr("La note agrégée ne remplace pas la revue des risques individuels.")))
     st.markdown(
         f'''<div class="qdd-verdict {classe}">
   <div class="qdd-verdict-gauche">
-    <div class="qdd-verdict-etat">{tr(etat)}</div>{ligne_reserves}
+    <div class="qdd-verdict-etat">{tr(etat)}</div>
     <div class="qdd-verdict-note">{pct(note)}<span> %</span></div>
     <div class="qdd-verdict-libelle">{tr("Note QDD agrégée")} ·
       <span style="color:{COULEURS[par_cle["note"].delta_ton]}">{escape(tr(delta_note))}</span></div>
@@ -103,8 +109,8 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
     <div class="qdd-regle-echelle"><span>{pct(bas, 0)} %</span><span>100 %</span></div>
     <div class="qdd-regle-legende"><span class="qdd-leg-note"></span>{tr("Note")} {pct(note)} % ·
       <span class="qdd-leg-obj"></span>{tr("Objectif")} {pct(objectif)} %{legende_n1}</div>
-    <p><b>{marge_txt} pt</b> {tr("au-dessus de l'objectif" if marge >= 0 else "sous l'objectif")}.
-      {tr("La note agrégée ne remplace pas la revue des risques individuels.")}</p>
+    <p><b>{marge_txt} pt</b> {tr("au-dessus de l'objectif" if marge >= 0 else "sous l'objectif")}{"," if reserves and conforme else "."}
+      {phrase}</p>
   </div>
 </div>''',
         unsafe_allow_html=True)

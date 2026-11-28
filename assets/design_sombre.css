@@ -40,7 +40,6 @@ section[data-testid="stSidebar"] button[kind="primary"] p {color: #ffffff;}
 .qdd-verdict-etat {color: #4caf7a;} .qdd-verdict.ko .qdd-verdict-etat {color: #e06464;}
 .qdd-verdict {border-left-color: #4caf7a;} .qdd-verdict.ko {border-left-color: #e06464;}
 .qdd-verdict.reserve {border-left-color: #e0a35a;} .qdd-verdict.reserve .qdd-verdict-etat {color: #e0a35a;}
-.qdd-verdict-reserves {color: #f08a8a;}
 .qdd-vig[data-ton="rouge"] b {color: #e06464;} .qdd-vig[data-ton="orange"] b {color: #e0a35a;}
 .qdd-vig[data-ton="vert"] b {color: #4caf7a;}
 .st-key-assistant_accueil {background: #0b151e; border: 1px solid var(--qdd-ligne);}

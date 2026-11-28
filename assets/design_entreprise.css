@@ -122,7 +122,6 @@ button:focus-visible, a:focus-visible {outline: 2px solid #5ea2ef !important; ou
 .qdd-verdict.ko .qdd-verdict-etat {color: #ad3030;}
 .qdd-verdict.reserve {border-left-color: #c77a00;}
 .qdd-verdict.reserve .qdd-verdict-etat {color: #9c6400;}
-.qdd-verdict-reserves {margin-top: .25rem; font-size: .82rem; font-weight: 600; color: #ad3030; line-height: 1.35;}
 .qdd-verdict-note {font-size: 2.9rem; font-weight: 600; letter-spacing: -.04em; line-height: 1.1; color: var(--qdd-encre);
   font-variant-numeric: tabular-nums;}
 .qdd-verdict-note span {font-size: 1.4rem; color: var(--qdd-gris); font-weight: 500;}
