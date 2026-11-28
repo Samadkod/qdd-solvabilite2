@@ -298,6 +298,15 @@ def tableau():
     return pd.DataFrame(rows + EXTENSIONS)
 
 
+def _carte(st, e):
+    """Une carte compacte : titre visible, détail replié."""
+    effort = f' · effort : {e["effort"]}' if e['effort'] != '—' else ''
+    with st.expander(f'{e["id"]} · {e["titre"]}{effort}'):
+        st.write('Pourquoi :', e['pourquoi'])
+        if e['prerequis'] != '—':
+            st.write('Prérequis / décision :', e['prerequis'])
+
+
 def afficher_feuille_de_route():
     import streamlit as st
     df = tableau()
@@ -305,16 +314,20 @@ def afficher_feuille_de_route():
                'pas une mise en production ni une validation de l’organisation.')
     for col, statut in zip(st.columns(len(ORDRE)), ORDRE):
         col.metric(f'{ICONES[statut]} {statut}', int((df.statut == statut).sum()))
-    for statut in ORDRE:
-        st.markdown(f'#### {ICONES[statut]} {statut}')
-        rows = df[df.statut == statut]
-        if rows.empty:
-            st.caption('Aucun élément.')
-        for e in rows.to_dict('records'):
-            with st.container(border=True):
-                st.markdown(f'**{e["id"]} · {e["titre"]}**' + (f' · effort : {e["effort"]}' if e['effort'] != '—' else ''))
-                st.write('Pourquoi :', e['pourquoi'])
-                if e['prerequis'] != '—':
-                    st.write('Prérequis / décision :', e['prerequis'])
+    # Vue en colonnes : ce qui reste à faire, titres seuls ; le détail s'ouvre au clic.
+    actifs = [s for s in ORDRE if s != 'Fait']
+    for col, statut in zip(st.columns(len(actifs)), actifs):
+        with col:
+            st.markdown(f'**{ICONES[statut]} {statut}**')
+            rows = df[df.statut == statut]
+            if rows.empty:
+                st.caption('Aucun élément.')
+            for e in rows.to_dict('records'):
+                _carte(st, e)
+    faits = df[df.statut == 'Fait']
+    with st.expander(f'{ICONES["Fait"]} Fait · {len(faits)} fonctionnalités vérifiées'):
+        # Pas d'expander imbriqué (interdit par Streamlit) : un tableau consultable.
+        st.dataframe(faits[['id', 'titre', 'pourquoi']].rename(columns={'id': 'N°', 'titre': 'Fonctionnalité',
+                     'pourquoi': 'Détail'}), hide_index=True, width='stretch')
     st.download_button('Exporter la feuille de route (CSV)', df.to_csv(index=False, sep=';').encode('utf-8-sig'),
                        file_name='feuille_de_route.csv', mime='text/csv')
