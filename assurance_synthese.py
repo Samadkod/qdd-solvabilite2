@@ -5,6 +5,18 @@ import pandas as pd
 from langue import langue, t as tr
 from synthese import Tuile, tuiles, evolutions, COULEURS, BLOCS, CHARGEMENT, _liste_anomalies, _liste_controles
 
+def reserves_verdict(hors_tol: int, bloquants: int, lang: str = "fr") -> str:
+    """Les risques individuels qui nuancent un objectif atteint (vide s'il n'y en a pas)."""
+    if lang == "en":
+        morceaux = [f"{hors_tol} critical data item{'s' if hors_tol > 1 else ''} outside tolerance" if hors_tol else "",
+                    f"{bloquants} blocking control point{'s' if bloquants > 1 else ''}" if bloquants else ""]
+    else:
+        s = lambda n: "s" if n > 1 else ""
+        morceaux = [f"{hors_tol} donnée{s(hors_tol)} critique{s(hors_tol)} hors tolérance" if hors_tol else "",
+                    f"{bloquants} point{s(bloquants)} de contrôle bloquant{s(bloquants)}" if bloquants else ""]
+    return " · ".join(m for m in morceaux if m)
+
+
 def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes: pd.DataFrame | None = None,
                       volumes: pd.DataFrame | None = None, execution: pd.DataFrame | None = None,
                       precedentes: list[Tuile] | None = None, base=None, methode=None) -> None:
@@ -70,10 +82,16 @@ def afficher_synthese(c: dict, prev: dict | None, xlsx: bytes, aller, df_lignes:
     repere_n1 = (f'<span class="qdd-regle-n1" style="left:{pos(n1):.2f}%" title="N-1"></span>' if n1 is not None else "")
     legende_n1 = f' · <span class="qdd-leg-n1"></span>{tr("N-1")} {pct(n1)} %' if n1 is not None else ""
     delta_note = par_cle["note"].delta or ""
+    # Un objectif agrégé atteint ne vaut pas feu vert : les risques individuels bloquants sont dits dans le verdict.
+    reserves = reserves_verdict(par_cle["hors_tol"].nombre or 0, par_cle["ctrl_rouges"].nombre or 0, langue())
+    classe = "ko" if not conforme else ("reserve" if reserves else "ok")
+    etat = ("Objectif global non atteint" if not conforme else
+            "Objectif global atteint, avec réserves" if reserves else "Objectif global atteint")
+    ligne_reserves = f'<div class="qdd-verdict-reserves">{escape(reserves)}</div>' if reserves else ""
     st.markdown(
-        f'''<div class="qdd-verdict {"ok" if conforme else "ko"}">
+        f'''<div class="qdd-verdict {classe}">
   <div class="qdd-verdict-gauche">
-    <div class="qdd-verdict-etat">{tr("Objectif global atteint" if conforme else "Objectif global non atteint")}</div>
+    <div class="qdd-verdict-etat">{tr(etat)}</div>{ligne_reserves}
     <div class="qdd-verdict-note">{pct(note)}<span> %</span></div>
     <div class="qdd-verdict-libelle">{tr("Note QDD agrégée")} ·
       <span style="color:{COULEURS[par_cle["note"].delta_ton]}">{escape(tr(delta_note))}</span></div>

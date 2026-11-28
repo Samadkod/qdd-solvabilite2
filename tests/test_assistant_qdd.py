@@ -158,6 +158,8 @@ QUESTIONS_REFERENCE = [
     "Prépare les points clés à présenter au comité de pilotage QDD pour cette campagne.",
     "Un auditeur demande comment est obtenue la note des provisions RC décennale.",
     "Quelles preuves puis-je montrer pour la campagne, et où les trouver dans l'application ?",
+    # revue du 28/11/2026 : l'action proposée doit exister dans l'application (C07 ne se corrige pas dans l'Atelier)
+    "La date de survenance est en défaut : comment la corriger, et où ?",
 ]
 OUTILS_PAR_QUESTION = [
     [("indicateurs_campagne", {"campagne": "N"}), ("points_de_controle", {"campagne": "N", "controle": "", "statut": "Bloquant"})],
@@ -175,6 +177,8 @@ OUTILS_PAR_QUESTION = [
     [("indicateurs_campagne", {"campagne": "N"}), ("controle_niveau2", {"campagne": "N"}), ("variation_note", {})],
     [("donnees_critiques", {"campagne": "N"}), ("points_de_controle", {"campagne": "N", "controle": "", "statut": "tous"})],
     [("indicateurs_campagne", {"campagne": "N"}), ("controle_niveau2", {"campagne": "N"})],
+    [("dictionnaire", {"terme": "survenance"}), ("regle_controle", {"controle": "C07"}),
+     ("lignes_en_anomalie", {"campagne": "N", "controle": "C07"})],
 ]
 
 
@@ -431,3 +435,20 @@ def test_glossaire_constats_et_notice_acpr(contexte):
     assert executer_outil("notice_acpr", {"recherche": "48"}, contexte)["points"][0]["texte"].startswith(
         "Le répertoire comprend au moins les attributs suivants")
     assert "Ne cite jamais l'ACPR de mémoire" in a.SYSTEME
+
+
+def test_consigne_dit_ce_que_l_atelier_corrige():
+    """Revue du 28/11/2026 : bon diagnostic, action impossible (corriger C07 dans l'Atelier). La consigne donne le
+    périmètre réel de l'Atelier, lu dans son code, et impose les trois rubriques d'action."""
+    from assistant_qdd import DIAGNOSTIC, SYSTEME
+    from operations_qdd.correction import ESSAIS_VALIDABLES, REGLES
+    assert "{ATELIER}" not in SYSTEME
+    for regle in REGLES:
+        assert regle in SYSTEME
+    for r, m in ESSAIS_VALIDABLES["N"]:
+        assert f"{r} · {m}" in SYSTEME
+    assert "date de survenance C07" in SYSTEME and "ne renvoie jamais vers l'Atelier" in SYSTEME
+    for rubrique in ("« Dans l'application »", "« Hors application »", "« À vérifier par le valideur »"):
+        assert rubrique in SYSTEME
+    assert "Pour corriger une donnée, renvoie vers l'Atelier" not in SYSTEME
+    assert "Toute correction passe par" not in DIAGNOSTIC

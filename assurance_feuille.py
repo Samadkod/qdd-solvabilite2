@@ -151,6 +151,15 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F42', statut='Fait', titre='Revue externe : verdict lisible, preuve SAS recalculée, assistant borné',
+         pourquoi='Retour d’une revue externe du site public (28/11/2026), vérifié dans le code. Synthèse : '
+                  '« Objectif global atteint, avec réserves » en orange quand des données critiques sont hors '
+                  'tolérance ou des points bloquants (aucun chiffre changé). Vérification SAS : écart et verdict '
+                  'recalculés côté Python, désaccord avec le verdict écrit par SAS signalé. Assistant : périmètre '
+                  'réel de l’Atelier de résolution (C02 et C05) lu dans son code, chaque action rangée en « Dans '
+                  'l’application », « Hors application », « À vérifier par le valideur » (il renvoyait vers l’Atelier '
+                  'une correction de date de survenance impossible).',
+         prerequis='Tests : valeur SAS fausse marquée « OK » détectée ; consigne de l’assistant.', effort='—'),
     dict(id='F41', statut='Fait', titre='Avis QDD sur un projet informatique',
          pourquoi='Mission « intégrer les exigences QDD dans les projets de transformation » et notice ACPR point 18 '
                   '(le responsable QDD évalue le risque porté par les projets ; 41 % le font selon l’enquête 2024, '
@@ -233,6 +242,17 @@ EXTENSIONS = [
                   'quand plusieurs défauts touchent la même campagne.',
          prerequis='Chaque scénario repart aujourd’hui de la base d’origine ; il faudrait chaîner les copies et leurs '
                    'preuves.', effort='Moyen'),
+    dict(id='E34', statut='Plus tard', titre='Fiche de passation : trois cas à reprendre sans aide',
+         pourquoi='Idée de la revue externe du 28/11/2026 : vérifier qu’une personne qui découvre l’application sait '
+                  'dire seule ce qui bloque, où est la preuve et qui doit agir. Trois cas fictifs (C07, C05 · Flottes '
+                  'auto, R04 RC décennale), corrigé calculé par le moteur ; utile pour former l’équipe à la prise de '
+                  'poste.', prerequis='Aucun calcul nouveau ; pages existantes.', effort='Faible'),
+    dict(id='E35', statut='En attente de décision', titre='Versionner le résultat de l’exécution SAS',
+         pourquoi='La revue externe a trouvé la page Vérification SAS vide : l’exécution du 23/10/2026 (59 sur 59) '
+                  'n’a pas laissé son fichier dans le dépôt. Relancer lancer_qdd.sas sur SAS OnDemand et déposer '
+                  'sas/sorties/verification_sas.csv dans resultats_sas/.',
+         prerequis='Exécution SAS par le propriétaire (valeurs attendues inchangées depuis le 21/10/2026).',
+         effort='Faible'),
     dict(id='E14', statut='En attente de décision', titre='Assistant : historique durable et notes sur les réponses',
          pourquoi='Retrouver ses conversations d’une visite à l’autre, noter les réponses pour améliorer l’assistant.',
          prerequis='Base de données extérieure (par exemple PostgreSQL hébergé) et connexion des utilisateurs '

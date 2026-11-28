@@ -29,17 +29,36 @@ def charger(source) -> pd.DataFrame:
     return df
 
 
+def recalculer(df: pd.DataFrame, attendues: Path = ATTENDUES) -> pd.DataFrame:
+    """Recalcule l'écart et le verdict côté Python, à partir de la valeur SAS et de la référence actuelle du moteur :
+    le verdict écrit par SAS n'est pas cru sur parole. Une ligne par valeur de référence."""
+    ref = pd.read_csv(attendues, sep=";")
+    cle = ["campagne", "indicateur"]
+    sas = df.assign(campagne=df["campagne"].astype(str).str.upper(), indicateur=df["indicateur"].astype(str).str.upper())
+    m = ref.assign(_c=ref["campagne"].str.upper(), _i=ref["indicateur"].str.upper()).merge(
+        sas[cle + ["valeur_sas", "verdict"]].rename(columns={"campagne": "_c", "indicateur": "_i", "verdict": "verdict_sas"}),
+        on=["_c", "_i"], how="left").drop(columns=["_c", "_i"])
+    m["ecart_recalcule"] = (m["valeur_attendue"] - m["valeur_sas"]).abs()
+    m["verdict_recalcule"] = "ÉCART"
+    m.loc[m["ecart_recalcule"] < TOLERANCE, "verdict_recalcule"] = "OK"
+    m.loc[m["valeur_sas"].isna(), "verdict_recalcule"] = "MANQUANT"
+    m["accord"] = m["verdict_sas"].fillna("MANQUANT").str.upper().eq("OK") == m["verdict_recalcule"].eq("OK")
+    return m
+
+
 def resume(df: pd.DataFrame, attendues: Path = ATTENDUES) -> dict:
-    """Bilan, et contrôle que le fichier correspond à la version actuelle des valeurs attendues."""
+    """Bilan recalculé côté Python, contrôle que le fichier suit les valeurs attendues actuelles, et désaccords avec
+    le verdict écrit par SAS."""
     ref = pd.read_csv(attendues, sep=";")
     cle = ["campagne", "indicateur"]
     m = ref.merge(df[cle + ["valeur_attendue"]], on=cle, how="left", suffixes=("", "_fichier"))
     a_jour = bool(len(df) == len(ref) and m["valeur_attendue_fichier"].notna().all()
                   and ((m["valeur_attendue"] - m["valeur_attendue_fichier"]).abs() < 1e-9).all())
-    ok = int((df["verdict"].str.upper() == "OK").sum())
-    return {"n": len(df), "ok": ok, "ecarts": len(df) - ok,
-            "ecart_max": float(df["ecart"].max(skipna=True)) if len(df) else float("nan"),
-            "a_jour": a_jour,
+    rc = recalculer(df, attendues)
+    ok = int((rc["verdict_recalcule"] == "OK").sum())
+    return {"n": len(rc), "ok": ok, "ecarts": len(rc) - ok,
+            "ecart_max": float(rc["ecart_recalcule"].max(skipna=True)) if len(rc) else float("nan"),
+            "desaccords": int((~rc["accord"]).sum()), "detail": rc, "a_jour": a_jour,
             "execution": str(df["execution"].iloc[0]) if "execution" in df and len(df) else None,
             "version_sas": str(df["version_sas"].iloc[0]) if "version_sas" in df and len(df) else None}
 
@@ -69,7 +88,10 @@ def afficher() -> None:
     c2.metric("Écarts", r["ecarts"])
     c3.metric("Plus grand écart", f"{r['ecart_max']:.1e}".replace(".", ","), help=f"Tolérance : {TOLERANCE:.0e}")
     c4.metric("Exécution SAS", (r["execution"] or "—").replace("T", " ")[:16])
-    if r["ecarts"] == 0 and r["a_jour"]:
+    if r["desaccords"]:
+        st.error(f"{r['desaccords']} valeur(s) où le verdict écrit par SAS ne correspond pas à l'écart recalculé ici : "
+                 "le fichier n'est pas fiable, relancez lancer_qdd.sas.", icon=":material/gpp_bad:")
+    if r["ecarts"] == 0 and r["a_jour"] and not r["desaccords"]:
         st.success("Parité SAS / Python : toutes les valeurs sont identiques, à la tolérance près.",
                    icon=":material/verified:")
     elif not r["a_jour"]:
@@ -78,10 +100,15 @@ def afficher() -> None:
     else:
         st.error(f"{r['ecarts']} valeur(s) en écart : voir les lignes ÉCART ou MANQUANT ci-dessous.",
                  icon=":material/error:")
+    st.caption("Écarts et verdicts recalculés ici, à partir des valeurs SAS et de la référence actuelle du moteur "
+               f"(tolérance {TOLERANCE:.0e}) ; le verdict écrit par SAS sert seulement de contrôle croisé.")
     st.caption(f"Source : {'fichier chargé' if televerse is not None else 'resultats_sas/verification_sas.csv'}"
                + (f" · {r['version_sas']}" if r["version_sas"] else ""))
-    vue = df[COLONNES].sort_values(["verdict", "campagne", "indicateur"], ascending=[False, True, True])
-    st.dataframe(vue, hide_index=True, width="stretch",
-                 column_config={"valeur_attendue": st.column_config.NumberColumn("Python (attendu)", format="%.10f"),
+    vue = r["detail"].sort_values(["verdict_recalcule", "campagne", "indicateur"], ascending=[False, True, True])
+    st.dataframe(vue[["campagne", "indicateur", "valeur_attendue", "valeur_sas", "ecart_recalcule",
+                      "verdict_recalcule", "verdict_sas"]], hide_index=True, width="stretch",
+                 column_config={"campagne": "Campagne", "indicateur": "Indicateur",
+                                "valeur_attendue": st.column_config.NumberColumn("Python (attendu)", format="%.10f"),
                                 "valeur_sas": st.column_config.NumberColumn("SAS", format="%.10f"),
-                                "ecart": st.column_config.NumberColumn("Écart", format="%.2e")})
+                                "ecart_recalcule": st.column_config.NumberColumn("Écart recalculé", format="%.2e"),
+                                "verdict_recalcule": "Verdict recalculé", "verdict_sas": "Verdict écrit par SAS"})

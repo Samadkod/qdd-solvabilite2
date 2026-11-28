@@ -18,7 +18,24 @@ def _fichier(tmp_path, decale=0.0, retirer=0):
 
 def test_bilan_parite(tmp_path):
     r = resume(charger(_fichier(tmp_path, 3e-7)))
-    assert (r["n"], r["ok"], r["ecarts"], r["a_jour"]) == (59, 59, 0, True)
+    assert (r["n"], r["ok"], r["ecarts"], r["a_jour"], r["desaccords"]) == (59, 59, 0, True, 0)
+
+
+def test_verdict_sas_non_cru_sur_parole(tmp_path):
+    """Revue du 28/11/2026 : le bilan reprenait le verdict du CSV. Une valeur SAS fausse marquée « OK » est détectée."""
+    p = _fichier(tmp_path, 0.0)
+    df = pd.read_csv(p, sep=";")
+    df.loc[0, "valeur_sas"] += 0.01  # verdict laissé à « OK »
+    df.to_csv(p, sep=";", index=False)
+    r = resume(charger(p))
+    assert (r["ok"], r["ecarts"], r["desaccords"]) == (58, 1, 1)
+    ligne = r["detail"][~r["detail"]["accord"]].iloc[0]
+    assert ligne["verdict_sas"] == "OK" and ligne["verdict_recalcule"] == "ÉCART"
+
+
+def test_valeur_absente_comptee_manquante(tmp_path):
+    r = resume(charger(_fichier(tmp_path, retirer=2)))
+    assert r["n"] == 59 and (r["detail"]["verdict_recalcule"] == "MANQUANT").sum() == 2
 
 
 def test_ecarts_detectes(tmp_path):
