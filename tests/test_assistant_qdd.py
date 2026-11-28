@@ -135,9 +135,40 @@ def test_page_sans_cle_annonce_l_assistant_non_configure(monkeypatch):
     at.session_state["page"] = "assistant"
     at.run()
     assert not at.exception
-    assert any("pas encore activé" in i.value for i in at.info)
+    assert any("Mode démo" in w.value for w in at.warning)
     assert at.chat_input[0].disabled
-    assert all(b.disabled for b in at.button if b.key and b.key.startswith("assistant_ex_"))
+    assert not any(b.key and b.key.startswith("assistant_ex_") for b in at.button)
+
+
+def test_mode_demo_n_appelle_jamais_l_api(monkeypatch):
+    """Étape 1b : avec une clé mais ASSISTANT_MODE=demo, les réponses préparées s'affichent et aucun client
+    Anthropic n'est créé (faux client qui échoue s'il est appelé)."""
+    import anthropic
+    from streamlit.testing.v1 import AppTest
+
+    from assistant_qdd import reponses_preparees
+
+    def interdit(*a, **k):
+        raise AssertionError("appel à l'API en mode démo")
+    monkeypatch.setattr(anthropic, "Anthropic", interdit)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "factice")
+    monkeypatch.setenv("ASSISTANT_MODE", "demo")
+    at = AppTest.from_file(str(RACINE / "streamlit_app.py"), default_timeout=300)
+    at.session_state["page"] = "assistant"
+    at.run()
+    assert at.chat_input[0].disabled
+    preparees = reponses_preparees()
+    assert 4 <= len(preparees) <= 6 and all(r["reponse"] and r["question"] and r["date"] for r in preparees)
+    at.button(key="assistant_demo_0").click().run()
+    assert not at.exception
+    assert preparees[0]["question"] in " ".join(m.value for m in at.markdown)
+
+
+def test_reponse_preparee_c07_respecte_le_perimetre_de_l_atelier():
+    """La réponse préparée sur la date de survenance est celle d'après la revue : pas de renvoi vers l'Atelier."""
+    from assistant_qdd import reponses_preparees
+    r = next(x for x in reponses_preparees() if "survenance" in x["question"])
+    assert "ne s'applique pas ici" in r["reponse"] and "Hors application" in r["reponse"]
 
 
 # Questions de référence (métier) : plus affichées dans l'interface, gardées pour évaluer l'assistant avec une clé.

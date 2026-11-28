@@ -151,6 +151,17 @@ EXTENSIONS = [
                   'la page au lieu de répondre de mémoire.',
          prerequis='Notice découpée en points et vérifiée contre le texte du document ; à évaluer en ligne sur des '
                    'questions réglementaires.', effort='—'),
+    dict(id='F43', statut='Fait', titre='Assistant : réponses préparées et mode démo ; feuille de route en colonnes',
+         pourquoi='Étape 1 de la refonte (audit du 28/11/2026). Cinq réponses réelles de l’assistant, enregistrées et '
+                  'revérifiées, se lisent sans aucun appel ni coût. Mode démo sans clé, ou si le propriétaire met '
+                  'ASSISTANT_MODE = "demo" dans les secrets Streamlit : il coupe le direct sans toucher au code ; le '
+                  'direct reste ouvert tant que la connexion des utilisateurs (E14) n’existe pas. Feuille de route : '
+                  'colonnes par statut, détail replié, livraisons dans un tableau.',
+         prerequis='Test : faux client qui échoue s’il est appelé en mode démo.', effort='—'),
+    dict(id='E36', statut='Plus tard', titre='Visite guidée en 2 minutes sur la Synthèse',
+         pourquoi='Étape 1c de la refonte : cinq étapes (verdict, vigilance, contrôle bloquant, anomalie et '
+                  'responsable, réponse préparée de l’assistant) avec « Passer » et « Suivant ».',
+         prerequis='Réutiliser visite.py ; aucun calcul nouveau.', effort='Faible'),
     dict(id='F42', statut='Fait', titre='Revue externe : verdict lisible, preuve SAS recalculée, assistant borné',
          pourquoi='Retour d’une revue externe du site public (28/11/2026), vérifié dans le code. Synthèse : '
                   '« Objectif global atteint, avec réserves » en orange quand des données critiques sont hors '

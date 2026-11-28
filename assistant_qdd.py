@@ -853,6 +853,35 @@ def cle_api() -> str | None:
     return cle or os.environ.get("ANTHROPIC_API_KEY") or None
 
 
+DEMO = Path(__file__).parent / "referentiels" / "assistant_demo.json"
+
+
+def reponses_preparees() -> list[dict]:
+    """Réponses réelles de l'assistant, enregistrées et revérifiées : consultables sans aucun appel à l'API."""
+    return json.loads(DEMO.read_text(encoding="utf-8"))
+
+
+def mode_demo(cle: str | None) -> bool:
+    """Démo (aucun appel possible) sans clé, ou quand le propriétaire met ASSISTANT_MODE = "demo" dans les secrets
+    Streamlit : il coupe ainsi l'assistant en direct sans toucher au code."""
+    import streamlit as st
+    try:
+        force = str(st.secrets.get("ASSISTANT_MODE", "")).strip().lower() == "demo"
+    except Exception:  # noqa: BLE001 — pas de fichier de secrets
+        force = False
+    return not cle or force or os.environ.get("ASSISTANT_MODE", "").lower() == "demo"
+
+
+def afficher_preparee(r: dict) -> None:
+    import streamlit as st
+    with st.container(border=True, key="assistant_preparee"):
+        st.markdown(f"**{r['question']}**")
+        st.caption(f"Réponse réelle de l'assistant, enregistrée le {r['date'][8:]}/{r['date'][5:7]}/{r['date'][:4]} "
+                   f"(campagne {r['campagne']}, {r['duree']}, coût d'origine {r['cout_origine'].replace('$', chr(92) + '$')}) · "
+                   f"{r['verifiee']} Affichée ici sans aucun appel, donc sans coût.")
+        st.markdown(r["reponse"].replace("$", "\\$"))
+
+
 ERREURS = ("Clé d'API refusée", "Trop de demandes", "Le service a renvoyé", "Service injoignable", "Service trop lent")
 AVERTISSEMENT = "L'assistant lit les données, il ne modifie rien. Vérifiez sa réponse avant d'agir."
 
@@ -900,7 +929,9 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
     def panneau(x: dict) -> None:
         _detail_consultation(x)
 
-    cle = cle_api()
+    demo = mode_demo(cle_api())
+    cle = None if demo else cle_api()  # en démo, aucun appel à l'API n'est possible
+    preparees = reponses_preparees()
     convs = st.session_state.setdefault("assistant_convs", [])
     if not convs:
         convs.append(_nouvelle(c["campagne"]))
@@ -930,8 +961,9 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
     regenerer = False
     with zone, st.container(key="assistant_zone"):
         question = None
-        if not cle:
-            st.info("L'assistant n'est pas encore activé sur cet environnement.", icon=":material/info:")
+        if demo:
+            st.warning("**Mode démo** : réponses réelles de l'assistant, préparées à l'avance et revérifiées. Aucun "
+                       "appel, aucun coût. Les questions libres sont désactivées.", icon=":material/info:")
         if not conv["fil"]:
             with st.container(key="assistant_accueil"):
                 g, d = st.columns([1.15, 1], gap="large", vertical_alignment="center")
@@ -941,11 +973,29 @@ def afficher(c: dict, camps: list, var: pd.DataFrame, base: Path) -> None:
                            'campagne : état, écarts, anomalies, contrôles, lignage. Réponses chiffrées et sourcées.'
                            '</div>', unsafe_allow_html=True)
                 with d:
-                    st.markdown('<div class="qdd-acc-surtitre">Pour commencer</div>', unsafe_allow_html=True)
-                    for j, ex in enumerate(EXEMPLES):
-                        if st.button(ex, key=f"assistant_ex_{j}", icon=":material/arrow_forward:", width="stretch",
-                                     disabled=not cle or epuise):
-                            question = ex
+                    if demo:
+                        st.markdown('<div class="qdd-acc-surtitre">Réponses préparées</div>', unsafe_allow_html=True)
+                        for j, r in enumerate(preparees):
+                            if st.button(r["question"], key=f"assistant_demo_{j}", icon=":material/play_arrow:",
+                                         width="stretch"):
+                                st.session_state["assistant_demo_choix"] = j
+                    else:
+                        st.markdown('<div class="qdd-acc-surtitre">Pour commencer</div>', unsafe_allow_html=True)
+                        for j, ex in enumerate(EXEMPLES):
+                            if st.button(ex, key=f"assistant_ex_{j}", icon=":material/arrow_forward:", width="stretch",
+                                         disabled=not cle or epuise):
+                                question = ex
+            if not demo:
+                with st.expander("Réponses préparées (sans coût)", icon=":material/inventory_2:"):
+                    st.caption("De vraies réponses de l'assistant, enregistrées et revérifiées : à lire sans dépenser "
+                               "le budget de la visite.")
+                    for j, r in enumerate(preparees):
+                        if st.button(r["question"], key=f"assistant_demo_{j}", type="tertiary",
+                                     icon=":material/play_arrow:"):
+                            st.session_state["assistant_demo_choix"] = j
+            choix = st.session_state.get("assistant_demo_choix")
+            if choix is not None and choix < len(preparees):
+                afficher_preparee(preparees[choix])
         else:
             t, b = st.columns([4, 1], vertical_alignment="center")
             t.markdown(f'<div class="qdd-conv-titre">{conv["titre"]}</div>', unsafe_allow_html=True)
